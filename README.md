@@ -71,8 +71,8 @@ The original code is from [jonniek/mpv-playlistmanager](https://github.com/jonni
 
 I made a little change to the original code. Just exported two functions and key bindings:
 
-1. `sortplaylistbydatedesc`
-2. `sortplaylistbyname`
+1. `sortplaylistbydatedesc` (CTRL+SHIFT+s/META+SHIFT+s)
+2. `sortplaylistbyname` (CTRL+SHIFT+d/META+SHIFT+d)
 
 ### SmartCopyPaste.lua
 
