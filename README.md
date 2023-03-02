@@ -9,8 +9,9 @@ for [mpv](https://mpv.io). Most of lua scripts are from internet except
 First [install mpv](https://mpv.io/installation/) and then download and unzip 
 [this repo](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
 
-In Mac or Linux, run the following from the terminal. Then installs `my-config` to your mpv configuration directory. Your original mpv 
-configuration is be copied to `~/Downloads` directory if it exists.
+In Mac or Linux, run the following from the terminal. Then it will install 
+`my-config` to your mpv configuration directory. Your original mpv 
+configuration will be copied to `~/Downloads` directory if it exists.
 
 ```console
 cd mpv-config-main 
@@ -24,7 +25,7 @@ In Microsoft Windows, run the following from the `Command Prompt` or
 C:\path-to\mpv-config-main> install.bat
 ```
 
-**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not have it. Please remove about 10 lines in `# Video` section in `mpv.conf`.
+**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not have it. Please remove about 10 lines below `# Video` in `mpv.conf`.
 
 ## Lua scripts
 
