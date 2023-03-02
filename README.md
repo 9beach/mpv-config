@@ -57,7 +57,7 @@ The original code is from [ModernX](https://github.com/cyl0/ModernX).
 
 ![img](https://github.com/cyl0/ModernX/blob/main/preview.png?raw=true)
 
-I added a simple function on the original code. In idle state, it shows a qoute about writing and art. You can copy it, and add your favorites to `writing-quotes`.
+I added a simple function on the original code. In idle state, it shows a qoute about writing and art. You can copy the text (with `SmartCopyPaste.lua`), and add your favorites to `writing-quotes` file.
 
 ### playlistmanager.lua
 
