@@ -4,6 +4,12 @@
 -- Project: SmartCopyPaste
 -- Version: 3.2
 
+-- edited by 9beach
+-- https://github.com/9beach/mpv-config/blob/main/scripts/SmartCopyPaste.lua
+--
+-- 1. Changed `mac_copy = 'pbcopy'` to `mac_copy = 'LC_CTYPE=UTF-8 pbcopy'`.
+-- 2. While copying, it copies idle text (writing quote) from `ModernX` in idle state.
+
 -- USER CUSTOMIZATION SETTINGS
 -- These settings are for users to manually change some options.
 -- Changes are recommended to be made in the script-opts directory.

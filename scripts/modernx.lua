@@ -5,11 +5,18 @@
 -- fork by cyl0
 -- https://github.com/cyl0/ModernX/
 
+-- edited by 9beach
+-- https://github.com/9beach/mpv-config/blob/main/scripts/modernx.lua
+--
+-- Added a simple function on the original code. In idle state, it shows
+-- a qoute about writing and art. You can copy it, and add your favorites
+-- `to writing-quotes`.
+
+
 local assdraw = require 'mp.assdraw'
 local msg = require 'mp.msg'
 local opt = require 'mp.options'
 local utils = require 'mp.utils'
-
 
 if os.getenv('windir') ~= nil then
     osp = 'windows'
