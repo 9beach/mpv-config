@@ -93,6 +93,6 @@ The original code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blo
 
 ### reload.lua
 
-The original code is from [4e6/mpv-reload4e6/mpv-reload](https://github.com/4e6/mpv-reload). Nothing changed.
+The original code is from [4e6/mpv-reload](https://github.com/4e6/mpv-reload). Nothing changed.
 
 > When an online video is stuck during buffering or got slow CDN source, restarting often helps. This script provides automatic reloading of videos that didn't have buffering progress for some time, keeping the current time position while preserving entries in the playlist. It also adds Ctrl+r keybinding to reload video manually.
