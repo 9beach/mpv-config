@@ -67,7 +67,7 @@ The original code is from [jonniek/mpv-playlistmanager](https://github.com/jonni
 
 ![img](https://github.com/jonniek/mpv-playlistmanager/raw/master/playlistmanager.png)
 
-I made a little change to the original code.I made a little change to the original code. Just exported two functions and key bindings.
+I made a little change to the original code. Just exported two functions and key bindings:
 
 1. `sortplaylistbydatedesc`
 2. `sortplaylistbyname`
@@ -78,7 +78,7 @@ The original code is from [Eisa01/mpv-scripts](https://github.com/Eisa01/mpv-scr
 
 This script gives mpv the capability to copy and paste file paths and URLs.
 
-I made a little change to the original code.
+I made a little change to the original code:
 
 1. Changed `mac_copy = 'pbcopy'` to `mac_copy = 'LC_CTYPE=UTF-8 pbcopy'`.
 2. While copying, it copies idle text (writing quote) from `ModernX` in idle state.
@@ -94,7 +94,3 @@ The original code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blo
 The original code is from [4e6/mpv-reload4e6/mpv-reload](https://github.com/4e6/mpv-reload). Nothing changed.
 
 > When an online video is stuck during buffering or got slow CDN source, restarting often helps. This script provides automatic reloading of videos that didn't have buffering progress for some time, keeping the current time position while preserving entries in the playlist. It also adds Ctrl+r keybinding to reload video manually.
-
-
-
-
