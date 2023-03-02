@@ -1,2 +1,3 @@
-# mpv-config
-My MPV confituration
+# MPV configuration
+
+My settings for MPV
