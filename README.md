@@ -24,7 +24,7 @@ In Microsoft Windows, run the following from the `Command Prompt` or
 C:\path-to\mpv-config-main> install.bat
 ```
 
-**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not have it. Please remove `# Video` section in `mpv.conf`.
+**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not have it. Please remove about 10 lines in `# Video` section in `mpv.conf`.
 
 ## Lua scripts
 
