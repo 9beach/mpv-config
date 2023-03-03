@@ -1,20 +1,24 @@
--- https://github.com/9beach/mpv-config/blob/master/scripts/finder-integration.lua
---
--- This script provides two script messages:
--- 1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
---     selected. If you want to see playing file in explorer.exe, it will help
---     you.
--- 2. `touch-file` changes the mdate of playing file to current time. If you
---    want to mark playing file to delete later or do something else with, it
---    will help you.
--- 
--- To invoke these messages, copy this file to $MPV_HOME/scripts, and add the
--- lines below to $MPV_HOME/input.conf.
---
--- CTRL+f              script-message reveal-in-finder
--- CTRL+x              script-message touch-file
--- META+f              script-message reveal-in-finder
--- META+x              script-message touch-file
+--[[
+https://github.com/9beach/mpv-config/blob/master/scripts/finder-integration.lua
+
+This script provides two script messages:
+1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
+    selected. If you want to see playing file in explorer.exe, it will help
+    you.
+2. `touch-file` changes the mdate of playing file to current time. If you
+   want to mark playing file to delete later or do something else with, it
+   will help you.
+
+To invoke these messages, copy this script to `$MPV_HOME/scripts`, and add the
+lines below to `$MPV_HOME/input.conf`.
+
+```
+CTRL+f              script-message reveal-in-finder
+CTRL+x              script-message touch-file
+META+f              script-message reveal-in-finder
+META+x              script-message touch-file
+```
+]]
 
 local mp = require 'mp'
 

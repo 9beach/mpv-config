@@ -7,8 +7,8 @@ This script provides script messages below:
 * script-message simple-playlist sort date-asc
 * script-message simple-playlist sort date-desc startover
 
-`sort` also support `size-asc`, `size-desc`, `name-asc`, `name-desc` with or without
-`startover`.
+`simple-playlist sort` also support `size-asc`, `size-desc`, `name-asc`,
+`name-desc` with or without `startover`.
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse
@@ -21,8 +21,8 @@ This script provides script messages below:
 
 You can edit key binddings in `input.conf`.
 
-Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager> and
-<https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
+Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
+and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
 ]]
 
 local options = require 'mp.options'
@@ -175,7 +175,6 @@ function shuffle_playlist()
     mp.osd_message("Playlist shuffled")
 end
 
--- From https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua
 function sort_playlist_by(sort_id, startover)
     sort_mode = 1
     for mode, sort_data in pairs(sort_modes) do

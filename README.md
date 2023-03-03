@@ -46,10 +46,10 @@ This script has two functionalities:
 
 This script provides two script messages:
 
-1. `reveal-in-finder` (CTRL+f/META+f) runs explorer.exe/Finder.app/Nautilus
+1. `reveal-in-finder` (`CTRL+f`/`META+f`) runs explorer.exe/Finder.app/Nautilus
 with playing file selected. If you want to see playing file in explorer.exe,
 it will help you.
-2. `touch-file` (CTRL+x/META+x) changes the mdate of playing file to current
+2. `touch-file` (`CTRL+x`/`META+x`) changes the mdate of playing file to current
 time. If you want to mark playing file to delete later or do something else
 with, it will help you.
 
@@ -63,8 +63,8 @@ This script provides script messages below:
 * script-message simple-playlist sort date-asc
 * script-message simple-playlist sort date-desc startover
 
-`sort` also support `size-asc`, `size-desc`, `name-asc`, `name-desc` with or without
-`startover`.
+`simple-playlist sort` also support `size-asc`, `size-desc`, `name-asc`,
+`name-desc` with or without `startover`.
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse

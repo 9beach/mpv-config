@@ -25,7 +25,7 @@ else
     o.device = 'linux'
 end
 
-function osd_print(text)
+function osd_info(text)
     msg.info(text)
     if o.osd_messages == true then mp.osd_message(text) end
 end
@@ -115,10 +115,10 @@ function copy()
    	local path = mp.get_property('path')
     if (path ~= nil) then
         set_clipboard(path)
-        osd_print('File path or URL copied')
+        osd_info('File path or URL copied')
     elseif (o.idle_state_copy_script ~= '') then
         mp.command(o.idle_state_copy_script)
-        osd_print('Copy message sent')
+        osd_info('Copy message sent')
     end
 end
 
@@ -131,7 +131,7 @@ function paste()
     clip = get_clipboard()
 
     if not clip then
-        osd_print('Clipboard is empty')
+        osd_info('Clipboard is empty')
         return
     end
 
@@ -148,29 +148,13 @@ function paste()
     end    
 
     if i == 0 then
-        osd_print('No valid URLs or files from clipboard')
+        osd_info('No valid URLs or files from clipboard')
     elseif i == 1 then
-        osd_print('Loading ...')
+        osd_info('Loading ...')
     else
-        osd_print('Loading '..tostring(i)..' URLs or files ...')
+        osd_info('Loading '..tostring(i)..' URLs or files ...')
     end
 end
-
-mp.register_event('file-loaded', function()
-    -- Only support Youtube seektime
-    local path = mp.get_property('path')
-    if path then
-        osd_print(path)
-    end
-end)
-
-mp.register_script_message("copy-to-clipboard", function(title, text)
-    set_clipboard(text)
-    if o.osd_messages == true then
-        msg.info(title.." copied: "..text)
-        mp.osd_message(title.." copied")
-    end
-end)
 
 bind_keys(o.copy_keybind, 'copy', copy)
 bind_keys(o.paste_keybind, 'paste', paste)
