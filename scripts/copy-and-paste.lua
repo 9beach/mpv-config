@@ -15,7 +15,7 @@ local o = {
     paste_keybind = 'ctrl+v meta+v',
 }
 
-options.read_options(o, "copy-and-paste", function(list) update_opts(list) end)
+options.read_options(o, "copy-and-paste")
 
 if os.getenv('windir') ~= nil then
     o.device = 'windows'

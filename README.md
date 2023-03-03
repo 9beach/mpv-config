@@ -1,8 +1,9 @@
 # My mpv configuration
 
 This repository contains several [lua](http://lua.org) scripts and settings 
-for [mpv](https://mpv.io). Most of lua scripts are from internet except 
-`finder-integration.lua`, `copy-and-paste.lua` and `on-file-loaded.lua`.
+for [mpv](https://mpv.io). I wrote
+`finder-integration.lua`, `copy-and-paste.lua`, `simple-playlist.lua` and `on-file-loaded.lua`.
+But many parts in the scripts are from internet.
 
 ## Installation
 
@@ -54,6 +55,31 @@ with, it will help you.
 
 You can edit key binddings in `input.conf`.
 
+### simple-playlist.lua
+
+This script provides script messages below:
+
+* script-message simple-playlist sort date-desc
+* script-message simple-playlist sort date-asc
+* script-message simple-playlist sort date-desc startover
+
+`sort` also support `size-asc`, `size-desc`, `name-asc`, `name-desc` with or without
+`startover`.
+
+* script-message simple-playlist shuffle
+* script-message simple-playlist reverse
+* script-message simple-playlist show
+* script-message simple-playlist hide
+* script-message simple-playlist display-toggle
+* script-message simple-playlist playfirst
+* script-message simple-playlist playlast
+* script-message simple-playlist save
+
+You can edit key binddings in `input.conf`.
+
+Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager> and
+<https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
+
 ### modernx-and-quotes.lua
 
 The original code is from [ModernX](https://github.com/cyl0/ModernX).
@@ -67,20 +93,6 @@ about writing and art. You can copy the text (with `copy-and-paste.lua` or your
 own key binding), and add your favorites to `writing-quotes` file.
 
 ![img](writing-quotes.png)
-
-### playlistmanager.lua
-
-The original code is from [jonniek/mpv-playlistmanager](https://github.com/jonniek/mpv-playlistmanager).
-
-> This script allows you to see and interact with your playlist in an intuitive way. The key features are removing, reordering and playing files. Additional features include resolving url titles, stripping filenames according to patterns and creating/saving/shuffling/sorting playlists.
-
-![img](https://github.com/jonniek/mpv-playlistmanager/raw/master/playlistmanager.png)
-
-I made a little change to the original code. Just exported two functions and
-key bindings:
-
-1. `sortplaylistbydatedesc` (CTRL+SHIFT+s/META+SHIFT+s)
-2. `sortplaylistbyname` (CTRL+SHIFT+d/META+SHIFT+d)
 
 ### autoload.lua
 

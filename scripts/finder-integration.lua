@@ -29,14 +29,16 @@ else
     finder = {'nautilus'} -- not tested yet
 end
 
+function is_local_file(path)
+    return path ~= nil and string.find(path, '://') == nil
+end
+
 mp.register_script_message('reveal-in-finder', function()
     local path = mp.get_property_native('path')
 
-    if osp == 'windows' then
-        path = string.gsub(path, '/', '\\')
-    end
+    if not is_local_file(path) then return end
 
-    if path == nil or string.find(path, '^*[a-zA-Z]://') ~= nil then return end
+    if osp == 'windows' then path = string.gsub(path, '/', '\\') end
 
     local my_finder = finder
     my_finder[#my_finder+1] = path
@@ -46,19 +48,24 @@ end)
 
 function touch(path)
     local cmd = nil
+
     if osp == 'windows' then
-        cmd = {'powershell', '-command', '(Get-Item "'..path..'").LastWriteTime=(Get-Date)'}
+        cmd = {
+            'powershell',
+            '-command',
+            '(Get-Item "'..path..'").LastWriteTime=(Get-Date)'
+        }
     else
         cmd = {'touch', path}
     end
+
     return mp.command_native( {name='subprocess', args=cmd} )
 end
 
 mp.register_script_message('touch-file', function()
-    local path = mp.get_property_native('path', '')
-    if path == '' or string.find(path, '^[a-zA-Z]*://') ~= nil then
-        return
-    end
+    local path = mp.get_property_native('path')
+
+    if not is_local_file(path) then return end
 
     local r = touch(path)
     if r.status == 0 then
