@@ -11,10 +11,10 @@
 -- To invoke these messages, copy this file to $MPV_HOME/scripts, and add the
 -- lines below to $MPV_HOME/input.conf.
 --
--- CTRL+f              script-message-to finder_integration reveal-in-finder
--- CTRL+x              script-message-to finder_integration touch-file
--- META+f              script-message-to finder_integration reveal-in-finder
--- META+x              script-message-to finder_integration touch-file
+-- CTRL+f              script-message reveal-in-finder
+-- CTRL+x              script-message touch-file
+-- META+f              script-message reveal-in-finder
+-- META+x              script-message touch-file
 
 local mp = require 'mp'
 
