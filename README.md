@@ -2,7 +2,7 @@
 
 This repository contains several [lua](http://lua.org) scripts and settings 
 for [mpv](https://mpv.io). Most of lua scripts are from internet except 
-`scripts/finder-integration.lua` and `scripts/on-file-loaded.lua`.
+`finder-integration.lua`, `copy-and-paste.lua` and `on-file-loaded.lua`.
 
 ## Installation
 
@@ -25,32 +25,36 @@ In Microsoft Windows, run the following from the `Command Prompt` or
 C:\path-to\mpv-config-main> install.bat
 ```
 
-**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not have it. Please remove about 10 lines below `# Video` in `mpv.conf`.
+**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not
+have it. Please remove about 10 lines below `# Video` in `mpv.conf`.
 
 ## Lua scripts
 
+### copy-and-paste.lua
+
+This script gives mpv the capability to copy and paste file paths and URLs.
+
 ### on-file-loaded.lua
 
-I wrote this script. It has two functionalities:
+This script has two functionalities:
 
 1. Plays even in paused state when a new file is loaded.
 2. Shows OSC alwalys when an audio file is loaded.
 
-
 ### finder-integration.lua
 
-I wrote this script. It provides two script messages:
+This script provides two script messages:
 
-1. `reveal-in-finder` (CTRL+f/META+f) runs explorer.exe/Finder.app/Nautilus with playing 
-file selected. If you want to see playing file in explorer.exe, it will
-help you.
-2. `touch-file` (CTRL+x/META+x) changes the mdate of playing file to current time. If you
-want to mark playing file to delete later or do something else with, it
-will help you.
+1. `reveal-in-finder` (CTRL+f/META+f) runs explorer.exe/Finder.app/Nautilus
+with playing file selected. If you want to see playing file in explorer.exe,
+it will help you.
+2. `touch-file` (CTRL+x/META+x) changes the mdate of playing file to current
+time. If you want to mark playing file to delete later or do something else
+with, it will help you.
 
 You can edit key binddings in `input.conf`.
 
-### modernx.lua
+### modernx-and-quotes.lua
 
 The original code is from [ModernX](https://github.com/cyl0/ModernX).
 
@@ -58,7 +62,9 @@ The original code is from [ModernX](https://github.com/cyl0/ModernX).
 
 ![img](https://github.com/cyl0/ModernX/blob/main/preview.png?raw=true)
 
-I added a simple function on the original code. In idle state, it shows a qoute about writing and art. You can copy the text (with `SmartCopyPaste.lua`), and add your favorites to `writing-quotes` file.
+I added a simple function on the original code. In idle state, it shows a qoute
+about writing and art. You can copy the text (with `copy-and-paste.lua` or your
+own key binding), and add your favorites to `writing-quotes` file.
 
 ![img](writing-quotes.png)
 
@@ -70,21 +76,11 @@ The original code is from [jonniek/mpv-playlistmanager](https://github.com/jonni
 
 ![img](https://github.com/jonniek/mpv-playlistmanager/raw/master/playlistmanager.png)
 
-I made a little change to the original code. Just exported two functions and key bindings:
+I made a little change to the original code. Just exported two functions and
+key bindings:
 
 1. `sortplaylistbydatedesc` (CTRL+SHIFT+s/META+SHIFT+s)
 2. `sortplaylistbyname` (CTRL+SHIFT+d/META+SHIFT+d)
-
-### SmartCopyPaste.lua
-
-The original code is from [Eisa01/mpv-scripts](https://github.com/Eisa01/mpv-scripts).
-
-This script gives mpv the capability to copy and paste file paths and URLs.
-
-I made a little change to the original code:
-
-1. Changed `mac_copy = 'pbcopy'` to `mac_copy = 'LC_CTYPE=UTF-8 pbcopy'`.
-2. While copying, it copies idle text (writing quote) from `ModernX` in idle state.
 
 ### autoload.lua
 

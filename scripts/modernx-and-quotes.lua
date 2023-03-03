@@ -5,13 +5,11 @@
 -- fork by cyl0
 -- https://github.com/cyl0/ModernX/
 
--- edited by 9beach
--- https://github.com/9beach/mpv-config/blob/main/scripts/modernx.lua
+-- https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua
 --
 -- Added a simple function on the original code. In idle state, it shows
 -- a qoute about writing and art. You can copy it, and add your favorites
 -- `to writing-quotes`.
-
 
 local assdraw = require 'mp.assdraw'
 local msg = require 'mp.msg'
@@ -24,6 +22,27 @@ elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
     osp = 'mac'
 else
     osp = 'linux'
+end
+
+function pipe_write(cmd, text)
+    local f = io.popen(cmd, 'w')
+    local s = f:write(text)
+    f:close()
+end
+
+function set_clipboard(text)
+    if osp == 'linux' then
+        pipe_write('xclip -silent -selection clipboard -in', text)
+    elseif osp == 'windows' then
+        local clip = '"'..text:gsub('"', "'")..'"'
+        local args = {
+            'powershell', '-NoProfile', 'Set-Clipboard', '-value', clip
+        }
+        local res = utils.subprocess({args=args, cancellable=false})
+        if res.error then msg.error('paste failed: '..res.error) end
+    elseif osp == 'mac' then
+        pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
+    end
 end
 
 math.randomseed(os.time())
@@ -2744,8 +2763,8 @@ mp.register_script_message('osc-visibility', visibility_mode)
 mp.add_key_binding(nil, 'visibility', function() visibility_mode('cycle') end)
 
 mp.register_script_message("copy-quote", function()
-    local quote = quotes[quote_id]:gsub('"', "'")
-    mp.commandv("script-message", "copy-to-clipboard", "Quote", quote)
+    set_clipboard(quotes[quote_id])
+    mp.osd_message('Quote copied')
 end)
 
 mp.register_script_message("thumbfast-info", function(json)

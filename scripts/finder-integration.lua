@@ -32,6 +32,10 @@ end
 mp.register_script_message('reveal-in-finder', function()
     local path = mp.get_property_native('path')
 
+    if osp == 'windows' then
+        path = string.gsub(path, '/', '\\')
+    end
+
     if path == nil or string.find(path, '^*[a-zA-Z]://') ~= nil then return end
 
     local my_finder = finder
