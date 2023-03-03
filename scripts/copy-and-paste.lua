@@ -122,6 +122,11 @@ function copy()
     end
 end
 
+function file_exists(name)
+	local f = io.open(name, "r")
+	if f ~= nil then io.close(f) return true else return false end
+end
+
 function paste()
     clip = get_clipboard()
 
@@ -132,15 +137,19 @@ function paste()
 
     local i = 0
     for path in clip:gmatch("[^\r\n]+") do
-        i = i + 1
-        if i == 1 then
-            mp.commandv('loadfile', path)
-        else
-            mp.commandv('loadfile', path, 'append-play')
+        if path:match('^%a[%a%d-_]+://') ~= nil or file_exists(path) then
+            i = i + 1
+            if i == 1 then
+                mp.commandv('loadfile', path)
+            else
+                mp.commandv('loadfile', path, 'append-play')
+            end
         end
     end    
 
-    if i == 1 then
+    if i == 0 then
+        osd_print('No valid URLs or files from clipboard')
+    elseif i == 1 then
         osd_print('Loading ...')
     else
         osd_print('Loading '..tostring(i)..' URLs or files ...')
