@@ -90,7 +90,7 @@ function get_clipboard()
             return ''
         end
     elseif o.device == 'mac' then
-        return pipe_read('pbpaste')
+        return pipe_read('LC_CTYPE=UTF-8 pbpaste')
     end
 
     return ''
