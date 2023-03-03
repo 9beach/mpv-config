@@ -1,9 +1,9 @@
 # My mpv configuration
 
 This repository contains several [lua](http://lua.org) scripts and settings 
-for [mpv](https://mpv.io). I wrote
-`finder-integration.lua`, `copy-and-paste.lua`, `simple-playlist.lua` and `on-file-loaded.lua`.
-But many parts in the scripts are from internet.
+for [mpv](https://mpv.io). Some are from internet, and I wrote
+`finder-integration.lua`, `copy-and-paste.lua`, `simple-playlist.lua` and 
+`on-file-loaded.lua`. But many parts in my scripts are also from internet.
 
 ## Installation
 
@@ -27,7 +27,7 @@ C:\path-to\mpv-config-main> install.bat
 ```
 
 **WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not
-have it. Please remove about 10 lines below `# Video` in `mpv.conf`.
+have it. Please remove 10 or more lines below `# Video` in `mpv.conf`.
 
 ## Lua scripts
 
@@ -77,8 +77,8 @@ This script provides script messages below:
 
 You can edit key binddings in `input.conf`.
 
-Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager> and
-<https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
+Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
+and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
 
 ### modernx-and-quotes.lua
 
