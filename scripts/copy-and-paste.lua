@@ -116,7 +116,7 @@ function set_clipboard(text)
 end
 
 function copy()
-   	local path = mp.get_property('path')
+    local path = mp.get_property('path')
     if (path ~= nil) then
         set_clipboard(path)
         osd_info('File path or URL copied')
@@ -127,8 +127,8 @@ function copy()
 end
 
 function file_exists(name)
-	local f = io.open(name, "r")
-	if f ~= nil then io.close(f) return true else return false end
+    local f = io.open(name, "r")
+    if f ~= nil then io.close(f) return true else return false end
 end
 
 function paste()
