@@ -12,9 +12,11 @@ This script provides script messages below:
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse
-* script-message simple-playlist show
+* script-message simple-playlist show-text
+* script-message simple-playlist show-osc
 * script-message simple-playlist hide
-* script-message simple-playlist display-toggle
+* script-message simple-playlist display-toggle-text
+* script-message simple-playlist display-toggle-osc
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
@@ -52,6 +54,7 @@ end
 math.randomseed(os.time())
 
 local visible = false
+local is_osc = true
 
 local sort_modes = {
     {
@@ -104,26 +107,39 @@ end
 
 function refresh_playlist()
     if visible then
-        mp.command("script-message osc-playlist 0")
-        mp.command("script-message osc-playlist 60000")
+        hide_playlist()
+        show_playlist(is_osc)
     end
 end
 
-function show_playlist()
+function show_playlist(osc)
+    hide_playlist()
+
     visible = true
-    mp.command("script-message osc-playlist 60000")
+    is_osc = osc
+    if is_osc then
+        mp.command("script-message osc-playlist 60000")
+    else
+        mp.command("show-text ${playlist} 60000")
+    end
 end
 
 function hide_playlist()
     visible = false
     mp.command("script-message osc-playlist 0")
+    mp.command("show-text ${playlist} 0")
 end
 
-function toggle_playlist()
-    if visible == false then
-        show_playlist()
+function toggle_playlist(osc)
+    if is_osc == osc then
+        if visible == false then
+            show_playlist(osc)
+        else
+            is_osc = osc
+            hide_playlist();
+        end
     else
-        hide_playlist();
+        show_playlist(osc)
     end
 end
 
@@ -305,12 +321,16 @@ mp.register_script_message("simple-playlist", function (param1, param2, param3)
         shuffle_playlist()
     elseif param1 == 'reverse' then
         reverse_playlist()
-    elseif param1 == 'show' then
-        show_playlist()
+    elseif param1 == 'show-text' then
+        show_playlist(false)
+    elseif param1 == 'show-osc' then
+        show_playlist(true)
     elseif param1 == 'hide' then
         hide_playlist()
-    elseif param1 == 'display-toggle' then
-        toggle_playlist()
+    elseif param1 == 'display-toggle-text' then
+        toggle_playlist(false)
+    elseif param1 == 'display-toggle-osc' then
+        toggle_playlist(true)
     elseif param1 == 'save' then
         save_playlist()
     elseif param1 == 'playfirst' then

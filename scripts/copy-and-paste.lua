@@ -17,13 +17,17 @@ local o = {
 
 options.read_options(o, "copy-and-paste")
 
-if os.getenv('windir') ~= nil then
-    o.device = 'windows'
-elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-    o.device = 'mac'
-else
-    o.device = 'linux'
+function update_options(list)
+    if os.getenv('windir') ~= nil then
+        o.device = 'windows'
+    elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+        o.device = 'mac'
+    else
+        o.device = 'linux'
+    end
 end
+
+update_options()
 
 function osd_info(text)
     msg.info(text)

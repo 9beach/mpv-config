@@ -40,20 +40,18 @@ This script gives mpv the capability to copy and paste file paths and URLs.
 This script has two functionalities:
 
 1. Plays even in paused state when a new file is loaded.
-2. Shows OSC alwalys when an audio file is loaded.
+2. Shows OSC always when an audio file is loaded.
 
 ### finder-integration.lua
 
 This script provides two script messages:
-
-1. `reveal-in-finder` (`CTRL+f`/`META+f`) runs explorer.exe/Finder.app/Nautilus
-with playing file selected. If you want to see playing file in explorer.exe,
-it will help you.
-2. `touch-file` (`CTRL+x`/`META+x`) changes the mdate of playing file to current
-time. If you want to mark playing file to delete later or do something else
-with, it will help you.
-
-You can edit key binddings in `input.conf`.
+1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
+   selected. If you want to reveal playing file in explorer.exe, it will help you.
+2. `touch-file` changes the mdate of playing file to current time. If you want
+   to mark playing file to delete later or do something else with, it will help
+   you.
+   
+You can edit key bindings in `input.conf`.
 
 ### simple-playlist.lua
 
@@ -68,14 +66,16 @@ This script provides script messages below:
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse
-* script-message simple-playlist show
+* script-message simple-playlist show-text
+* script-message simple-playlist show-osc
 * script-message simple-playlist hide
-* script-message simple-playlist display-toggle
+* script-message simple-playlist display-toggle-text
+* script-message simple-playlist display-toggle-osc
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
 
-You can edit key binddings in `input.conf`.
+You can edit key bindings in `input.conf`.
 
 Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
 and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.

@@ -13,7 +13,7 @@ local o = {
     play_on_loaded = true,
 }
 
-options.read_options(o, "on-file-loaded", function(list) update_opts(list) end)
+options.read_options(o, "on-file-loaded")
 
 AUDIO_EXTENSIONS = {
     'aiff', 'ape', 'au', 'flac', 'm4a', 'mka', 'mp3', 'oga', 'ogg',
