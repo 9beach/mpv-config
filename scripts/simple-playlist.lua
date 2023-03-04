@@ -31,10 +31,17 @@ local options = require 'mp.options'
 local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
+-- Interval between "Playlist sorted by ..." info message and refreshed OSD 
+-- playlist text.
+local internal_refresh_timeout = 1
 local o = {
     playlist_dir = '~~desktop/',
-    refresh_after_reload_timeout = 3,
-    internal_refresh_timeout = 1,
+    -- Interval between a new file loading and refreshed OSD playlist text.
+    -- Before the loading, 'shuffle'/'startover sort' message could be
+    -- displayed. Without this, we don't need a interval.
+    -- 
+    -- I feel two types of intervals need to be seperated. Just a feeling.
+    refresh_after_reload_timeout = 2,
 }
 
 options.read_options(o, "simple-playlist")
@@ -123,6 +130,12 @@ function refresh_playlist()
     end
 end
 
+function refresh_playlist_later()
+    if is_visible then
+        mp.add_timeout(internal_refresh_timeout, refresh_playlist)
+    end
+end
+
 function show_playlist(osc)
     hide_playlist()
 
@@ -171,6 +184,7 @@ function alphanumsort(a, b)
            tostring(b):lower():gsub("%.?%d+",padnum)..("%3d"):format(#a)
 end
 
+-- Always does not start over.
 function reverse_playlist()
     local length = mp.get_property_number('playlist-count', 0)
     if length < 2 then return end
@@ -179,9 +193,10 @@ function reverse_playlist()
     end
 
     mp.osd_message("Playlist reversed")
-    mp.add_timeout(o.internal_refresh_timeout, refresh_playlist)
+    refresh_playlist_later()
 end
 
+-- Always starts over.
 function shuffle_playlist()
     local length = mp.get_property_number('playlist-count', 0)
     if length < 2 then return end
@@ -237,7 +252,7 @@ function sort_playlist_by(sort_id, startover)
     if startover == 'startover' then
         mp.set_property('playlist-pos', 0)
     else
-        mp.add_timeout(o.internal_refresh_timeout, refresh_playlist)
+        refresh_playlist_later()
     end
 end
 
@@ -309,7 +324,7 @@ function save_playlist()
     file:close()
 
     osd_info('Playlist written to "'..path..'"')
-    mp.add_timeout(o.internal_refresh_timeout, refresh_playlist)
+    refresh_playlist_later()
 end
 
 mp.observe_property('playlist-count', "number", function()
@@ -317,10 +332,17 @@ mp.observe_property('playlist-count', "number", function()
 end)
 
 mp.register_event("file-loaded", function ()
-    if (is_osc) then
-        refresh_playlist()
-    else
-        mp.add_timeout(o.refresh_after_reload_timeout, refresh_playlist)
+    -- When a new media is loaded, we need to update displaying playlist.
+    -- But just before OSD message, i.e. "Playlist sorted by ...", could be
+    -- displayed. We don't want to clear that immediately.
+    if is_visible then
+        if (not is_osc and o.refresh_after_reload_timeout ~= 0) then
+            -- OSD playlist clears OSD message, so we need interval.
+            mp.add_timeout(o.refresh_after_reload_timeout, refresh_playlist)
+        else
+            -- OSC (not OSD) playlist does not clear OSD message.
+            refresh_playlist()
+        end
     end
 end)
 
