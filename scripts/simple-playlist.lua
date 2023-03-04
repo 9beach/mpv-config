@@ -40,7 +40,9 @@ local o = {
     -- Before the loading, 'shuffle'/'startover sort' message could be
     -- displayed. Without this, we don't need a interval.
     -- 
-    -- I feel two types of intervals need to be seperated. Just a feeling.
+    -- I feel two types of intervals, `internal_refresh_timeout` and 
+    -- `o.refresh_after_reload_timeout` need to be seperated. Just a feeling
+    -- with a little observation.
     refresh_after_reload_timeout = 2,
 }
 
