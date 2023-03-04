@@ -1,15 +1,17 @@
--- https://github.com/9beach/mpv-config/blob/master/scripts/on-file-loaded.lua
---
--- This script has two functionalities:
--- 1. Plays even in paused state when a new file is loaded.
--- 2. Shows OSC alwalys when an audio file is loaded.
---
--- Just copy this file to $MPV_HOME/scripts.
+--[[
+https://github.com/9beach/mpv-config/blob/master/scripts/on-file-loaded.lua
+
+This script provides the functions below:
+
+* Plays even in paused state when a new file is loaded.
+* Shows OSC alwalys when an audio file is loaded.
+]]
 
 local options = require 'mp.options'
+local msg = require 'mp.msg'
 
 local o = {
-    audio_osc_always = true,
+    osc_always_on_audio = true,
     play_on_loaded = true,
 }
 
@@ -21,7 +23,7 @@ AUDIO_EXTENSIONS = {
 }
 
 function get_ext(filepath)
-  return filepath:match("^.+%.(.+)$")
+    return filepath:match("^.+%.(.+)$")
 end
 
 function is_in(element, array)
@@ -31,16 +33,35 @@ function is_in(element, array)
     return false
 end
 
-mp.register_event("file-loaded", function()
-    -- 1. Plays even in paused state when a new file is loaded.
+-- Shows OSC alwalys when an audio file is loaded.
+function set_osc_visibility()
+    local path = mp.get_property("path", "")
+    local is_audio = false
+
+    if path ~= nil then
+        local ext = get_ext(path)
+        if (ext ~= nil) then
+            is_audio = is_in(string.lower(ext), AUDIO_EXTENSIONS)
+        end
+    end
+
+    local v = is_audio and "always" or "auto"
+    mp.commandv("script-message", "osc-visibility", v, "no-osd")
+    mp.commandv("set", "options/osd-bar", (is_audio and "no" or "yes"))
+end
+
+function on_file_load()
+    -- Plays even in paused state when a new file is loaded.
     if o.play_on_loaded == true then
         mp.set_property_bool("pause", false)
     end
 
-    -- 2. Shows OSC alwalys when an audio file is loaded.
-    if o.audio_osc_always == true then
-        local ext = string.lower(get_ext(mp.get_property("path", "")))
-        local visibility = is_in(ext, AUDIO_EXTENSIONS) and "always" or "auto"
-        mp.commandv("script-message", "osc-visibility", visibility, "no-osd")
-    end
+    if o.osc_always_on_audio == true then set_osc_visibility() end
+end
+
+mp.register_event("file-loaded", function()
+    on_file_load()
+
+    -- Sometimes missing in OSX, so try again
+    mp.add_timeout(1, set_osc_visibility)
 end)
