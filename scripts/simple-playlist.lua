@@ -33,6 +33,8 @@ local msg = require 'mp.msg'
 
 local o = {
     playlist_dir = '~~desktop/',
+    refresh_after_reload_timeout = 3,
+    internal_refresh_timeout = 1,
 }
 
 options.read_options(o, "simple-playlist")
@@ -53,7 +55,7 @@ end
 
 math.randomseed(os.time())
 
-local visible = false
+local is_visible = false
 local is_osc = true
 
 local sort_modes = {
@@ -105,8 +107,17 @@ function is_local_file(path)
     return path ~= nil and string.find(path, '://') == nil
 end
 
+function hide_playlist()
+    if is_visible and is_osc then
+        mp.command("script-message osc-playlist 0")
+    elseif is_visible and not is_osc then
+        mp.command("show-text ${playlist} 0")
+    end
+    is_visible = false
+end
+
 function refresh_playlist()
-    if visible then
+    if is_visible then
         hide_playlist()
         show_playlist(is_osc)
     end
@@ -115,7 +126,7 @@ end
 function show_playlist(osc)
     hide_playlist()
 
-    visible = true
+    is_visible = true
     is_osc = osc
     if is_osc then
         mp.command("script-message osc-playlist 60000")
@@ -124,15 +135,9 @@ function show_playlist(osc)
     end
 end
 
-function hide_playlist()
-    visible = false
-    mp.command("script-message osc-playlist 0")
-    mp.command("show-text ${playlist} 0")
-end
-
 function toggle_playlist(osc)
     if is_osc == osc then
-        if visible == false then
+        if is_visible == false then
             show_playlist(osc)
         else
             is_osc = osc
@@ -172,8 +177,9 @@ function reverse_playlist()
     for outer=1, length-1, 1 do
         mp.commandv('playlist-move', outer, 0)
     end
-    refresh_playlist()
+
     mp.osd_message("Playlist reversed")
+    mp.add_timeout(o.internal_refresh_timeout, refresh_playlist)
 end
 
 function shuffle_playlist()
@@ -185,10 +191,8 @@ function shuffle_playlist()
     mp.command("playlist-shuffle")
     mp.commandv("playlist-move", pos, math.random(0, length-1))
 
-    mp.set_property('playlist-pos', 0)
-
-    refresh_playlist()
     mp.osd_message("Playlist shuffled")
+    mp.set_property('playlist-pos', 0)
 end
 
 function sort_playlist_by(sort_id, startover)
@@ -228,13 +232,13 @@ function sort_playlist_by(sort_id, startover)
         end
     end
 
+    mp.osd_message("Playlist sorted by "..sort_modes[sort_mode].title)
+
     if startover == 'startover' then
         mp.set_property('playlist-pos', 0)
+    else
+        mp.add_timeout(o.internal_refresh_timeout, refresh_playlist)
     end
-
-    refresh_playlist()
-
-    mp.osd_message("Playlist sorted by "..sort_modes[sort_mode].title)
 end
 
 function osd_error(text)
@@ -288,22 +292,24 @@ function save_playlist()
     file:write("#EXTM3U\n")
     local pwd = mp.get_property("working-directory")
 
-    local i=0
+    local is_windows = o.device == 'windows'
+    local i = 0
     while i < length do
         local item_path = mp.get_property('playlist/'..i..'/filename')
         if is_local_file(item_path) then
             item_path = utils.join_path(pwd, item_path)
-        end
-        local title = mp.get_property('playlist/'..i..'/title')
-        if title then
-            file:write("#EXTINF:,"..title.."\n")
+            if is_windows then
+                item_path = string.gsub(item_path, '/', '\\')
+            end
         end
         file:write(item_path, "\n")
-        i=i+1
+        i = i+1
     end
 
-    osd_info('Playlist written to "'..path..'"')
     file:close()
+
+    osd_info('Playlist written to "'..path..'"')
+    mp.add_timeout(o.internal_refresh_timeout, refresh_playlist)
 end
 
 mp.observe_property('playlist-count', "number", function()
@@ -311,7 +317,11 @@ mp.observe_property('playlist-count', "number", function()
 end)
 
 mp.register_event("file-loaded", function ()
-    refresh_playlist()
+    if (is_osc) then
+        refresh_playlist()
+    else
+        mp.add_timeout(o.refresh_after_reload_timeout, refresh_playlist)
+    end
 end)
 
 mp.register_script_message("simple-playlist", function (param1, param2, param3)
