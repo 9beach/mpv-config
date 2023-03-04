@@ -62,6 +62,6 @@ end
 mp.register_event("file-loaded", function()
     on_file_load()
 
-    -- Sometimes missing in OSX, so try again
+    -- Sometimes the message is missed in OSX, so we try again.
     mp.add_timeout(1, set_osc_visibility)
 end)

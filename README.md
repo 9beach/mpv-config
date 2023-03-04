@@ -46,7 +46,8 @@ This script has two functionalities:
 
 This script provides two script messages:
 1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
-   selected. If you want to reveal playing file in explorer.exe, it will help you.
+   selected. If you want to reveal playing file in explorer.exe, it will help
+   you.
 2. `touch-file` changes the mdate of playing file to current time. If you want
    to mark playing file to delete later or do something else with, it will help
    you.
@@ -84,7 +85,10 @@ and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/play
 
 The original code is from [ModernX](https://github.com/cyl0/ModernX).
 
-> An MPV OSC script based on [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern/) that aims to mirror the functionality of MPV's stock OSC while with a more modern-looking interface.
+> An MPV OSC script based on 
+> [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern/) that aims to 
+> mirror the functionality of MPV's stock OSC while with a more modern-looking 
+> interface.
 
 ![img](https://github.com/cyl0/ModernX/blob/main/preview.png?raw=true)
 
@@ -98,10 +102,16 @@ own key binding), and add your favorites to `writing-quotes` file.
 
 The original code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua). Nothing changed.
 
-> This script automatically loads playlist entries before and after the the currently played file. It does so by scanning the directory a file is located in when starting playback.
+> This script automatically loads playlist entries before and after the the 
+> currently played file. It does so by scanning the directory a file is located
+> in when starting playback.
 
 ### reload.lua
 
 The original code is from [4e6/mpv-reload](https://github.com/4e6/mpv-reload). Nothing changed.
 
-> When an online video is stuck during buffering or got slow CDN source, restarting often helps. This script provides automatic reloading of videos that didn't have buffering progress for some time, keeping the current time position while preserving entries in the playlist. It also adds Ctrl+r keybinding to reload video manually.
+> When an online video is stuck during buffering or got slow CDN source, 
+> restarting often helps. This script provides automatic reloading of videos 
+> that didn't have buffering progress for some time, keeping the current time 
+> position while preserving entries in the playlist. It also adds Ctrl+r 
+> keybinding to reload video manually.
