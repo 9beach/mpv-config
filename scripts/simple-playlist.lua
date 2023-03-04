@@ -15,8 +15,8 @@ This script provides script messages below:
 * script-message simple-playlist show-text
 * script-message simple-playlist show-osc
 * script-message simple-playlist hide
-* script-message simple-playlist display-toggle-text
-* script-message simple-playlist display-toggle-osc
+* script-message simple-playlist toggle-show-text
+* script-message simple-playlist toggle-show-osc
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
@@ -337,9 +337,9 @@ mp.register_script_message("simple-playlist", function (param1, param2, param3)
         show_playlist(true)
     elseif param1 == 'hide' then
         hide_playlist()
-    elseif param1 == 'display-toggle-text' then
+    elseif param1 == 'toggle-show-text' then
         toggle_playlist(false)
-    elseif param1 == 'display-toggle-osc' then
+    elseif param1 == 'toggle-show-osc' then
         toggle_playlist(true)
     elseif param1 == 'save' then
         save_playlist()

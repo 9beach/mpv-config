@@ -69,8 +69,8 @@ This script provides script messages below:
 * script-message simple-playlist show-text
 * script-message simple-playlist show-osc
 * script-message simple-playlist hide
-* script-message simple-playlist display-toggle-text
-* script-message simple-playlist display-toggle-osc
+* script-message simple-playlist toggle-show-text
+* script-message simple-playlist toggle-show-osc
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
