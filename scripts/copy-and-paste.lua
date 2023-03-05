@@ -122,7 +122,11 @@ function copy()
     local path = mp.get_property('path')
     if (path ~= nil) then
         set_clipboard(path)
-        osd_info('File path or URL copied')
+        if path:match('://') ~= nil then
+            osd_info('URL copied')
+        else
+            osd_info('File path copied')
+        end
     elseif (o.idle_state_copy_script ~= '') then
         mp.command(o.idle_state_copy_script)
         osd_info('Copy message sent')
@@ -155,7 +159,7 @@ function paste()
     end    
 
     if i == 0 then
-        osd_info('No valid URLs or files from clipboard')
+        osd_info('No valid URLs or file paths from clipboard')
     elseif i == 1 then
         osd_info('Loading ...')
     else
