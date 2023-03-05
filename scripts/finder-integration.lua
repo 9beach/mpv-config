@@ -2,6 +2,7 @@
 https://github.com/9beach/mpv-config/blob/master/scripts/finder-integration.lua
 
 This script provides two script messages:
+
 1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
    selected. If you want to reveal playing file in explorer.exe, it will help
    you.

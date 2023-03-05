@@ -13,7 +13,8 @@ local o = {
     copy_keybind = 'ctrl+c meta+c',
     paste_keybind = 'ctrl+v meta+v',
     -- In idle state, there is no path or URL to copy. You can call something 
-    -- else. "copy-quote" is a script message of "modernx-and-quotes.lua".
+    -- else with `idle_state_copy_script`. "copy-quote" is a script message 
+    -- of "modernx-and-quotes.lua".
     idle_state_copy_script = 'script-message copy-quote',
 }
 
