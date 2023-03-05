@@ -5,30 +5,6 @@ for [mpv](https://mpv.io). Some are from internet, and I wrote
 `finder-integration.lua`, `copy-and-paste.lua`, `simple-playlist.lua` and 
 `on-file-loaded.lua`. But many parts in my scripts are also from internet.
 
-## Installation
-
-First [install mpv](https://mpv.io/installation/) and then download and unzip 
-[this repo](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
-
-In Mac or Linux, run the following from the terminal. Then it will install 
-`my-config` to your mpv configuration directory. Your original mpv 
-configuration will be copied to `~/Downloads` directory if it exists.
-
-```console
-cd mpv-config-main 
-./install.sh
-```
-
-In Microsoft Windows, run the following from the `Command Prompt` or
-`PowerShell`.
-
-```console
-C:\path-to\mpv-config-main> install.bat
-```
-
-**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not
-have it. Please remove 10 or more lines below `# Video` in `mpv.conf`.
-
 ## Lua scripts
 
 ### copy-and-paste.lua
@@ -117,3 +93,31 @@ The original code is from [4e6/mpv-reload](https://github.com/4e6/mpv-reload). N
 > that didn't have buffering progress for some time, keeping the current time 
 > position while preserving entries in the playlist. It also adds Ctrl+r 
 > keybinding to reload video manually.
+
+## Installation
+
+You can copy and install each Lua script above. The installation script below
+is probably just for me. It installs all the scripts and configurations of 
+this repo.
+
+First [install mpv](https://mpv.io/installation/) and then download and unzip 
+[this repo](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+
+In Mac or Linux, run the following from the terminal. Then it will install 
+`my-config` to your mpv configuration directory. Your original mpv 
+configuration will be copied to `~/Downloads` directory if it exists.
+
+```console
+cd mpv-config-main 
+./install.sh
+```
+
+In Microsoft Windows, run the following from the `Command Prompt` or
+`PowerShell`.
+
+```console
+C:\path-to\mpv-config-main> install.bat
+```
+
+**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not
+have it. Please remove 10 or more lines below `# Video` in `mpv.conf`.
