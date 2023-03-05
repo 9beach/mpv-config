@@ -42,8 +42,8 @@ end
 update_options()
 
 function bind_keys(keys, name, func, opts)
-    if not keys then
-        mp.add_key_binding(keys, name, func, opts)
+    if not keys or keys == '' then
+        mp.add_key_binding(nil, name, func, opts)
         return
     end
 

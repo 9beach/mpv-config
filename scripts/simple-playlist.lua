@@ -31,19 +31,14 @@ local options = require 'mp.options'
 local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
--- Interval between "Playlist sorted by ..." info message and refreshed OSD 
--- playlist text.
-local internal_refresh_timeout = 1
+-- Interval between "Playlist sorted ..." message and OSD playlist refreshing.
+local osd_message_refresh_interval = 1
+
 local o = {
     playlist_dir = '~~desktop/',
-    -- Interval between a new file loading and refreshed OSD playlist text.
-    -- Before the loading, 'shuffle'/'startover sort' message could be
-    -- displayed. Without this, we don't need a interval.
-    -- 
-    -- I feel two types of intervals, `internal_refresh_timeout` and 
-    -- `o.refresh_after_reload_timeout` need to be seperated. Just a feeling
-    -- with a little observation.
-    refresh_after_reload_timeout = 2,
+    -- Set this interval value (`2` seconds is good) if your OSD messages on 
+    -- `file-loaded` events are hidden immediately by the playlist refreshing.
+    reload_refresh_interval = 2,
 }
 
 options.read_options(o, "simple-playlist")
@@ -151,7 +146,7 @@ function refresh_playlist_later()
         if is_osc then
             show_playlist(is_osc)
         else
-            mp.add_timeout(internal_refresh_timeout, refresh_playlist)
+            mp.add_timeout(osd_message_refresh_interval, refresh_playlist)
         end
     end
 end
@@ -344,9 +339,9 @@ mp.register_event("file-loaded", function ()
     -- But just before OSD message, i.e. "Playlist sorted by ...", could be
     -- displayed. We don't want to clear that immediately.
     if is_visible then
-        if (not is_osc and o.refresh_after_reload_timeout ~= 0) then
+        if (not is_osc and o.reload_refresh_interval ~= 0) then
             -- OSD playlist clears OSD message, so we need interval.
-            mp.add_timeout(o.refresh_after_reload_timeout, refresh_playlist)
+            mp.add_timeout(o.reload_refresh_interval, refresh_playlist)
         else
             -- OSC (not OSD) playlist does not clear OSD message.
             refresh_playlist()
