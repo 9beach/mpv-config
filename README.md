@@ -90,16 +90,6 @@ This code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master
 > currently played file. It does so by scanning the directory a file is located
 > in when starting playback.
 
-### reload.lua
-
-This code is from [4e6/mpv-reload](https://github.com/4e6/mpv-reload). Nothing changed.
-
-> When an online video is stuck during buffering or got slow CDN source,
-> restarting often helps. This script provides automatic reloading of videos
-> that didn't have buffering progress for some time, keeping the current time
-> position while preserving entries in the playlist. It also adds Ctrl+r
-> keybinding to reload video manually.
-
 ## Installation
 
 You can copy and install each Lua script above. The installation script below

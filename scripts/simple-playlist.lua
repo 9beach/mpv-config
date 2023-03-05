@@ -301,7 +301,7 @@ function save_playlist()
     end
 
     local date = os.date("*t")
-    local name = ("mpv-%03d-%02d%02d%02d-%02d%02d%02d.m3u"):format(
+    local name = ("mpv-%04d-%02d%02d%02d-%02d%02d%02d.m3u"):format(
         length, date.year-2000, date.month, date.day, date.hour, date.min, date.sec
     )
 

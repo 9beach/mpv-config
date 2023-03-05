@@ -13,6 +13,7 @@ local msg = require 'mp.msg'
 local o = {
     osc_always_on_audio = true,
     play_on_loaded = true,
+    visibility_message_again = false,
 }
 
 options.read_options(o, "on-file-loaded")
@@ -48,6 +49,8 @@ function change_osc_visibility()
     local v = is_audio and "always" or "auto"
     mp.commandv("script-message", "osc-visibility", v, "no-osd")
     mp.commandv("set", "options/osd-bar", (is_audio and "no" or "yes"))
+
+    return is_audio
 end
 
 mp.register_event("file-loaded", function()
@@ -56,10 +59,15 @@ mp.register_event("file-loaded", function()
         mp.set_property_bool("pause", false)
     end
 
+    -- Shows OSC alwalys when an audio file is loaded.
     if o.osc_always_on_audio == true then
-        change_osc_visibility()
+        local is_audio = change_osc_visibility()
 
-        -- Sometimes the message is missing in OSX, so we try again.
-        mp.add_timeout(1, change_osc_visibility)
+        -- Sometimes "osc-visibility" is overwritten by other scripts, so we
+        -- need to try again. This will be helpful when running `reload.lua` 
+        -- and `modernx.lua`.
+        if is_audio and visibility_message_again then
+            mp.add_timeout(1, change_osc_visibility)
+        end
     end
 end)
