@@ -35,6 +35,8 @@ have it. Please remove 10 or more lines below `# Video` in `mpv.conf`.
 
 This script gives mpv the capability to copy and paste file paths and URLs.
 
+You can edit key bindings in `script-opts/copy-and-paste.conf`.
+
 ### on-file-loaded.lua
 
 This script has two functionalities:
@@ -51,8 +53,8 @@ This script provides two script messages:
 2. `touch-file` changes the mdate of playing file to current time. If you want
    to mark playing file to delete later or do something else with, it will help
    you.
-   
-You can edit key bindings in `input.conf`.
+
+You can edit key bindings in `script-opts/finder-integration.conf`.
 
 ### simple-playlist.lua
 
