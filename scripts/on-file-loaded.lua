@@ -66,7 +66,8 @@ mp.register_event("file-loaded", function()
         -- Sometimes "osc-visibility" is overwritten by other scripts, so we
         -- need to try again. This will be helpful when running `reload.lua` 
         -- and `modernx.lua`.
-        if is_audio and visibility_message_again then
+        if is_audio and o.visibility_message_again then
+            msg.info('sent again script-message')
             mp.add_timeout(1, change_osc_visibility)
         end
     end
