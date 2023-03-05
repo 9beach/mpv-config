@@ -34,7 +34,7 @@ function is_in(element, array)
 end
 
 -- Shows OSC alwalys when an audio file is loaded.
-function set_osc_visibility()
+function change_osc_visibility()
     local path = mp.get_property("path", "")
     local is_audio = false
 
@@ -50,18 +50,16 @@ function set_osc_visibility()
     mp.commandv("set", "options/osd-bar", (is_audio and "no" or "yes"))
 end
 
-function on_file_load()
+mp.register_event("file-loaded", function()
     -- Plays even in paused state when a new file is loaded.
     if o.play_on_loaded == true then
         mp.set_property_bool("pause", false)
     end
 
-    if o.osc_always_on_audio == true then set_osc_visibility() end
-end
+    if o.osc_always_on_audio == true then
+        change_osc_visibility()
 
-mp.register_event("file-loaded", function()
-    on_file_load()
-
-    -- Sometimes the message is missed in OSX, so we try again.
-    mp.add_timeout(1, set_osc_visibility)
+        -- Sometimes the message is missing in OSX, so we try again.
+        mp.add_timeout(1, change_osc_visibility)
+    end
 end)

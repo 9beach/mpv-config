@@ -65,7 +65,7 @@ end
 math.randomseed(os.time())
 
 local is_visible = false
-local is_osc = true
+local is_osc = false
 
 local sort_modes = {
     {
@@ -117,24 +117,14 @@ function is_local_file(path)
 end
 
 function hide_playlist()
-    if is_visible and is_osc then
-        mp.command("script-message osc-playlist 0")
-    elseif is_visible and not is_osc then
-        mp.command("show-text ${playlist} 0")
-    end
-    is_visible = false
-end
-
-function refresh_playlist()
     if is_visible then
-        hide_playlist()
-        show_playlist(is_osc)
-    end
-end
+        is_visible = false
 
-function refresh_playlist_later()
-    if is_visible then
-        mp.add_timeout(internal_refresh_timeout, refresh_playlist)
+        if is_osc then
+            mp.command("script-message osc-playlist 0")
+        elseif not is_osc then
+            mp.command("show-text ' ' 0")
+        end
     end
 end
 
@@ -147,6 +137,22 @@ function show_playlist(osc)
         mp.command("script-message osc-playlist 60000")
     else
         mp.command("show-text ${playlist} 60000")
+    end
+end
+
+function refresh_playlist()
+    if is_visible then
+        show_playlist(is_osc)
+    end
+end
+
+function refresh_playlist_later()
+    if is_visible then
+        if is_osc then
+            show_playlist(is_osc)
+        else
+            mp.add_timeout(internal_refresh_timeout, refresh_playlist)
+        end
     end
 end
 
