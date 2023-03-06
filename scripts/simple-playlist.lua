@@ -55,9 +55,6 @@ end
 
 math.randomseed(os.time())
 
--- Only `show_playlist()` and `hide_playlist()` touches this variable. 
-local is_osc = false
-
 local sort_modes = {
     {
         id="name-asc",
@@ -116,6 +113,9 @@ end
 function is_local_file(path)
     return path ~= nil and string.find(path, '://') == nil
 end
+
+-- Only `show_playlist()` and `hide_playlist()` touche this variable. 
+local is_osc = false
 
 function hide_playlist()
     if is_osc then
@@ -271,7 +271,7 @@ function save_playlist()
     local name = ("mpv-%04d-%02d%02d%02d-%02d%02d%02d.m3u"):format(
         length, date.year-2000, date.month, date.day, 
         date.hour, date.min, date.sec
-    )
+        )
 
     local path = utils.join_path(o.playlist_dir, name)
     local file, err = io.open(path, "w")
