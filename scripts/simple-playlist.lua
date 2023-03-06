@@ -12,16 +12,17 @@ This script provides script messages below:
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse
-* script-message simple-playlist show-text
-* script-message simple-playlist show-osc
+* script-message simple-playlist show-text 5
+* script-message simple-playlist show-osc 5
 * script-message simple-playlist hide
-* script-message simple-playlist toggle-show-text
-* script-message simple-playlist toggle-show-osc
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
 
-You can edit key binddings in `input.conf`.
+`5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
+simple, the playlist is not refreshed automatically, so another `show-text` or
+`show-osc` is needed to refresh the playlist. You can edit key bindings in
+`input.conf`.
 
 Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
 and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
@@ -31,15 +32,9 @@ local options = require 'mp.options'
 local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
--- Interval between "Playlist sorted ..." message and OSD playlist refreshing.
-local osd_message_refresh_interval = 1
-
 local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
     playlist_dir = '~~desktop/',
-    -- Set this interval value (`2` seconds is good) if your OSD messages on 
-    -- `file-loaded` events are hidden immediately by the playlist refreshing.
-    reload_refresh_interval = 2,
 }
 
 options.read_options(o, "simple-playlist")
@@ -53,14 +48,14 @@ else
 end
 
 if o.playlist_dir == nil or o.playlist_dir == "" then
-    o.playlist_dir = mp.command_native({"expand-path", "~~home/"}).."/playlists"
+    o.playlist_dir = mp.command_native({"expand-path", "~~/"}).."/playlists"
 else
     o.playlist_dir = mp.command_native({"expand-path", o.playlist_dir})
 end
 
 math.randomseed(os.time())
 
-local is_visible = false
+-- Only `show_playlist()` and `hide_playlist()` touches this variable. 
 local is_osc = false
 
 local sort_modes = {
@@ -108,61 +103,50 @@ local sort_modes = {
     },
 }
 
+function osd_error(text)
+    msg.error(text)
+    mp.osd_message(text)
+end
+
+function osd_info(text)
+    msg.info(text)
+    mp.osd_message(text)
+end
+
 function is_local_file(path)
     return path ~= nil and string.find(path, '://') == nil
 end
 
 function hide_playlist()
-    if is_visible then
-        is_visible = false
-
-        if is_osc then
-            mp.command("script-message osc-playlist 0")
-        elseif not is_osc then
-            mp.command("show-text ' ' 0")
-        end
+    if is_osc then
+        mp.command("script-message osc-playlist 0")
+    else
+        mp.command("show-text ${playlist} 0")
     end
+    is_osc = false -- `osc-playlist` blinks when hiding.
 end
 
-function show_playlist(osc)
+function show_playlist(osc, duration)
     hide_playlist()
 
-    is_visible = true
+    if duration ~= nil then
+        if osc then
+            duration = ' '..duration -- seconds
+        else
+            duration = ' '..duration..'000' -- milliseconds
+        end
+    else
+        duration = ''
+    end
+
+    if osc then
+        mp.command("script-message osc-playlist"..duration)
+    else
+        mp.command("show-text ${playlist}"..duration)
+    end
+
+    -- update global variable
     is_osc = osc
-    if is_osc then
-        mp.command("script-message osc-playlist 60000")
-    else
-        mp.command("show-text ${playlist} 60000")
-    end
-end
-
-function refresh_playlist()
-    if is_visible then
-        show_playlist(is_osc)
-    end
-end
-
-function refresh_playlist_later()
-    if is_visible then
-        if is_osc then
-            show_playlist(is_osc)
-        else
-            mp.add_timeout(osd_message_refresh_interval, refresh_playlist)
-        end
-    end
-end
-
-function toggle_playlist(osc)
-    if is_osc == osc then
-        if is_visible == false then
-            show_playlist(osc)
-        else
-            is_osc = osc
-            hide_playlist();
-        end
-    else
-        show_playlist(osc)
-    end
 end
 
 function get_file_info(item)
@@ -197,7 +181,6 @@ function reverse_playlist()
     end
 
     mp.osd_message("Playlist reversed")
-    refresh_playlist_later()
 end
 
 -- Always starts over.
@@ -255,19 +238,7 @@ function sort_playlist_by(sort_id, startover)
 
     if startover == 'startover' then
         mp.set_property('playlist-pos', 0)
-    else
-        refresh_playlist_later()
     end
-end
-
-function osd_error(text)
-    msg.error(text)
-    mp.osd_message(text)
-end
-
-function osd_info(text)
-    msg.info(text)
-    mp.osd_message(text)
 end
 
 function create_dir(dir)
@@ -298,7 +269,8 @@ function save_playlist()
 
     local date = os.date("*t")
     local name = ("mpv-%04d-%02d%02d%02d-%02d%02d%02d.m3u"):format(
-        length, date.year-2000, date.month, date.day, date.hour, date.min, date.sec
+        length, date.year-2000, date.month, date.day, 
+        date.hour, date.min, date.sec
     )
 
     local path = utils.join_path(o.playlist_dir, name)
@@ -328,25 +300,7 @@ function save_playlist()
     file:close()
 
     osd_info('Playlist written to "'..path..'"')
-    refresh_playlist_later()
 end
-
-mp.observe_property('playlist-count', "number", refresh_playlist)
-
-mp.register_event("file-loaded", function ()
-    -- When a new media is loaded, we need to update displaying playlist.
-    -- But just before OSD message, i.e. "Playlist sorted by ...", could be
-    -- displayed. We don't want to clear that immediately.
-    if is_visible then
-        if (not is_osc and o.reload_refresh_interval ~= 0) then
-            -- OSD playlist clears OSD message, so we need interval.
-            mp.add_timeout(o.reload_refresh_interval, refresh_playlist)
-        else
-            -- OSC (not OSD) playlist does not clear OSD message.
-            refresh_playlist()
-        end
-    end
-end)
 
 mp.register_script_message("simple-playlist", function (param1, param2, param3)
     if param1 == 'sort' then
@@ -356,15 +310,11 @@ mp.register_script_message("simple-playlist", function (param1, param2, param3)
     elseif param1 == 'reverse' then
         reverse_playlist()
     elseif param1 == 'show-text' then
-        show_playlist(false)
+        show_playlist(false, param2)
     elseif param1 == 'show-osc' then
-        show_playlist(true)
+        show_playlist(true, param2)
     elseif param1 == 'hide' then
         hide_playlist()
-    elseif param1 == 'toggle-show-text' then
-        toggle_playlist(false)
-    elseif param1 == 'toggle-show-osc' then
-        toggle_playlist(true)
     elseif param1 == 'save' then
         save_playlist()
     elseif param1 == 'playfirst' then

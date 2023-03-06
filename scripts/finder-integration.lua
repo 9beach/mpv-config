@@ -26,20 +26,16 @@ local o = {
 
 options.read_options(o, "finder-integration")
 
-function update_options()
-    if os.getenv('windir') ~= nil then
-        o.os = 'windows'
-        o.finder = utils.parse_json(o.windows_finder)
-    elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-        o.os = 'mac'
-        o.finder = utils.parse_json(o.mac_finder)
-    else
-        o.os = 'linux'
-        o.finder = utils.parse_json(o.linux_finder)
-    end
+if os.getenv('windir') ~= nil then
+    o.os = 'windows'
+    o.finder = utils.parse_json(o.windows_finder)
+elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+    o.os = 'mac'
+    o.finder = utils.parse_json(o.mac_finder)
+else
+    o.os = 'linux'
+    o.finder = utils.parse_json(o.linux_finder)
 end
-
-update_options()
 
 function bind_keys(keys, name, func, opts)
     if not keys or keys == '' then

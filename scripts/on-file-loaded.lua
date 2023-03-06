@@ -5,6 +5,7 @@ This script provides the functions below:
 
 * Plays even in paused state when a new file is loaded.
 * Shows OSC alwalys when an audio file is loaded.
+* Sets the geometry a value when an audio file is loaded.
 ]]
 
 local options = require 'mp.options'
@@ -15,9 +16,6 @@ local o = {
     play_on_loaded = true,
     -- Shows OSC alwalys when an audio file is loaded.
     osc_always_on_audio = true,
-    -- Sometimes `osc-visibility` is overwritten by other scripts, in that 
-    -- case we need to try again.
-    osc_always_message_again = false,
 }
 
 options.read_options(o, "on-file-loaded")
@@ -27,10 +25,6 @@ AUDIO_EXTENSIONS = {
     'ogm', 'opus', 'wav', 'wma'
 }
 
-function get_ext(filepath)
-    return filepath:match("^.+%.(.+)$")
-end
-
 function is_in(element, array)
     for _, v in ipairs(array) do
         if v == element then return true end
@@ -38,23 +32,23 @@ function is_in(element, array)
     return false
 end
 
--- Shows OSC alwalys when an audio file is loaded.
-function change_osc_visibility()
+function is_audio_file()
     local path = mp.get_property("path", "")
-    local is_audio = false
 
-    if path ~= nil then
-        local ext = get_ext(path)
-        if (ext ~= nil) then
-            is_audio = is_in(string.lower(ext), AUDIO_EXTENSIONS)
-        end
+    local ext = path:match("^.+%.(.+)$")
+    if (ext ~= nil) then
+        return is_in(string.lower(ext), AUDIO_EXTENSIONS)
     end
 
+    return false
+end
+
+-- Shows OSC alwalys when an audio file is loaded.
+function change_osc_visibility(is_audio)
     local v = is_audio and "always" or "auto"
+
     mp.commandv("script-message", "osc-visibility", v, "no-osd")
     mp.commandv("set", "options/osd-bar", (is_audio and "no" or "yes"))
-
-    return is_audio
 end
 
 mp.register_event("file-loaded", function()
@@ -63,13 +57,8 @@ mp.register_event("file-loaded", function()
         mp.set_property_bool("pause", false)
     end
 
-    -- Shows OSC alwalys when an audio file is loaded.
-    if o.osc_always_on_audio == true then
-        local is_audio = change_osc_visibility()
+    local is_audio = is_audio_file()
 
-        if is_audio and o.osc_always_message_again then
-            msg.info('sent again script-message')
-            mp.add_timeout(1, change_osc_visibility)
-        end
-    end
+    -- Shows OSC alwalys when an audio file is loaded.
+    change_osc_visibility(is_audio)
 end)

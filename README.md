@@ -7,10 +7,12 @@ parts in my scripts are from internet.
 
 ## Lua scripts
 
-You can copy and install each script below to your mpv scripts directory, which
-is usually `~/.config/mpv/scripts/` or `%APPDATA%/mpv/scripts/`. Please see
+You can copy and install each script below to your **mpv** scripts directory, 
+which is usually `~/.config/mpv/scripts/` or `%APPDATA%/mpv/scripts/`. Please 
+see
 [https://mpv.io/manual/master/#files](https://mpv.io/manual/master/#files) and
-[https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location) for more information.
+[https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location)
+for more information.
 
 ### [finder-integration.lua](https://github.com/9beach/mpv-config/blob/main/scripts/finder-integration.lua)
 
@@ -27,7 +29,7 @@ You can edit key bindings in `script-opts/finder-integration.conf`.
 
 ### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
 
-This script gives mpv the capability to copy and paste file paths and URLs.
+This script gives **mpv** the capability to copy and paste file paths and URLs.
 
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 
@@ -44,16 +46,17 @@ This script provides script messages below:
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse
-* script-message simple-playlist show-text
-* script-message simple-playlist show-osc
+* script-message simple-playlist show-text 5
+* script-message simple-playlist show-osc 5
 * script-message simple-playlist hide
-* script-message simple-playlist toggle-show-text
-* script-message simple-playlist toggle-show-osc
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
 
-You can edit key bindings in `input.conf`.
+`5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
+simple, the playlist is not refreshed automatically, so another `show-text` or
+`show-osc` is needed to refresh the playlist. You can edit key bindings in
+`input.conf`.
 
 Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
 and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
@@ -64,6 +67,7 @@ This script has two functionalities:
 
 1. Plays even in paused state when a new file is loaded.
 2. Shows OSC always when an audio file is loaded.
+3. Sets the geometry of **mpv** a fixed value when an audio file is loaded.
 
 ### [modernx-and-quotes.lua](https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua)
 
@@ -100,7 +104,7 @@ First [install mpv](https://mpv.io/installation/) and then download and unzip
 [this repo](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
 
 In Mac or Linux, run the following from the terminal. Then it will install
-`my-config` to your mpv configuration directory. Your original mpv
+`my-config` to your **mpv** configuration directory. Your original **mpv**
 configuration will be copied to `~/Downloads` directory if it exists.
 
 ```console
