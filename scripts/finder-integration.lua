@@ -6,9 +6,9 @@ This script provides two script messages:
 1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
    selected. If you want to reveal playing file in explorer.exe, it will help
    you.
-2. `touch-file` changes the mdate of playing file to current time. If you want
-   to mark playing file to delete later or do something else with, it will help
-   you.
+2. `touch-file` changes the `mdate` of playing file to current time. If you
+   want to mark playing file to delete later or do something else with, it will
+   help you.
 ]]
 
 local mp = require 'mp'

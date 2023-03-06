@@ -35,6 +35,7 @@ local msg = require 'mp.msg'
 local osd_message_refresh_interval = 1
 
 local o = {
+    -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
     playlist_dir = '~~desktop/',
     -- Set this interval value (`2` seconds is good) if your OSD messages on 
     -- `file-loaded` events are hidden immediately by the playlist refreshing.
@@ -330,9 +331,7 @@ function save_playlist()
     refresh_playlist_later()
 end
 
-mp.observe_property('playlist-count', "number", function()
-    refresh_playlist()
-end)
+mp.observe_property('playlist-count', "number", refresh_playlist)
 
 mp.register_event("file-loaded", function ()
     -- When a new media is loaded, we need to update displaying playlist.

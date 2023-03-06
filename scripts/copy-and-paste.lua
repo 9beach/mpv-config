@@ -12,25 +12,21 @@ local o = {
     osd_messages = true,
     copy_keybind = 'ctrl+c meta+c',
     paste_keybind = 'ctrl+v meta+v',
-    -- In idle state, there is no path or URL to copy. You can call something 
-    -- else with `idle_state_copy_script`. "copy-quote" is a script message 
-    -- of "modernx-and-quotes.lua".
+    -- In idle state, there is no path or URL to copy. You can call something
+    -- else with `idle_state_copy_script`. `copy-quote` is a script message
+    -- of `modernx-and-quotes.lua`.
     idle_state_copy_script = 'script-message copy-quote',
 }
 
 options.read_options(o, "copy-and-paste")
 
-function update_options(list)
-    if os.getenv('windir') ~= nil then
-        o.device = 'windows'
-    elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-        o.device = 'mac'
-    else
-        o.device = 'linux'
-    end
+if os.getenv('windir') ~= nil then
+    o.device = 'windows'
+elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+    o.device = 'mac'
+else
+    o.device = 'linux'
 end
-
-update_options()
 
 function osd_info(text)
     msg.info(text)
@@ -46,7 +42,7 @@ function bind_keys(keys, name, func, opts)
     local i = 0
     for key in string.gmatch(keys, "[^%s]+") do
         i = i + 1
-        if i == 1 then 
+        if i == 1 then
             mp.add_forced_key_binding(key, name, func, opts)
         else
             mp.add_forced_key_binding(key, name .. i, func, opts)
@@ -71,7 +67,7 @@ function get_clipboard()
     if o.device == 'linux' then
         return pipe_read(o.linux_paste)
     elseif o.device == 'windows' then
-        local script =  [[
+        local script = [[
         & {
             Trap {
                 Write-Error -ErrorRecord $_
@@ -156,7 +152,7 @@ function paste()
                 mp.commandv('loadfile', path, 'append-play')
             end
         end
-    end    
+    end
 
     if i == 0 then
         osd_info('No valid URLs or file paths from clipboard')

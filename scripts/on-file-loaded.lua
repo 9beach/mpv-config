@@ -11,9 +11,13 @@ local options = require 'mp.options'
 local msg = require 'mp.msg'
 
 local o = {
-    osc_always_on_audio = true,
+    -- Plays even in paused state when a new file is loaded.
     play_on_loaded = true,
-    visibility_message_again = false,
+    -- Shows OSC alwalys when an audio file is loaded.
+    osc_always_on_audio = true,
+    -- Sometimes `osc-visibility` is overwritten by other scripts, in that 
+    -- case we need to try again.
+    osc_always_message_again = false,
 }
 
 options.read_options(o, "on-file-loaded")
@@ -63,10 +67,7 @@ mp.register_event("file-loaded", function()
     if o.osc_always_on_audio == true then
         local is_audio = change_osc_visibility()
 
-        -- Sometimes "osc-visibility" is overwritten by other scripts, so we
-        -- need to try again. This will be helpful when running `reload.lua` 
-        -- and `modernx.lua`.
-        if is_audio and o.visibility_message_again then
+        if is_audio and o.osc_always_message_again then
             msg.info('sent again script-message')
             mp.add_timeout(1, change_osc_visibility)
         end
