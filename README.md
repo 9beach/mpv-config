@@ -29,7 +29,12 @@ You can edit key bindings in `script-opts/finder-integration.conf`.
 
 ### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
 
+https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua
+
 This script gives **mpv** the capability to copy and paste file paths and URLs.
+You can paste and play multiple lines of media file paths, media URLs, and
+HTML page URLs embedding media including YouTube, Twitter, Twitch.tv, Naver,
+Kakao ...
 
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 

@@ -1,6 +1,13 @@
--- https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua
---
--- This script gives mpv the capability to copy and paste file paths and URLs.
+--[[
+https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua
+
+This script gives **mpv** the capability to copy and paste file paths and URLs.
+You can paste and play multiple lines of media file paths, media URLs, and 
+HTML page URLs embedding media including YouTube, Twitter, Twitch.tv, Naver, 
+Kakao ...
+
+You can edit key bindings in `script-opts/copy-and-paste.conf`.
+]]
 
 local options = require 'mp.options'
 local utils = require 'mp.utils'
@@ -117,6 +124,7 @@ end
 function copy()
     local path = mp.get_property('path')
     if (path ~= nil) then
+        if o.device == 'windows' then path = string.gsub(path, '/', '\\') end
         set_clipboard(path)
         if path:match('://') ~= nil then
             osd_info('URL copied')
