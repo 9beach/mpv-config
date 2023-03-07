@@ -7,9 +7,9 @@
 
 -- https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua
 --
--- Added a simple function on the original code. In idle state, it shows
--- a qoute about writing and art. You can copy it, and add your favorites
--- `to writing-quotes`.
+-- I added a simple feature. In idle state, it shows a qoute about writing and
+-- art. You can copy the text with `script-message copy-quote`, and also add 
+-- your favorite qoutes to `writing-quotes` file.
 
 local assdraw = require 'mp.assdraw'
 local msg = require 'mp.msg'
@@ -48,7 +48,7 @@ end
 math.randomseed(os.time())
 
 local quote_id = 1
-local quotes = {'Drop (or paste) media files (or URLs) to play here'}
+local quotes = {'Drop (or paste) media files or URLs to play here.'}
 local quotes_path
 
 if osp == 'windows' then
@@ -66,9 +66,7 @@ if quotes_f then
     end
 end
 
---
 -- Parameters
---
 -- default user option values
 -- may change them in osc.conf
 local user_opts = {
@@ -272,8 +270,6 @@ if builtin_osc_enabled then
     mp.set_property_native('osc', false)
 end
 
---
-
 -- WindowControl helpers
 function window_controls_enabled()
     val = user_opts.windowcontrols
@@ -321,9 +317,7 @@ function build_keyboard_controls()
     return mapping
 end
 
---
 -- Helperfunctions
---
 
 function set_osd(res_x, res_y, text)
     if state.osd.res_x == res_x and
@@ -504,9 +498,7 @@ function ass_draw_rr_h_ccw(ass, x0, y0, x1, y1, r1, hexagon, r2)
     end
 end
 
---
 -- Tracklist Management
---
 
 local nicetypes = {video = texts.video, audio = texts.audio, sub = texts.subtitle}
 
@@ -597,9 +589,7 @@ function get_track(type)
     return 0
 end
 
---
 -- Element Management
---
 
 local elements = {}
 
@@ -711,9 +701,7 @@ function prepare_elements()
     end
 end
 
---
 -- Element Rendering
---
 
 -- returns nil or a chapter element from the native property chapter-list
 function get_chapter(possec)
@@ -968,9 +956,7 @@ function render_elements(master_ass)
     end
 end
 
---
 -- Message display
---
 
 -- pos is 1 based
 function limited_list(prop, pos)
@@ -1088,9 +1074,7 @@ function render_message(ass)
     end
 end
 
---
 -- Initialisation and Layout
---
 
 function new_element(name, type)
     elements[name] = {}
@@ -1226,9 +1210,7 @@ function window_controls()
     lo.alpha[3] = 0
 end
 
---
 -- Layouts
---
 
 local layouts = {}
 
@@ -1256,9 +1238,7 @@ layouts = function ()
     local osc_w, osc_h=
     osc_geo.w, osc_geo.h
 
-    --
     -- Controller Background
-    --
     local lo
 
     new_element('TransBg', 'box')
@@ -1268,16 +1248,12 @@ layouts = function ()
     lo.layer = 10
     lo.alpha[3] = 0
 
-    --
     -- Alignment
-    --
     local refX = osc_w / 2
     local refY = posY
     local geo
 
-    --
     -- Seekbar
-    --
     new_element('seekbarbg', 'box')
     lo = add_layout('seekbarbg')
     lo.geometry = {x = refX , y = refY - 96 , an = 5, w = osc_geo.w - 50, h = 2}
@@ -1296,9 +1272,7 @@ layouts = function ()
     local showjump = user_opts.showjump
     local offset = showjump and 60 or 0
 
-    --
     -- Volumebar
-    --
     lo = new_element('volumebarbg', 'box')
     lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol
     lo = add_layout('volumebarbg')
@@ -1579,7 +1553,6 @@ function osc_init()
     --function () mp.commandv('seek', 5, 'relative', 'keyframes') end
     function () mp.commandv("add", "chapter", 1) end
 
-    --
     update_tracklist()
 
     --cy_audio
@@ -1892,9 +1865,7 @@ function shutdown()
 
 end
 
---
 -- Other important stuff
---
 
 function show_osc()
     -- show when disabled can happen (e.g. mouse_move) due to async/delayed unbinding
@@ -2172,9 +2143,7 @@ function render()
         osc_param.playresy, ass.text)
 end
 
---
 -- Eventhandling
---
 
 local function element_has_action(element, action)
     return element and element.eventresponder and
@@ -2567,7 +2536,6 @@ function visibility_mode(mode, no_osd)
 end
 
 -- KeyboardControl
---
 
 local osc_key_bindings = {}
 
