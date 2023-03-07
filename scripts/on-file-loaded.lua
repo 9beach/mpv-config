@@ -5,7 +5,6 @@ This script provides the functions below:
 
 * Plays even in paused state when a new file is loaded.
 * Shows OSC alwalys when an audio file is loaded.
-* Sets the geometry a value when an audio file is loaded.
 ]]
 
 local options = require 'mp.options'
