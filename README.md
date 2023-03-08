@@ -123,6 +123,3 @@ In Microsoft Windows, run the following from the `Command Prompt` or
 ```console
 C:\path-to\mpv-config-main> install.bat
 ```
-
-**WARNING!** My Windows machine has NVIDIA GPU installed. So if yours does not
-have it. Please remove 10 or more lines below `# Video` in `mpv.conf`.
