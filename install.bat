@@ -17,5 +17,5 @@ COPY input.conf %MPV_CONF_PATH%
 COPY writing-quotes %MPV_CONF_PATH%
 COPY mpv.conf %MPV_CONF_PATH%
 
-REM If your machine has NVIDIA GPU installed, remove REM below line.
+REM If your machine has NVIDIA GPU installed, uncomment below line.
 REM POWERSHELL -command "$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'; ((get-content mpv.conf) -replace '^# *windows *: *', '') > %MPV_CONF_PATH%\mpv.conf"
