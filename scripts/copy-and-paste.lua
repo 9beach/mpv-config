@@ -6,6 +6,10 @@ You can paste and play multiple lines of media file paths, media URLs, and
 HTML page URLs embedding media including YouTube, Twitter, Twitch.tv, Naver, 
 Kakao ...
 
+To play media from their HTML page URLs, you need to install
+[YT-DLP](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
+Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\`
+
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 ]]
 

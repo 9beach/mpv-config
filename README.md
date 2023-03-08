@@ -7,8 +7,8 @@ parts in my scripts are from internet.
 
 ## Lua scripts
 
-You can copy and install each script below to your **mpv** scripts directory, 
-which is usually `~/.config/mpv/scripts/` or `%APPDATA%/mpv/scripts/`. Please 
+You can copy and install each script below to your **mpv** scripts directory,
+which is usually `~/.config/mpv/scripts/` or `%APPDATA%/mpv/scripts/`. Please
 see
 [https://mpv.io/manual/master/#files](https://mpv.io/manual/master/#files) and
 [https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location)
@@ -36,27 +36,31 @@ You can paste and play multiple lines of media file paths, media URLs, and
 HTML page URLs embedding media including YouTube, Twitter, Twitch.tv, Naver,
 Kakao ...
 
+To play media from their HTML page URLs, you need to install
+[YT-DLP](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
+Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\`
+
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 
 This script provides script messages below:
 
-* script-message simple-playlist sort date-desc
-* script-message simple-playlist sort date-asc
-* script-message simple-playlist sort date-desc startover
+- script-message simple-playlist sort date-desc
+- script-message simple-playlist sort date-asc
+- script-message simple-playlist sort date-desc startover
 
 `simple-playlist sort` also support `size-asc`, `size-desc`, `name-asc`,
 `name-desc` with or without `startover`.
 
-* script-message simple-playlist shuffle
-* script-message simple-playlist reverse
-* script-message simple-playlist show-text 5
-* script-message simple-playlist show-osc 5
-* script-message simple-playlist hide
-* script-message simple-playlist playfirst
-* script-message simple-playlist playlast
-* script-message simple-playlist save
+- script-message simple-playlist shuffle
+- script-message simple-playlist reverse
+- script-message simple-playlist show-text 5
+- script-message simple-playlist show-osc 5
+- script-message simple-playlist hide
+- script-message simple-playlist playfirst
+- script-message simple-playlist playlast
+- script-message simple-playlist save
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
 simple, the playlist is not refreshed automatically, so another `show-text` or
