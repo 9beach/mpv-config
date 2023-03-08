@@ -15,5 +15,7 @@ XCOPY script-opts %MPV_CONF_PATH%\script-opts\
 XCOPY scripts %MPV_CONF_PATH%\scripts\
 COPY input.conf %MPV_CONF_PATH%
 COPY writing-quotes %MPV_CONF_PATH%
+COPY mpv.conf %MPV_CONF_PATH%
 
-POWERSHELL -command "$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'; ((get-content mpv.conf) -replace '^# *windows *: *', '') > %MPV_CONF_PATH%\mpv.conf"
+REM If your machine has NVIDIA GPU installed, remove REM below line.
+REM POWERSHELL -command "$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'; ((get-content mpv.conf) -replace '^# *windows *: *', '') > %MPV_CONF_PATH%\mpv.conf"
