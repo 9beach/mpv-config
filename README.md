@@ -72,11 +72,14 @@ and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/play
 
 ### [on-file-loaded.lua](https://github.com/9beach/mpv-config/blob/main/scripts/on-file-loaded.lua)
 
-This script has two functionalities:
+This script provides functions below:
 
-1. Plays even in paused state when a new file is loaded.
-2. Shows OSC always when an audio file is loaded.
-3. Sets the geometry of **mpv** a fixed value when an audio file is loaded.
+* Plays even in paused state when a new file is loaded.
+* Shows OSC alwalys when an audio file is loaded.
+* Does not show subtitle if lower-case path matches given patterns.
+* Does not show subtitle if audio language matches given values.
+
+You can edit the configuration in `script-opts/on-file-loaded.conf`.
 
 ### [modernx-and-quotes.lua](https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua)
 
