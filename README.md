@@ -94,9 +94,12 @@ The original code is from [ModernX](https://github.com/cyl0/ModernX).
 
 I added a simple feature. In idle state, it shows a qoute about writing and art.
 You can copy the text with `script-message copy-quote`, and also add your
-favorite qoutes to `writing-quotes` file.
+favorite qoutes to `script-opts/modernx-and-quotes.txt` file.
 
-![img](writing-quotes.png)
+![img](modernx-and-quotes.png)
+
+To install **modernx-and-quotes**, please copy `scripts/modernx-and-quotes.lua`,
+`script-opts/osc.conf`, and `script-opts/modernx-and-quotes.txt` to your system.
 
 ### autoload.lua
 

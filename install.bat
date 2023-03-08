@@ -14,7 +14,6 @@ XCOPY fonts %MPV_CONF_PATH%\fonts\
 XCOPY script-opts %MPV_CONF_PATH%\script-opts\
 XCOPY scripts %MPV_CONF_PATH%\scripts\
 COPY input.conf %MPV_CONF_PATH%
-COPY writing-quotes %MPV_CONF_PATH%
 COPY mpv.conf %MPV_CONF_PATH%
 
 REM If your machine has NVIDIA GPU installed, uncomment below line.

@@ -52,9 +52,11 @@ local quotes = {'Drop (or paste) media files or URLs to play here.'}
 local quotes_path
 
 if osp == 'windows' then
-    quotes_path = os.getenv('AppData')..'\\mpv\\writing-quotes'
+    quotes_path = 
+        os.getenv('AppData')..'\\mpv\\script-opts\\modernx-and-quotes.txt'
 else
-    quotes_path = os.getenv('HOME')..'/.config/mpv/writing-quotes'
+    quotes_path = 
+        os.getenv('HOME')..'/.config/mpv/script-opts/modernx-and-quotes.txt'
 end
 
 local quotes_f = io.open(quotes_path, "r")
