@@ -3,12 +3,12 @@ https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua
 
 This script gives **mpv** the capability to copy and paste file paths and URLs.
 You can paste and play multiple lines of media file paths, media URLs, and 
-HTML page URLs embedding media including YouTube, Twitter, Twitch.tv, Naver, 
-Kakao...
+HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
-To play media from their HTML page URLs, you need to install
-[YT-DLP](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
-Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\`
+To play media from their URLs, you need to install
+[yt-dlp](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
+Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\` or `mpv.exe`
+directory.
 
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 ]]
@@ -21,8 +21,9 @@ local o = {
     linux_copy = 'xclip -silent -selection clipboard -in',
     linux_paste = 'xclip -selection clipboard -o',
     osd_messages = true,
-    copy_keybind = 'ctrl+c meta+c',
-    paste_keybind = 'ctrl+v meta+v',
+    copy_current_track_keybind = 'Ctrl+c Meta+c',
+    paste_to_playlist_keybind = 'Ctrl+v Meta+v',
+    append_to_playlist_keybind = 'Ctrl+Shift+v Meta+Shift+v',
     -- In idle state, there is no path or URL to copy. You can call something
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
@@ -146,7 +147,7 @@ function file_exists(name)
     if f ~= nil then io.close(f) return true else return false end
 end
 
-function paste()
+function paste_to_playlist(append)
     clip = get_clipboard()
 
     if not clip then
@@ -159,7 +160,11 @@ function paste()
         if path:match('^%a[%a%d-_]+://') ~= nil or file_exists(path) then
             i = i + 1
             if i == 1 then
-                mp.commandv('loadfile', path)
+                if append == false then
+                    mp.commandv('loadfile', path)
+                else
+                    mp.commandv('loadfile', path, 'append-play')
+                end
             else
                 mp.commandv('loadfile', path, 'append-play')
             end
@@ -169,11 +174,25 @@ function paste()
     if i == 0 then
         osd_info('No valid URLs or file paths from clipboard')
     elseif i == 1 then
-        osd_info('Loading ...')
+        if append == false then
+            osd_info('Loading a item...')
+        else
+            osd_info('Adding a item to playlist...')
+        end
     else
-        osd_info('Loading '..tostring(i)..' URLs or files ...')
+        if append == false then
+            osd_info('Loading '..tostring(i)..' URLs or files...')
+        else
+            osd_info('Adding '..tostring(i)..' URLs or files to playlist...')
+        end
     end
 end
 
-bind_keys(o.copy_keybind, 'copy', copy)
-bind_keys(o.paste_keybind, 'paste', paste)
+
+bind_keys(o.copy_current_track_keybind, 'copy-current-track', copy)
+bind_keys(o.paste_to_playlist_keybind, 'paste-to-playlist', function()
+    paste_to_playlist(false)
+end)
+bind_keys(o.append_to_playlist_keybind, 'append-to-playlist', function()
+    paste_to_playlist(true)
+end)
