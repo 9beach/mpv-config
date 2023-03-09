@@ -38,7 +38,8 @@ Kakao...
 
 To play media from their HTML page URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
-Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\`
+Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\` or `mpv.exe`
+directory. 
 
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 
