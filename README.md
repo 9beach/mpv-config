@@ -127,9 +127,13 @@ cd mpv-config-main
 ./install.sh
 ```
 
-In Microsoft Windows, run the following from the `Command Prompt` or
+If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
+
+In _Microsoft Windows_, run the following from the `Command Prompt` or
 `PowerShell`.
 
 ```console
 C:\path-to\mpv-config-main> install.bat
 ```
+
+If your machine has NVIDIA GPU installed, run `install.bat nvidia`.
