@@ -28,25 +28,23 @@ You can edit key bindings in `script-opts/finder-integration.conf`.
 
 ### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
 
-https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua
-
 This script gives **mpv** the capability to copy and paste file paths and URLs.
 You can paste and play multiple lines of media file paths, media URLs, and
 HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
-This script provides the functions below:
+You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 
 - Pastes file paths or URLs in clipboard to playlist. (`Ctrl+v, Meta+v`)
 - Appends file paths or URLs in clipboard to playlist. (`Ctrl+V, Meta+V`)
 - Appends file paths or URLs in clipboard to current track. (`Ctrl+b, Meta+b`)
 - Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
-- Calls specified script message to copy something in idle state.
-
-You can edit key bindings in `script-opts/copy-and-paste.conf`.
 
 To play media from their URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
 Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or `mpv.exe` directory.
+
+For _OSX_ users, it's nice to know that when option key pressed, the context
+menu of a file will reveal `Copy as pathname` menu item (or just press `⌘⌥C`).
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 
@@ -125,12 +123,13 @@ This code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master
 
 ## Installation
 
-You can copy and install each Lua script above. The installation script below
-is probably just for me. It installs all the scripts and configurations of
-this repo.
+You can copy and install each Lua script above individually. Please notice that
+the installation script below is probably just for me, and also that subtitle 
+settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for Koreans.
+Anyhow it installs all the scripts and configurations of this repository.
 
 First [install mpv](https://mpv.io/installation/) and then download and unzip
-[this repo](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+[this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
 
 In Mac or Linux, run the following from the terminal. Then it will install
 `my-config` to your **mpv** configuration directory. Your original **mpv**

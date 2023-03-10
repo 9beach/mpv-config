@@ -2,14 +2,22 @@
 https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua
 
 This script gives **mpv** the capability to copy and paste file paths and URLs.
-You can paste and play multiple lines of media file paths, media URLs, and 
+You can paste and play multiple lines of media file paths, media URLs, and
 HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
+
+You can edit key bindings below in `script-opts/copy-and-paste.conf`:
+
+- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+v, Meta+v`)
+- Appends file paths or URLs in clipboard to playlist. (`Ctrl+V, Meta+V`)
+- Appends file paths or URLs in clipboard to current track. (`Ctrl+b, Meta+b`)
+- Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
 
 To play media from their URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
 Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or `mpv.exe` directory.
 
-You can edit key bindings in `script-opts/copy-and-paste.conf`.
+For _OSX_ users, it's nice to know that when option key pressed, the context 
+menu of a file will reveal `Copy as pathname` menu item (or just press `⌘⌥C`).
 ]]
 
 local options = require 'mp.options'
@@ -17,12 +25,19 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
+    -- Sets Linux commands for copy and paste. We do not need the alternatives
+    -- for copy and paste commands of OSX and Microsoft Windows.
     linux_copy = 'xclip -silent -selection clipboard -in',
     linux_paste = 'xclip -selection clipboard -o',
+    -- Enables displaying osd messages when actions occur.
     osd_messages = true,
+    -- Keybind for copy file path or URL of current track.
     copy_current_track_keybind = 'Ctrl+c Meta+c',
+    -- Keybind for paste file paths or URLs in clipboard to playlist.
     paste_to_playlist_keybind = 'Ctrl+v Meta+v',
+    -- Keybind for append file paths or URLs in clipboard to playlist.
     append_to_playlist_keybind = 'Ctrl+Shift+v Meta+Shift+v',
+    -- Keybind for append file paths or URLs in clipboard to current track.
     append_to_current_track_keybind = 'Ctrl+b Meta+b',
     -- In idle state, there is no path or URL to copy. You can call something
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
