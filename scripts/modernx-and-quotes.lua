@@ -9,7 +9,7 @@
 --
 -- I added a simple feature. In idle state, it shows a qoute about writing and
 -- art. You can copy the text with `script-message copy-quote`, and also add 
--- your favorite qoutes to `writing-quotes` file.
+-- your favorite qoutes to `script-opts/modernx-and-quotes.txt` file.
 
 local assdraw = require 'mp.assdraw'
 local msg = require 'mp.msg'

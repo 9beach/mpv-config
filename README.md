@@ -83,6 +83,8 @@ This script provides functions below:
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
+`watch_later` settings override subtitle visibilities obove.
+
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)

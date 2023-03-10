@@ -39,6 +39,6 @@ mv "$MPV_CONF_PATH" "$BACKUP_DIR" 2> /dev/null \
 mkdir -p "$MPV_CONF_PATH"
 cp -R fonts script-opts scripts input.conf "$MPV_CONF_PATH"
 cat mpv.conf | my_filter > "$MPV_CONF_PATH"/mpv.conf
-cp -R "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH"
-cp -f "$BACKUP_DIR/.volume" "$MPV_CONF_PATH"
+cp -R "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH" 2> /dev/null
+cp "$BACKUP_DIR/.volume" "$MPV_CONF_PATH" 2> /dev/null
 echo "copied new mpv config to \"$MPV_CONF_PATH\""

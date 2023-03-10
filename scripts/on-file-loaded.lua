@@ -8,6 +8,8 @@ This script provides the functions below:
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
+`watch_later` settings override subtitle visibilities obove.
+
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
 ]]
 
@@ -71,10 +73,15 @@ mp.register_event("file-loaded", function()
     end
 
     local path = mp.get_property("path", "")
-    local is_audio = is_audio_file(path)
 
     -- Shows OSC alwalys when an audio file is loaded.
-    change_osc_visibility(is_audio)
+    change_osc_visibility(is_audio_file(path))
+
+    -- `watch_later` settings override `sub-visibility` obove. 
+    if 0 ~= mp.get_property_number('time-pos') then
+        msg.info('resumed file, sub-visibility check skipped.')
+        return
+    end
 
     local sub_visible = true
 
