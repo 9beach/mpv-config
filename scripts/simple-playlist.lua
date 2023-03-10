@@ -60,14 +60,14 @@ local sort_modes = {
         id="name-asc",
         title="name",
         compar=function (a, b, pl)
-            return alphanumsort(pl[a].sort_name, pl[b].sort_name)
+            return alphanumsort(pl[a].filename, pl[b].filename)
         end,
     },
     {
         id="name-desc",
         title="name in descending order",
         compar=function (a, b, pl)
-            return alphanumsort(pl[b].sort_name, pl[a].sort_name)
+            return alphanumsort(pl[b].filename, pl[a].filename)
         end,
     },
     {
@@ -149,8 +149,8 @@ function show_playlist(osc, duration)
     is_osc = osc
 end
 
-function get_file_info(item)
-    local path = mp.get_property('playlist/'..(item-1)..'/filename')
+function get_file_info(playlist, item)
+    local path = playlist[item].filename
     if not is_local_file(path) then return {} end
 
     local file_info = utils.file_info(path)
@@ -215,9 +215,8 @@ function sort_playlist_by(sort_id, startover)
     local order = {}
     for i=1, #playlist do
         order[i] = i
-        playlist[i].sort_name = mp.get_property('playlist/'..(i-1)..'/filename')
         if need_file_info then
-            playlist[i].file_info = get_file_info(i)
+            playlist[i].file_info = get_file_info(playlist, i)
         end
     end
 
@@ -266,8 +265,8 @@ function create_dir(dir)
 end
 
 function save_playlist()
-    local length = mp.get_property_number('playlist-count', 0)
-    if length == 0 then return end
+    local playlist = mp.get_property_native('playlist')
+    if #playlist == 0 then return end
 
     if create_dir(o.playlist_dir) == false then
         osd_error('Failed to create playlist directory "'..o.playlist_dir..'"')
@@ -276,7 +275,7 @@ function save_playlist()
 
     local date = os.date("*t")
     local name = ("mpv-%04d-%02d%02d%02d-%02d%02d%02d.m3u"):format(
-        length, date.year-2000, date.month, date.day, 
+        #playlist, date.year-2000, date.month, date.day, 
         date.hour, date.min, date.sec
         )
 
@@ -291,9 +290,9 @@ function save_playlist()
     local pwd = mp.get_property("working-directory")
 
     local is_windows = o.device == 'windows'
-    local i = 0
-    while i < length do
-        local item_path = mp.get_property('playlist/'..i..'/filename')
+    for i=1, #playlist do
+        msg.info(playlist[i].filename)
+        local item_path = playlist[i].filename
         if is_local_file(item_path) then
             item_path = utils.join_path(pwd, item_path)
             if is_windows then
@@ -301,7 +300,6 @@ function save_playlist()
             end
         end
         file:write(item_path, "\n")
-        i = i+1
     end
 
     file:close()
@@ -325,8 +323,8 @@ mp.register_script_message("simple-playlist", function (param1, param2, param3)
     elseif param1 == 'save' then
         save_playlist()
     elseif param1 == 'playfirst' then
-        local playlist = mp.get_property_native('playlist')
-        if #playlist < 2 then
+        local length = mp.get_property_number('playlist-count', 0)
+        if length < 2 then
             return
         else
             mp.set_property("playlist-pos", 0)
