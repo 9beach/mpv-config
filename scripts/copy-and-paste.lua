@@ -187,14 +187,20 @@ function paste_to_playlist(mode)
     elseif i == 1 then
         if mode == 'load' then
             osd_info('Loading a item...')
-        else
+        elseif mode == 'append' then
             osd_info('Adding a item to playlist...')
+        else
+            osd_info('Adding a item to current track...')
         end
     else
         if mode == 'load' then
             osd_info('Loading '..tostring(i)..' URLs or files...')
-        else
+        elseif mode == 'append' then
             osd_info('Adding '..tostring(i)..' URLs or files to playlist...')
+        else
+            osd_info(
+                'Adding '..tostring(i)..' URLs or files to current track...'
+                )
         end
     end
 end
@@ -206,6 +212,8 @@ end)
 bind_keys(o.append_to_playlist_keybind, 'append-to-playlist', function()
     paste_to_playlist('append')
 end)
-bind_keys(o.append_to_current_track_keybind, 'append-to-current-track', function()
-    paste_to_playlist('append-next')
-end)
+bind_keys(
+    o.append_to_current_track_keybind,
+    'append-to-current-track',
+    function() paste_to_playlist('append-next') end
+    )

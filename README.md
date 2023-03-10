@@ -37,17 +37,17 @@ HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 This script provides the functions below:
 
-- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+v Meta+v`)
-- Appends file paths or URLs in clipboard to playlist. (`Ctrl+V Meta+V`)
-- Appends file paths or URLs in clipboard to current track. (`Ctrl+b Meta+b`)
-- Copies file path or URL of current track. (`Ctrl+c Meta+c`)
+- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+v, Meta+v`)
+- Appends file paths or URLs in clipboard to playlist. (`Ctrl+V, Meta+V`)
+- Appends file paths or URLs in clipboard to current track. (`Ctrl+b, Meta+b`)
+- Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
 - Calls specified script message to copy something in idle state.
+
+You can edit key bindings in `script-opts/copy-and-paste.conf`.
 
 To play media from their URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
 Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or `mpv.exe` directory.
-
-You can edit key bindings in `script-opts/copy-and-paste.conf`.
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 
