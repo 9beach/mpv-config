@@ -24,6 +24,7 @@ local o = {
     copy_current_track_keybind = 'Ctrl+c Meta+c',
     paste_to_playlist_keybind = 'Ctrl+v Meta+v',
     append_to_playlist_keybind = 'Ctrl+Shift+v Meta+Shift+v',
+    append_to_current_track_keybind = 'Ctrl+Shift+b Meta+Shift+b',
     -- In idle state, there is no path or URL to copy. You can call something
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
@@ -147,7 +148,8 @@ function file_exists(name)
     if f ~= nil then io.close(f) return true else return false end
 end
 
-function paste_to_playlist(append)
+-- mode: load/append/append-next
+function paste_to_playlist(mode)
     clip = get_clipboard()
 
     if not clip then
@@ -155,12 +157,15 @@ function paste_to_playlist(append)
         return
     end
 
+    local length = mp.get_property_number('playlist-count', 0)
+    local pos = mp.get_property_number('playlist-pos', 0)
+
     local i = 0
     for path in clip:gmatch("[^\r\n]+") do
         if path:match('^%a[%a%d-_]+://') ~= nil or file_exists(path) then
             i = i + 1
             if i == 1 then
-                if append == false then
+                if mode == 'load' then
                     mp.commandv('loadfile', path)
                 else
                     mp.commandv('loadfile', path, 'append-play')
@@ -171,16 +176,23 @@ function paste_to_playlist(append)
         end
     end
 
+    if mode == 'append-next' and length > 1 then
+        local new_length = mp.get_property_number('playlist-count', 0)
+        for outer = length,new_length-1,1 do
+            mp.commandv('playlist-move', new_length-1, pos+1)
+        end
+    end
+
     if i == 0 then
         osd_info('No valid URLs or file paths from clipboard')
     elseif i == 1 then
-        if append == false then
+        if mode == 'load' then
             osd_info('Loading a item...')
         else
             osd_info('Adding a item to playlist...')
         end
     else
-        if append == false then
+        if mode == 'load' then
             osd_info('Loading '..tostring(i)..' URLs or files...')
         else
             osd_info('Adding '..tostring(i)..' URLs or files to playlist...')
@@ -188,11 +200,13 @@ function paste_to_playlist(append)
     end
 end
 
-
 bind_keys(o.copy_current_track_keybind, 'copy-current-track', copy)
 bind_keys(o.paste_to_playlist_keybind, 'paste-to-playlist', function()
-    paste_to_playlist(false)
+    paste_to_playlist('load')
 end)
 bind_keys(o.append_to_playlist_keybind, 'append-to-playlist', function()
-    paste_to_playlist(true)
+    paste_to_playlist('append')
+end)
+bind_keys(o.append_to_current_track_keybind, 'append-to-current-track', function()
+    paste_to_playlist('append-next')
 end)
