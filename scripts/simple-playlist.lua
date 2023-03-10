@@ -198,19 +198,19 @@ function shuffle_playlist()
 end
 
 function sort_playlist_by(sort_id, startover)
-    sort_mode = 1
+    local index = 1
     for mode, sort_data in pairs(sort_modes) do
         if sort_data.id == sort_id then
-            sort_mode = mode
+            index = mode
         end
     end
 
-    local need_file_info = sort_mode ~= 1 and sort_mode ~= 2
+    local need_file_info = index ~= 1 and index ~= 2
 
     local playlist = mp.get_property_native('playlist')
     if #playlist < 2 then return end
 
-    mp.osd_message("Sorting playlist by "..sort_modes[sort_mode].title.."...", 10)
+    mp.osd_message("Sorting playlist by "..sort_modes[index].title.."...", 10)
 
     local order = {}
     for i=1, #playlist do
@@ -221,7 +221,7 @@ function sort_playlist_by(sort_id, startover)
     end
 
     table.sort(order, function(a, b)
-        return sort_modes[sort_mode].compar(a, b, playlist)
+        return sort_modes[index].compar(a, b, playlist)
     end)
 
     for i=1, #playlist do
