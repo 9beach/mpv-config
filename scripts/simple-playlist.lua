@@ -59,43 +59,43 @@ local sort_modes = {
     {
         id="name-asc",
         title="name",
-        compar=function (a, b, playlist)
-            return alphanumsort(playlist[a].sort_name, playlist[b].sort_name)
+        compar=function (a, b, pl)
+            return alphanumsort(pl[a].sort_name, pl[b].sort_name)
         end,
     },
     {
         id="name-desc",
         title="name in descending order",
-        compar=function (a, b, playlist)
-            return alphanumsort(playlist[b].sort_name, playlist[a].sort_name)
+        compar=function (a, b, pl)
+            return alphanumsort(pl[b].sort_name, pl[a].sort_name)
         end,
     },
     {
         id="date-asc",
         title="date",
-        compar=function (a, b)
-            return (get_file_info(a).mtime or 0) < (get_file_info(b).mtime or 0)
+        compar=function (a, b, pl)
+            return (pl[a].file_info.mtime or 0) < (pl[b].file_info.mtime or 0)
         end,
     },
     {
         id="date-desc",
         title="date in descending order",
-        compar=function (a, b)
-            return (get_file_info(a).mtime or 0) > (get_file_info(b).mtime or 0)
+        compar=function (a, b, pl)
+            return (pl[b].file_info.mtime or 0) < (pl[a].file_info.mtime or 0)
         end,
     },
     {
         id="size-asc",
         title="size",
-        compar=function (a, b)
-            return (get_file_info(a).size or 0) < (get_file_info(b).size or 0)
+        compar=function (a, b, pl)
+            return (pl[a].file_info.size or 0) < (pl[b].file_info.size or 0)
         end,
     },
     {
         id="size-desc",
         title="size in descending order",
-        compar=function (a, b)
-            return (get_file_info(a).size or 0) > (get_file_info(b).size or 0)
+        compar=function (a, b, pl)
+            return (pl[b].file_info.size or 0) < (pl[a].file_info.size or 0)
         end,
     },
 }
@@ -205,13 +205,20 @@ function sort_playlist_by(sort_id, startover)
         end
     end
 
+    local need_file_info = sort_mode ~= 1 and sort_mode ~= 2
+
     local playlist = mp.get_property_native('playlist')
     if #playlist < 2 then return end
+
+    mp.osd_message("Sorting playlist by "..sort_modes[sort_mode].title.."...", 10)
 
     local order = {}
     for i=1, #playlist do
         order[i] = i
         playlist[i].sort_name = mp.get_property('playlist/'..(i-1)..'/filename')
+        if need_file_info then
+            playlist[i].file_info = get_file_info(i)
+        end
     end
 
     table.sort(order, function(a, b)
@@ -234,7 +241,7 @@ function sort_playlist_by(sort_id, startover)
         end
     end
 
-    mp.osd_message("Playlist sorted by "..sort_modes[sort_mode].title)
+    mp.osd_message("Playlist sorted", 3)
 
     if startover == 'startover' then
         mp.set_property('playlist-pos', 0)
