@@ -7,8 +7,7 @@ HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 To play media from their URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp) in your system. For _Microsoft
-Windows_ users, just copy `yt-dlp.exe` to `C:\Windows\System\` or `mpv.exe`
-directory.
+Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or `mpv.exe` directory.
 
 You can edit key bindings in `script-opts/copy-and-paste.conf`.
 ]]
@@ -24,7 +23,7 @@ local o = {
     copy_current_track_keybind = 'Ctrl+c Meta+c',
     paste_to_playlist_keybind = 'Ctrl+v Meta+v',
     append_to_playlist_keybind = 'Ctrl+Shift+v Meta+Shift+v',
-    append_to_current_track_keybind = 'Ctrl+Shift+b Meta+Shift+b',
+    append_to_current_track_keybind = 'Ctrl+b Meta+b',
     -- In idle state, there is no path or URL to copy. You can call something
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
