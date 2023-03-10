@@ -27,6 +27,7 @@ local o = {
     hide_sub_if_path_matches = '',
     -- Does not show subtitle if audio language matches given values.
     hide_sub_if_alang_matches = '',
+    -- `watch_later` settings override subtitle visibilities obove.
 }
 
 options.read_options(o, "on-file-loaded")
