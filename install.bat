@@ -6,7 +6,7 @@ SET /A "RAND = (%RANDOM% + 1) * (%RANDOM% + 1)"
 SET MPV_CONF_PATH=%UserProfile%\AppData\Roaming\mpv
 SET BACKUP_DIR=%UserProfile%\Downloads\mpv-%RAND%
 
-MOVE %MPV_CONF_PATH% %BACKUP_DIR% 2> NULL && ECHO %BACKUP_DIR%
+MOVE %MPV_CONF_PATH% %BACKUP_DIR% && ECHO %BACKUP_DIR%
 
 MKDIR %MPV_CONF_PATH%
 
@@ -15,8 +15,10 @@ XCOPY script-opts %MPV_CONF_PATH%\script-opts\
 XCOPY scripts %MPV_CONF_PATH%\scripts\
 COPY input.conf %MPV_CONF_PATH%
 COPY mpv.conf %MPV_CONF_PATH%
-XCOPY %BACKUP_DIR%\watch_later %MPV_CONF_PATH%\watch_later\ 2> NULL
-COPY %BACKUP_DIR%\.volume" %MPV_CONF_PATH% 2> NULL
+IF EXIST %BACKUP_DIR%\watch_later (
+	XCOPY %BACKUP_DIR%\watch_later %MPV_CONF_PATH%\watch_later\
+)
+IF EXIST "%BACKUP_DIR%\.volume" COPY %BACKUP_DIR%\.volume %MPV_CONF_PATH%
 
 IF NOT "%1" == "nvidia" GOTO :EOF
 
