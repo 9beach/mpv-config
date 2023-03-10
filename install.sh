@@ -35,9 +35,10 @@ BACKUP_DIR="$HOME/Downloads/mpv-$(date "+%m%d%H%M%Y.%S")"
 
 mv "$MPV_CONF_PATH" "$BACKUP_DIR" 2> /dev/null \
 	&& echo "moved old mpv config to \"$BACKUP_DIR\""
-set -e
 
 mkdir -p "$MPV_CONF_PATH"
 cp -R fonts script-opts scripts input.conf "$MPV_CONF_PATH"
 cat mpv.conf | my_filter > "$MPV_CONF_PATH"/mpv.conf
+cp -R "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH"
+cp -f "$BACKUP_DIR/.volume" "$MPV_CONF_PATH"
 echo "copied new mpv config to \"$MPV_CONF_PATH\""

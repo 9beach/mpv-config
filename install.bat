@@ -15,6 +15,8 @@ XCOPY script-opts %MPV_CONF_PATH%\script-opts\
 XCOPY scripts %MPV_CONF_PATH%\scripts\
 COPY input.conf %MPV_CONF_PATH%
 COPY mpv.conf %MPV_CONF_PATH%
+XCOPY %BACKUP_DIR%\watch_later %MPV_CONF_PATH%\watch_later\ 2> NULL
+COPY %BACKUP_DIR%\.volume" %MPV_CONF_PATH% 2> NULL
 
 IF NOT "%1" == "nvidia" GOTO :EOF
 
