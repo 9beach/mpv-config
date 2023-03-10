@@ -8,9 +8,8 @@ obviously.
 
 You can copy and install each script below to your **mpv** scripts directory,
 which is usually `~/.config/mpv/scripts/` or `%APPDATA%/mpv/scripts/`. Please
-see
-[https://mpv.io/manual/master/#files](https://mpv.io/manual/master/#files) and
-[https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location)
+see [https://mpv.io/manual/master/#files](https://mpv.io/manual/master/#files)
+and [https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location)
 for more information.
 
 ### [finder-integration.lua](https://github.com/9beach/mpv-config/blob/main/scripts/finder-integration.lua)
@@ -40,8 +39,9 @@ You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 - Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
 
 To play media from their URLs, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system. For _Microsoft
-Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or **mpv** directory.
+[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system. For
+_Microsoft Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or **mpv** 
+directory.
 
 For _OSX_ users, it's nice to know that when option key pressed, the context
 menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`).
