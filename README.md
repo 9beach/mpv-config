@@ -1,9 +1,8 @@
 # My mpv configuration
 
 This repository contains several [Lua](http://lua.org) scripts and settings
-for [mpv](https://mpv.io). I wrote `finder-integration.lua`,
-`copy-and-paste.lua`, `simple-playlist.lua` and `on-file-loaded.lua`. But many
-parts in my scripts are from internet.
+I wrote for [mpv](https://mpv.io). Many parts in my code are from internet
+obviously.
 
 ## Lua scripts
 
@@ -74,7 +73,7 @@ simple, the playlist is not refreshed automatically, so another `show-text` or
 `show-osc` is needed to refresh the playlist. You can edit key bindings in
 `input.conf`.
 
-Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
+Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>
 and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
 
 ### [on-file-loaded.lua](https://github.com/9beach/mpv-config/blob/main/scripts/on-file-loaded.lua)
@@ -87,6 +86,14 @@ This script provides functions below:
 * Does not show subtitle if audio language matches given values.
 
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
+
+### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
+
+This script provides the functions below:
+
+* Saves and restores sound volume level
+
+You can edit the configuration in `script-opts/on-startup-shutdown.lua`.
 
 ### [modernx-and-quotes.lua](https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua)
 
