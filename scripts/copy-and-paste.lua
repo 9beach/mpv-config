@@ -17,7 +17,7 @@ To play media from their URLs, you need to install
 Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or `mpv.exe` directory.
 
 For _OSX_ users, it's nice to know that when option key pressed, the context 
-menu of a file will reveal `Copy as pathname` menu item (or just press `⌘⌥C`).
+menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`).
 ]]
 
 local options = require 'mp.options'
