@@ -210,7 +210,7 @@ function sort_playlist_by(sort_id, startover)
     local playlist = mp.get_property_native('playlist')
     if #playlist < 2 then return end
 
-    mp.osd_message("Sorting playlist by "..sort_modes[index].title.."...", 10)
+    mp.osd_message("Sorting playlist by "..sort_modes[index].title.."...", 30)
 
     local order = {}
     for i=1, #playlist do
@@ -240,7 +240,7 @@ function sort_playlist_by(sort_id, startover)
         end
     end
 
-    mp.osd_message("Playlist sorted", 3)
+    mp.osd_message("Playlist sorted")
 
     if startover == 'startover' then
         mp.set_property('playlist-pos', 0)
