@@ -12,12 +12,12 @@ This script provides script messages below:
 
 * script-message simple-playlist shuffle
 * script-message simple-playlist reverse
-* script-message simple-playlist show-text 5
-* script-message simple-playlist show-osc 5
-* script-message simple-playlist hide
 * script-message simple-playlist playfirst
 * script-message simple-playlist playlast
 * script-message simple-playlist save
+* script-message simple-playlist show-text 5
+* script-message simple-playlist show-osc 5
+* script-message simple-playlist hide
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
 simple, the playlist is not refreshed automatically, so another `show-text` or
