@@ -55,19 +55,29 @@ end
 
 math.randomseed(os.time())
 
+function alphanum_compar(a, b)
+    local function padnum(d)
+        local dec, n = string.match(d, "(%.?)0*(.+)")
+        return #dec > 0 and ("%.12f"):format(d) or
+               ("%s%03d%s"):format(dec, #n, n)
+    end
+    return tostring(a):lower():gsub("%.?%d+",padnum)..("%3d"):format(#b) <
+           tostring(b):lower():gsub("%.?%d+",padnum)..("%3d"):format(#a)
+end
+
 local sort_modes = {
     {
         id="name-asc",
         title="name",
         compar=function (a, b, pl)
-            return alphanumsort(pl[a].filename, pl[b].filename)
+            return alphanum_compar(pl[a].filename, pl[b].filename)
         end,
     },
     {
         id="name-desc",
         title="name in descending order",
         compar=function (a, b, pl)
-            return alphanumsort(pl[b].filename, pl[a].filename)
+            return alphanum_compar(pl[b].filename, pl[a].filename)
         end,
     },
     {
@@ -160,16 +170,6 @@ function get_file_info(playlist, item)
     end
 
     return file_info
-end
-
-function alphanumsort(a, b)
-    local function padnum(d)
-        local dec, n = string.match(d, "(%.?)0*(.+)")
-        return #dec > 0 and ("%.12f"):format(d) or
-               ("%s%03d%s"):format(dec, #n, n)
-    end
-    return tostring(a):lower():gsub("%.?%d+",padnum)..("%3d"):format(#b) <
-           tostring(b):lower():gsub("%.?%d+",padnum)..("%3d"):format(#a)
 end
 
 -- Always does not start over.
