@@ -7,9 +7,9 @@
 
 -- https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua
 --
--- I added a simple feature. In idle state, it shows a qoute about writing and
--- art. You can copy the text with `script-message copy-quote`, and also add 
--- your favorite qoutes to `script-opts/modernx-and-quotes.txt` file.
+-- I added a simple feature. In idle state, it shows a quote about writing and art.
+-- You can copy the text with `script-message copy-quote`, and also add your
+-- favorite quotes to `script-opts/modernx-and-quotes.txt` file.
 
 local assdraw = require 'mp.assdraw'
 local msg = require 'mp.msg'

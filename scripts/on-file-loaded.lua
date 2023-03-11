@@ -4,11 +4,11 @@ https://github.com/9beach/mpv-config/blob/master/scripts/on-file-loaded.lua
 This script provides the functions below:
 
 * Plays even in paused state when a new file is loaded.
-* Shows OSC alwalys when an audio file is loaded.
+* Shows OSC always when an audio file is loaded.
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
-`watch_later` settings override subtitle visibilities obove.
+`watch_later` settings override subtitle visibilities above.
 
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
 ]]

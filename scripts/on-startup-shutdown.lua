@@ -5,6 +5,8 @@ This script provides the functions below:
 
 * Saves and restores sound volume level
 
+`watch_later` settings override sound volume level above.
+
 You can edit the configuration in `script-opts/on-startup-shutdown.lua`.
 ]]
 

@@ -79,11 +79,11 @@ and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/play
 This script provides functions below:
 
 * Plays even in paused state when a new file is loaded.
-* Shows OSC alwalys when an audio file is loaded.
+* Shows OSC always when an audio file is loaded.
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
-`watch_later` settings override subtitle visibilities obove.
+`watch_later` settings override subtitle visibilities above.
 
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
 
@@ -92,6 +92,8 @@ You can edit the configuration in `script-opts/on-file-loaded.conf`.
 This script provides the functions below:
 
 * Saves and restores sound volume level
+
+`watch_later` settings override sound volume level above.
 
 You can edit the configuration in `script-opts/on-startup-shutdown.lua`.
 
@@ -106,9 +108,9 @@ The original code is from [ModernX](https://github.com/cyl0/ModernX).
 
 ![img](https://github.com/cyl0/ModernX/blob/main/preview.png?raw=true)
 
-I added a simple feature. In idle state, it shows a qoute about writing and art.
+I added a simple feature. In idle state, it shows a quote about writing and art.
 You can copy the text with `script-message copy-quote`, and also add your
-favorite qoutes to `script-opts/modernx-and-quotes.txt` file.
+favorite quotes to `script-opts/modernx-and-quotes.txt` file.
 
 ![img](modernx-and-quotes.png)
 
