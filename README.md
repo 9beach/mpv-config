@@ -7,7 +7,7 @@ obviously.
 ## Installation
 
 You can copy and install each Lua script below individually. Please notice that
-the installation script below is probably just for me, and also that subtitle 
+the installation script is probably just for me, and also that subtitle 
 settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for Koreans.
 Anyhow it installs all the scripts and settings of this repository.
 
