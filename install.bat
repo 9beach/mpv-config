@@ -15,13 +15,8 @@ XCOPY script-opts %MPV_CONF_PATH%\script-opts\
 XCOPY scripts %MPV_CONF_PATH%\scripts\
 COPY input.conf %MPV_CONF_PATH%
 COPY mpv.conf %MPV_CONF_PATH%
-IF EXIST %BACKUP_DIR%\watch_later (
-	XCOPY %BACKUP_DIR%\watch_later %MPV_CONF_PATH%\watch_later\
-)
+IF EXIST %BACKUP_DIR%\watch_later MOVE %BACKUP_DIR%\watch_later %MPV_CONF_PATH%\watch_later
 IF EXIST "%BACKUP_DIR%\.volume" COPY %BACKUP_DIR%\.volume %MPV_CONF_PATH%
-
 IF NOT "%1" == "nvidia" GOTO :EOF
-
 POWERSHELL -command "$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'; ((get-content mpv.conf) -replace '^# *nvidia *: *', '') > %MPV_CONF_PATH%\mpv.conf"
-
 :EOF
