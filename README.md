@@ -1,8 +1,38 @@
-# My mpv configuration
+# My mpv settings
 
 This repository contains several [Lua](http://lua.org) scripts and settings
 I wrote for [mpv](https://mpv.io). Many parts in my code are from internet
 obviously.
+
+## Installation
+
+You can copy and install each Lua script below individually. Please notice that
+the installation script below is probably just for me, and also that subtitle 
+settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for Koreans.
+Anyhow it installs all the scripts and settings of this repository.
+
+First [install mpv](https://mpv.io/installation/) and then download and unzip
+[this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+
+In Mac or Linux, run the following from the terminal. Then it installs
+`9beach/mpv-config` to your **mpv** configuration directory. Your original 
+**mpv** settings are copied to `~/Downloads` directory if it exists.
+
+```console
+cd mpv-config-main
+./install.sh
+```
+
+If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
+
+In _Microsoft Windows_, run the following from the `Command Prompt` or
+`PowerShell`.
+
+```console
+C:\path-to\mpv-config-main> install.bat
+```
+
+If your machine has NVIDIA GPU installed, run `install.bat nvidia`.
 
 ## Lua scripts
 
@@ -85,7 +115,7 @@ This script provides functions below:
 
 `watch_later` settings override subtitle visibilities above.
 
-You can edit the configuration in `script-opts/on-file-loaded.conf`.
+You can edit the settings in `script-opts/on-file-loaded.conf`.
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
 
@@ -95,7 +125,7 @@ This script provides the functions below:
 
 `watch_later` settings override sound volume level above.
 
-You can edit the configuration in `script-opts/on-startup-shutdown.lua`.
+You can edit the settings in `script-opts/on-startup-shutdown.lua`.
 
 ### [modernx-and-quotes.lua](https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua)
 
@@ -124,33 +154,3 @@ This code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master
 > This script automatically loads playlist entries before and after the the
 > currently played file. It does so by scanning the directory a file is located
 > in when starting playback.
-
-## Installation
-
-You can copy and install each Lua script above individually. Please notice that
-the installation script below is probably just for me, and also that subtitle 
-settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for Koreans.
-Anyhow it installs all the scripts and configurations of this repository.
-
-First [install mpv](https://mpv.io/installation/) and then download and unzip
-[this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
-
-In Mac or Linux, run the following from the terminal. Then it will install
-`my-config` to your **mpv** configuration directory. Your original **mpv**
-configuration will be copied to `~/Downloads` directory if it exists.
-
-```console
-cd mpv-config-main
-./install.sh
-```
-
-If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
-
-In _Microsoft Windows_, run the following from the `Command Prompt` or
-`PowerShell`.
-
-```console
-C:\path-to\mpv-config-main> install.bat
-```
-
-If your machine has NVIDIA GPU installed, run `install.bat nvidia`.
