@@ -124,21 +124,12 @@ function is_local_file(path)
     return path ~= nil and string.find(path, '://') == nil
 end
 
--- Only `show_playlist()` and `hide_playlist()` touche this variable. 
-local is_osc = false
-
 function hide_playlist()
-    if is_osc then
-        mp.command("script-message osc-playlist 0")
-    else
-        mp.command("show-text ${playlist} 0")
-    end
-    is_osc = false -- `osc-playlist` blinks when hiding.
+    mp.command("script-message osc-playlist 0")
+    mp.command("show-text ${playlist} 0")
 end
 
 function show_playlist(osc, duration)
-    hide_playlist()
-
     if duration ~= nil then
         if osc then
             duration = ' '..duration -- seconds
@@ -150,13 +141,12 @@ function show_playlist(osc, duration)
     end
 
     if osc then
+        mp.command("show-text ' ' 0")
         mp.command("script-message osc-playlist"..duration)
     else
+        mp.command("script-message osc-playlist 0")
         mp.command("show-text ${playlist}"..duration)
     end
-
-    -- update global variable
-    is_osc = osc
 end
 
 function get_file_info(playlist, item)
