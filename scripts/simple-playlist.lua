@@ -230,7 +230,7 @@ function sort_playlist_by(sort_id, startover)
         end
     end
 
-    mp.osd_message("Playlist sorted")
+    mp.osd_message("Playlist sorted by "..sort_modes[index].title)
 
     if startover == 'startover' then
         mp.set_property('playlist-pos', 0)
