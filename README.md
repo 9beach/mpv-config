@@ -6,10 +6,10 @@ obviously.
 
 ## Installation
 
-You can copy and install each Lua script below individually. Please notice that
-the installation script is probably just for me, and also that subtitle 
-settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for Koreans.
-Anyhow it installs all the scripts and settings of this repository.
+You can install each Lua script below individually by just copying it. Please
+notice that the installation script is probably just for me, and also that
+subtitle settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for
+Koreans. Anyhow it installs all the scripts and settings of this repository.
 
 First [install mpv](https://mpv.io/installation/) and then download and unzip
 [this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
