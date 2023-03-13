@@ -126,7 +126,7 @@ end
 
 function hide_playlist()
     mp.command("script-message osc-playlist 0")
-    mp.command("show-text ${playlist} 0")
+    mp.command("show-text ' ' 0")
 end
 
 function show_playlist(osc, duration)
