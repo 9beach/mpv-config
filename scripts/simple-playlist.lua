@@ -24,8 +24,7 @@ simple, the playlist is not refreshed automatically, so another `show-text` or
 `show-osc` is needed to refresh the playlist. You can edit key bindings in
 `input.conf`.
 
-Many parts in the code are from <https://github.com/jonniek/mpv-playlistmanager>
-and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
+Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 ]]
 
 local options = require 'mp.options'
@@ -165,8 +164,8 @@ end
 function reverse_playlist()
     local length = mp.get_property_number('playlist-count', 0)
     if length < 2 then return end
-    for outer=1, length-1, 1 do
-        mp.commandv('playlist-move', outer, 0)
+    for i=1, length-1 do
+        mp.commandv('playlist-move', i, 0)
     end
 
     mp.osd_message("Playlist reversed")

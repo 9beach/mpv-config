@@ -101,8 +101,7 @@ simple, the playlist is not refreshed automatically, so another `show-text` or
 `show-osc` is needed to refresh the playlist. You can edit key bindings in
 `input.conf`.
 
-Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>
-and <https://github.com/zsugabubus/dotfiles/blob/master/.config/mpv/scripts/playlist-filtersort.lua>.
+Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 
 ### [on-file-loaded.lua](https://github.com/9beach/mpv-config/blob/main/scripts/on-file-loaded.lua)
 
