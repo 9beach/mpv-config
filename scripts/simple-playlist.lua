@@ -149,8 +149,7 @@ function show_playlist(osc, duration)
     end
 end
 
-function get_file_info(playlist, item)
-    local path = playlist[item].filename
+function get_file_info(path)
     if not is_local_file(path) then return {} end
 
     local file_info = utils.file_info(path)
@@ -187,6 +186,14 @@ function shuffle_playlist()
     mp.set_property('playlist-pos', 0)
 end
 
+function swap_playlist_items(i, j)
+    if i == j then return end
+    if i > j then i, j = j, i end
+
+    mp.commandv('playlist-move', j-1, i-1)
+    mp.commandv('playlist-move', i, j)
+end
+
 function sort_playlist_by(sort_id, startover)
     local index = 1
     for mode, sort_data in pairs(sort_modes) do
@@ -202,31 +209,29 @@ function sort_playlist_by(sort_id, startover)
 
     mp.osd_message("Sorting playlist by "..sort_modes[index].title.."...", 30)
 
-    local order = {}
+    local new2old = {}
+    local old2new = {}
     for i=1, #playlist do
-        order[i] = i
+        new2old[i], old2new[i] = i
         if need_file_info then
-            playlist[i].file_info = get_file_info(playlist, i)
+            playlist[i].file_info = get_file_info(playlist[i].filename)
         end
     end
 
-    table.sort(order, function(a, b)
+    table.sort(new2old, function(a, b)
         return sort_modes[index].compar(a, b, playlist)
     end)
 
     for i=1, #playlist do
-        playlist[order[i]].new_pos = i
+        old2new[new2old[i]] = i
     end
 
     for i=1, #playlist do
-        while true do
-            local j = playlist[i].new_pos
-            if i == j then
-                break
-            end
-            mp.commandv('playlist-move', (i)     - 1, (j + 1) - 1)
-            mp.commandv('playlist-move', (j - 1) - 1, (i)     - 1)
-            playlist[j], playlist[i] = playlist[i], playlist[j]
+        local j = new2old[i]
+        if i ~= j then
+            swap_playlist_items(i, j)
+            new2old[old2new[i]] = j
+            old2new[j] = old2new[i]
         end
     end
 
@@ -281,7 +286,6 @@ function save_playlist()
 
     local is_windows = o.device == 'windows'
     for i=1, #playlist do
-        msg.info(playlist[i].filename)
         local item_path = playlist[i].filename
         if is_local_file(item_path) then
             item_path = utils.join_path(pwd, item_path)
