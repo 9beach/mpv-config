@@ -51,8 +51,7 @@ local quote_id = 1
 local quotes = {'Drop (or paste) media files or URLs to play here.'}
 local quotes_path
 
-quotes_path = (os.getenv('APPDATA') or os.getenv('HOME')..'/.config')..
-              '/mpv/script-opts/modernx-and-quotes.txt'
+quotes_path = mp.command_native({"expand-path", "~~/"}).."/script-opts/modernx-and-quotes.txt"
 
 local quotes_f = io.open(quotes_path, "r")
 if quotes_f then

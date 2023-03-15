@@ -23,7 +23,7 @@ options.read_options(o, "on-startup-shutdown")
 if o.save_and_restore_sound_volume == false then return end
 
 local volume_filepath = 
-    (os.getenv('APPDATA') or os.getenv('HOME')..'/.config')..'/mpv/.volume'
+    mp.command_native({"expand-path", "~~/"}).."/.volume"
 
 local volume
 
