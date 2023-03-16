@@ -59,12 +59,17 @@ function is_audio_file(path)
     return false
 end
 
+local show_osd_bar = mp.get_property_bool("options/osd-bar")
+local osd_on_seek =  mp.get_property_native("osd-on-seek")
+
 -- Shows OSC alwalys when an audio file is loaded.
 function change_osc_visibility(is_audio)
-    local v = is_audio and "always" or "auto"
+    local vosc = is_audio and "always" or "auto"
 
-    mp.commandv("script-message", "osc-visibility", v, "no-osd")
-    mp.commandv("set", "options/osd-bar", (is_audio and "no" or "yes"))
+    mp.commandv("script-message", "osc-visibility", vosc, "no-osd")
+    local vosd_bar = (is_audio or not show_osd_bar) and "no" or "yes"
+    mp.commandv("set", "options/osd-bar", vosd_bar)
+    mp.commandv("set", "osd-on-seek", is_audio and "no" or osd_on_seek)
 end
 
 mp.register_event("file-loaded", function()
