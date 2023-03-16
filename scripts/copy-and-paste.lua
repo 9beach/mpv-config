@@ -7,9 +7,9 @@ HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 
-- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+v, Meta+v`)
-- Appends file paths or URLs in clipboard to playlist. (`Ctrl+V, Meta+V`)
-- Appends file paths or URLs in clipboard to current track. (`Ctrl+b, Meta+b`)
+- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+V, Meta+V`)
+- Appends file paths or URLs in clipboard to playlist. (`Ctrl+b, Meta+b`)
+- Appends file paths or URLs in clipboard to current track. (`Ctrl+v, Meta+v`)
 - Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
 
 To play media from their URLs, you need to install
