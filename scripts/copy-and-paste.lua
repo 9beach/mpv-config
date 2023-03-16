@@ -34,11 +34,11 @@ local o = {
     -- Keybind for copy file path or URL of current track.
     copy_current_track_keybind = 'Ctrl+c Meta+c',
     -- Keybind for paste file paths or URLs in clipboard to playlist.
-    paste_to_playlist_keybind = 'Ctrl+v Meta+v',
+    paste_to_playlist_keybind = 'Ctrl+Shift+v Meta+Shift+v',
     -- Keybind for append file paths or URLs in clipboard to playlist.
-    append_to_playlist_keybind = 'Ctrl+Shift+v Meta+Shift+v',
+    append_to_playlist_keybind = 'Ctrl+b Meta+b',
     -- Keybind for append file paths or URLs in clipboard to current track.
-    append_to_current_track_keybind = 'Ctrl+b Meta+b',
+    append_to_current_track_keybind = 'Ctrl+v Meta+v',
     -- In idle state, there is no path or URL to copy. You can call something
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
