@@ -130,7 +130,8 @@ function set_clipboard(text)
     if o.device == 'linux' then
         pipe_write(o.linux_copy, text)
     elseif o.device == 'windows' then
-        local clip = '"'..text:gsub('"', "'")..'"'
+        local clip = 
+            '"'..text:gsub('`', '``'):gsub('"', '`"'):gsub('%$', '`$')..'"'
         local args = {
             'powershell', '-NoProfile', 'Set-Clipboard', '-value', clip
         }

@@ -34,7 +34,8 @@ function set_clipboard(text)
     if osp == 'linux' then
         pipe_write('xclip -silent -selection clipboard -in', text)
     elseif osp == 'windows' then
-        local clip = '"'..text:gsub('"', "'")..'"'
+        local clip = 
+            '"'..text:gsub('`', '``'):gsub('"', '`"'):gsub('%$', '`$')..'"'
         local args = {
             'powershell', '-NoProfile', 'Set-Clipboard', '-value', clip
         }

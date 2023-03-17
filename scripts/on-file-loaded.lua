@@ -59,6 +59,7 @@ function is_audio_file(path)
     return false
 end
 
+-- Saves previous states
 local show_osd_bar = mp.get_property_bool("options/osd-bar")
 local osd_on_seek =  mp.get_property_native("osd-on-seek")
 
