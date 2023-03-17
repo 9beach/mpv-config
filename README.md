@@ -25,6 +25,12 @@ cd mpv-config-main
 
 If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
 
+If you prefer `portable_config`, run the following.
+
+```
+MPV_CONF_PATH="path-to-my-mpv\portable_config" ./install.sh
+```
+
 In _Microsoft Windows_, run the following from the `Command Prompt` or
 `PowerShell`.
 
@@ -33,6 +39,15 @@ C:\path-to\mpv-config-main> install.bat
 ```
 
 If your machine has NVIDIA GPU installed, run `install.bat nvidia`.
+
+If you prefer `portable_config`, run the following.
+
+```
+C:\path-to\mpv-config-main> SET MPV_CONF_PATH=C:\path-to-my-mpv\portable_config
+C:\path-to\mpv-config-main> install.bat
+```
+
+Notice that there are no quotation marks in `MPV_CONF_PATH` definition.
 
 ## Lua scripts
 
