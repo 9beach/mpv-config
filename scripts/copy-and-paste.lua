@@ -144,8 +144,10 @@ end
 
 function copy()
     local path = mp.get_property('path')
-    if (path ~= nil) then
-        if o.device == 'windows' then path = string.gsub(path, '/', '\\') end
+    if path ~= nil then
+        if o.device == 'windows' and path:match('://') == nil then
+            path = string.gsub(path, '/', '\\')
+        end
         set_clipboard(path)
         if path:match('://') ~= nil then
             osd_info('URL copied')
