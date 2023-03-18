@@ -24,7 +24,7 @@ local o = {
     download_command = 'yt-dlp --write-sub',
     linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',
-    mac_download = 'osascript -e \'tell application "Terminal" to activate\' -e "tell application \"Terminal\" to do script \"bash \'$download_script\'\""',
+    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \"bash \'$download_script\'\"" -e end',
     -- Keybind for downloading currently playing media.
     download_current_track_keybind = 'Ctrl+d Meta+d',
     -- Keybind for downloading all media of playlist.
@@ -95,11 +95,7 @@ ECHO Download completed. Press any key to quit.
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
-    post_script = [[
-cd ..
-echo "Download completed. Press CTRL+d to quit terminal."
-rm -- "$0"
-]]
+    post_script = 'cd ..; echo "Download completed."; rm -- "$0"'
 end
 
 if o.download_dir == nil or o.download_dir == "" then
