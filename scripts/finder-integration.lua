@@ -62,10 +62,9 @@ function reveal_in_finder()
     local path = mp.get_property_native('path')
 
     if not is_local_file(path) then return end
-
     if o.os == 'windows' then path = string.gsub(path, '/', '\\') end
 
-    local my_finder = o.finder
+    local my_finder = { table.unpack(o.finder) }
     my_finder[#my_finder+1] = path
 
     mp.command_native( {name='subprocess', args=my_finder} )
@@ -93,6 +92,7 @@ function touch_file()
     local path = mp.get_property_native('path')
 
     if not is_local_file(path) then return end
+    if o.os == 'windows' then path = string.gsub(path, '/', '\\') end
 
     local r = touch(path)
     if r.status == 0 then
