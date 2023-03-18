@@ -89,7 +89,11 @@ end
 
 local post_script
 if o.device == 'windows' then
-    post_script = 'cd .. & ECHO Download completed. Press any key to quit. & PAUSE >NUL & DEL %0 & EXIT'
+    post_script = [[
+CD ..
+ECHO Download completed. Press any key to quit.
+PAUSE >NUL & DEL %0 & EXIT
+]]
 else
     post_script = [[
 cd ..
