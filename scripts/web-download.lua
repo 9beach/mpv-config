@@ -22,9 +22,9 @@ local msg = require 'mp.msg'
 local o = {
     download_dir = '~~desktop/',
     download_command = 'yt-dlp --write-sub',
-    linux_download = '',
+    linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',
-    mac_download = 'osascript -e "tell application \"Terminal\" to do script \"bash -c \'$download_script\'\""',
+    mac_download = 'osascript -e \'tell application "Terminal" to activate\' -e "tell application \"Terminal\" to do script \"bash \'$download_script\'\""',
     -- Keybind for downloading currently playing media.
     download_current_track_keybind = 'Ctrl+d Meta+d',
     -- Keybind for downloading all media of playlist.
@@ -41,7 +41,7 @@ else
     o.device = 'linux'
 end
 
--- Need to replace $MPV_DIR, $DIRNAME, $DOWNLOAD_DIR and, $FILE_COUNT
+-- Need to replace $DIRNAME, $DOWNLOAD_DIR, and $FILE_COUNT
 local pre_script
 if o.device == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
@@ -149,11 +149,10 @@ function get_download_script_content(current)
         end
     end
 
-    -- Need to replace $DIRNAME, $DOWNLOAD_DIR, $MPV_DIR, and $FILE_COUNT
+    -- Need to replace $DIRNAME, $DOWNLOAD_DIR, and $FILE_COUNT
     if count ~= 0 then
         local dirname = get_dirname()
         local my_pre_script = pre_script
-            :gsub('$MPV_DIR', mp.command_native({"expand-path", "~~/"}))
             :gsub('$DIRNAME', dirname)
             :gsub('$DOWNLOAD_DIR', o.download_dir)
             :gsub('$FILE_COUNT', tostring(count))
@@ -213,7 +212,7 @@ function download(current)
         if current then
             mp.osd_message("Current track is not from internet.")
         else
-            mp.osd_message("No URLs in playlist.")
+            mp.osd_message("No URLs in the playlist.")
         end
         return
     end
@@ -237,7 +236,7 @@ function download(current)
             5
             )
     else
-        os.execute(get_my_script_command(path))
+        os.execute(command)
     end
 end
 
