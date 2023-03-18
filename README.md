@@ -85,13 +85,14 @@ You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 - Appends file paths or URLs in clipboard to current track. (`Ctrl+v, Meta+v`)
 - Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
 
-To play media from their URLs, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system. For
-_Microsoft Windows_ users, just copy `yt-dlp.exe` to `C:\Windows` or **mpv** 
-directory.
-
 For _OSX_ users, it's nice to know that when option key pressed, the context
-menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`).
+menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
+can paste the paths of local media to **mpv** with this.
+
+To download media files, you need to install
+[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
+For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
+`C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 

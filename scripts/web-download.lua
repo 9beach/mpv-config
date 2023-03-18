@@ -11,7 +11,7 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
-For _Microsoft Windows_ users, just download `yt-dlp.exe` and move it to
+For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
 `C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
 ]]
 
@@ -204,7 +204,6 @@ function get_my_script_command(path)
     end
 end
 
--- os.tmpname()
 function download(current)
     local content = get_download_script_content(current)
 
