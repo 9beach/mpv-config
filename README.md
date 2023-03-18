@@ -57,18 +57,20 @@ see [https://mpv.io/manual/master/#files](https://mpv.io/manual/master/#files)
 and [https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location)
 for more information.
 
-### [finder-integration.lua](https://github.com/9beach/mpv-config/blob/main/scripts/finder-integration.lua)
+### [web-download.lua](https://github.com/9beach/mpv-config/blob/main/scripts/web-download.lua)
 
-This script provides two script messages:
+With this script, you can download media files in playlist from web sites
+including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
-1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
-   selected. If you want to reveal playing file in explorer.exe, it will help
-   you.
-2. `touch-file` changes the `mdate` of playing file to current time. If you
-   want to mark playing file to delete later or do something else with, it will
-   help you.
+You can edit key bindings below in `script-opts/web-download.conf`:
 
-You can edit key bindings in `script-opts/finder-integration.conf`.
+- Downloads currently playing media. (`Ctrl+d, Meta+d`)
+- Downloads all media of playlist. (`Ctrl+D, Meta+D`)
+
+To download media files, you need to install
+[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
+For _Microsoft Windows_ users, just download `yt-dlp.exe` and move it to
+`C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
 
 ### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
 
