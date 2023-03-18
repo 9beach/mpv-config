@@ -173,7 +173,6 @@ function make_download_script(content)
     else
         path = o.download_dir..os.tmpname()
     end
-    msg.error(path)
 
     local file, err = io.open(path, "w")
     if not file then
