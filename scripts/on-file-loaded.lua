@@ -3,12 +3,14 @@ https://github.com/9beach/mpv-config/blob/master/scripts/on-file-loaded.lua
 
 This script provides the functions below:
 
-* Plays even in paused state when a new file is loaded.
+* When an audio file is loaded, **mpv** becomes small rectangle. 
 * Shows OSC always when an audio file is loaded.
+* Plays even in paused state when a new file is loaded.
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
-`watch_later` settings override subtitle visibilities above.
+`watch_later` settings override subtitle visibilities above. So if you change
+the visibility of subtitle, **mpv** remembers that.
 
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
 ]]
@@ -18,6 +20,8 @@ local msg = require 'mp.msg'
 local utils = require 'mp.utils'
 
 local o = {
+    -- No video, so small geometry.
+    audio_geometry = '800x800+100%+100%',
     -- Plays even in paused state when a new file is loaded.
     play_on_loaded = true,
     -- Shows OSC alwalys when an audio file is loaded.
@@ -51,6 +55,12 @@ function is_in(element, array)
 end
 
 function is_audio_file(path)
+    local vid = mp.get_property("vid")
+    if vid == "no" then
+        msg.info('no video')
+        return true
+    end
+
     local ext = path:match("^.+%.(.+)$")
     if (ext ~= nil) then
         return is_in(string.lower(ext), AUDIO_EXTENSIONS)
@@ -62,6 +72,13 @@ end
 -- Saves previous states
 local show_osd_bar = mp.get_property_bool("options/osd-bar")
 local osd_on_seek =  mp.get_property_native("osd-on-seek")
+local geometry = mp.get_property_native("geometry")
+
+mp.set_property_native("geometry", o.audio_geometry)
+
+mp.observe_property('idle-active', 'bool', function(name, val)
+    mp.set_property_native("geometry", val and "" or o.audio_geometry)
+end)
 
 -- Shows OSC alwalys when an audio file is loaded.
 function change_osc_visibility(is_audio)
@@ -73,7 +90,7 @@ function change_osc_visibility(is_audio)
     mp.commandv("set", "osd-on-seek", is_audio and "no" or osd_on_seek)
 end
 
-mp.register_event("file-loaded", function()
+function on_file_loaded()
     -- Plays even in paused state when a new file is loaded.
     if o.play_on_loaded == true then
         mp.set_property_bool("pause", false)
@@ -82,8 +99,14 @@ mp.register_event("file-loaded", function()
     local path = mp.get_property("path", "")
 
     -- Shows OSC alwalys when an audio file is loaded.
-    change_osc_visibility(is_audio_file(path))
+    local is_audio = is_audio_file(path)
+    change_osc_visibility(is_audio)
+    mp.set_property_native(
+        "geometry", is_audio and o.audio_geometry or geometry
+        )
 
+    -- From here till end of the function, checks sub-visibility.
+    --
     -- `watch_later` settings override `sub-visibility` obove. 
     if 0 ~= mp.get_property_number('time-pos') then
         msg.info('resumed file, sub-visibility check skipped.')
@@ -110,7 +133,7 @@ mp.register_event("file-loaded", function()
     if o.hide_sub_if_alang_matches ~= '' and alang ~= '' then
         for lang in o.hide_sub_if_alang_matches:gmatch("[^, ]+") do
             if lang == alang then
-                msg.info('sub-visibility set false: alang matches')
+                msg.info('sub-visibility set false: audio lang matches')
                 sub_visible = false
                 break
             end
@@ -118,4 +141,8 @@ mp.register_event("file-loaded", function()
     end
 
     mp.set_property_bool("sub-visibility", sub_visible)
-end)
+end
+
+local is_first = true
+
+mp.register_event("file-loaded", on_file_loaded)

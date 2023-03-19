@@ -31,7 +31,7 @@ local o = {
     -- `ba` for 'best audio'. With YouTubes VP9 codec this file will most likely
     -- be .webm or .opus extension. To save the highest quality audio as an 
     -- mp3 file you need to install `ffmpeg` and change below to 
-    -- `yt-dlp -f ba -x --audio-format mp3`.
+    -- `yt-dlp --no-mtime -f ba -x --audio-format mp3`.
     download_audio_command = 'yt-dlp --no-mtime -f ba',
     linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',

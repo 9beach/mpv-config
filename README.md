@@ -125,14 +125,16 @@ Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 
 ### [on-file-loaded.lua](https://github.com/9beach/mpv-config/blob/main/scripts/on-file-loaded.lua)
 
-This script provides functions below:
+This script provides the functions below:
 
-* Plays even in paused state when a new file is loaded.
+* When an audio file is loaded, **mpv** becomes small rectangle.
 * Shows OSC always when an audio file is loaded.
+* Plays even in paused state when a new file is loaded.
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
-`watch_later` settings override subtitle visibilities above.
+`watch_later` settings override subtitle visibilities above. So if you change
+the visibility of subtitle, **mpv** remembers that.
 
 You can edit the settings in `script-opts/on-file-loaded.conf`.
 
