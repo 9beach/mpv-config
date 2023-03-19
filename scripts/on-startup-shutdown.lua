@@ -5,7 +5,9 @@ This script provides the functions below:
 
 * Saves and restores sound volume level
 
-`watch_later` settings override sound volume level above.
+`watch_later` setting for each file overrides sound volume level above.
+So if you change the sound volume level of a file, **mpv** remembers it just
+for that file if you resume to play it.
 
 You can edit the configuration in `script-opts/on-startup-shutdown.lua`.
 ]]

@@ -9,8 +9,9 @@ This script provides the functions below:
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 
-`watch_later` settings override subtitle visibilities above. So if you change
-the visibility of subtitle, **mpv** remembers that.
+`watch_later` setting for each file overrides subtitle visibilities above.
+So if you change the visibility of subtitle in a file, **mpv** remembers it
+just for that file if you resume to play it.
 
 You can edit the configuration in `script-opts/on-file-loaded.conf`.
 ]]
