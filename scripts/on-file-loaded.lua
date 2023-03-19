@@ -57,7 +57,7 @@ end
 function is_audio_file(path)
     local vid = mp.get_property("vid")
     if vid == "no" then
-        msg.info('no video')
+        msg.info('no video: '..path)
         return true
     end
 
