@@ -59,13 +59,15 @@ for more information.
 
 ### [web-download.lua](https://github.com/9beach/mpv-config/blob/main/scripts/web-download.lua)
 
-With this script, you can download media files in playlist from web sites
-including YouTube, Twitter, Twitch.tv, Naver, Kakao...
+With this script, you can download media files of **mpv** playlist from web
+sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/web-download.conf`:
 
 - Downloads currently playing media. (`Ctrl+d, Meta+d`)
-- Downloads all media of playlist. (`Ctrl+D, Meta+D`)
+- Downloads all media of **mpv** playlist. (`Ctrl+D, Meta+D`)
+- Downloads currently playing media as a audio file. (`Ctrl+e, Meta+e`)
+- Downloads all media of **mpv** playlist as audio files. (`Ctrl+E, Meta+E`)
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.

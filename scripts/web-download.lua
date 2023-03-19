@@ -1,13 +1,15 @@
 --[[
 https://github.com/9beach/mpv-config/blob/main/scripts/web-download.lua
 
-With this script, you can download media files in playlist from web sites
-including YouTube, Twitter, Twitch.tv, Naver, Kakao...
+With this script, you can download media files of **mpv** playlist from web
+sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/web-download.conf`:
 
 - Downloads currently playing media. (`Ctrl+d, Meta+d`)
-- Downloads all media of playlist. (`Ctrl+D, Meta+D`)
+- Downloads all media of **mpv** playlist. (`Ctrl+D, Meta+D`)
+- Downloads currently playing media as a audio file. (`Ctrl+e, Meta+e`)
+- Downloads all media of **mpv** playlist as audio files. (`Ctrl+E, Meta+E`)
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
@@ -20,15 +22,28 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
+    -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
     download_dir = '~~desktop/',
-    download_command = 'yt-dlp --write-sub',
+    -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
+    download_to_time_dir = false,
+    -- More detailed subtitle download options here.
+    download_command = 'yt-dlp --no-mtime --write-sub',
+    -- `ba` for 'best audio'. With YouTubes VP9 codec this file will most likely
+    -- be .webm or .opus extension. To save the highest quality audio as an 
+    -- mp3 file you need to install `ffmpeg` and change below to 
+    -- `yt-dlp -f ba -x --audio-format mp3`.
+    download_audio_command = 'yt-dlp --no-mtime -f ba',
     linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',
-    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \"bash \'$download_script\'\"" -e end',
+    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$download_script\'\\\"" -e end',
     -- Keybind for downloading currently playing media.
     download_current_track_keybind = 'Ctrl+d Meta+d',
     -- Keybind for downloading all media of playlist.
     download_playlist_keybind = 'Ctrl+Shift+d Meta+Shift+d',
+    -- Keybind for downloading currently playing media as a audio file.
+    download_current_track_audio_keybind = 'Ctrl+e Meta+e',
+    -- Keybind for downloading all media of playlist as audio files.
+    download_playlist_audio_keybind = 'Ctrl+Shift+e Meta+Shift+e',
 }
 
 options.read_options(o, "web-download")
@@ -41,61 +56,81 @@ else
     o.device = 'linux'
 end
 
--- Need to replace $DIRNAME, $DOWNLOAD_DIR, and $FILE_COUNT
+-- Need to replace $BASENAME, $DIRNAME, and $COUNT
 local pre_script
 if o.device == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
 @ECHO OFF
 
 SET PATH=%PATH%;%CD%
-
-CD "$DOWNLOAD_DIR"
-IF EXIST "$DIRNAME" (
-    ECHO "$DOWNLOAD_DIR\$DIRNAME" already exists. Press any key to quit.
-    PAUSE >NUL
-    EXIT
-)
-
-MKDIR "$DIRNAME"
-IF NOT EXIST "$DIRNAME" (
-    ECHO Failed to create "$DOWNLOAD_DIR\$DIRNAME". Press any key to quit.
-    PAUSE >NUL
-    EXIT
-)
+SET BASENAME=$BASENAME
 
 CD "$DIRNAME"
+IF %ERRORLEVEL% == 0 GOTO S1
+ECHO Failed to go to "$DIRNAME". Press any key to quit.
+PAUSE >NUL
+EXIT
 
-ECHO Press any key to download $FILE_COUNT file(s) in "$DOWNLOAD_DIR\$DIRNAME".
+:S1
+
+IF "%BASENAME%"=="" GOTO S2
+
+IF EXIST "$BASENAME" (
+    ECHO "$DIRNAME\$BASENAME" already exists. Press any key to quit.
+    PAUSE >NUL
+    EXIT
+)
+
+MKDIR "$BASENAME"
+IF NOT EXIST "$BASENAME" (
+    ECHO Failed to create "$DIRNAME\$BASENAME". Press any key to quit.
+    PAUSE >NUL
+    EXIT
+)
+
+CD "$BASENAME"
+
+:S2
+ECHO Press any key to download $COUNT file(s) to "$DIRNAME\$BASENAME".
 PAUSE >NUL
 ]]
 else
     pre_script = [[
-cd "$DOWNLOAD_DIR"
-if [ -d "$DIRNAME" ] || [ -f "$DIRNAME" ]; then
-    read -p '"$DOWNLOAD_DIR/$DIRNAME" already exists. Press any key to quit.'
-    exit
-fi
-
-mkdir "$DIRNAME"
-if [ ! -d "$DIRNAME" ]; then
-    read -p 'Failed to create "$DOWNLOAD_DIR/$DIRNAME". Press any key to quit.'
-    exit
-fi
-
 cd "$DIRNAME"
-read -p 'Press any key to download $FILE_COUNT file(s) in "$DOWNLOAD_DIR/$DIRNAME".'
+if [ $? -ne 0 ]; then
+    read -p 'Failed to go to "$DIRNAME". Press any key to quit.'
+    exit 1
+fi
+
+if [ ! "$BASENAME" = "" ]; then
+    if [ -d "$BASENAME" ] || [ -f "$BASENAME" ]; then
+        read -p '"$DIRNAME/$BASENAME" already exists. Press any key to quit.'
+        exit
+    fi
+    
+    mkdir "$BASENAME"
+    if [ ! -d "$BASENAME" ]; then
+        read -p 'Failed to create "$DIRNAME/$BASENAME". Press any key to quit.'
+        exit
+    fi
+    
+    cd "$BASENAME"
+fi
+read -p 'Press any key to download $COUNT file(s) to "$DIRNAME/$BASENAME".'
 ]]
 end
 
 local post_script
 if o.device == 'windows' then
     post_script = [[
-CD ..
+
+IF NOT "%BASENAME%"=="" CD ..
+
 ECHO Download completed. Press any key to quit.
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
-    post_script = 'cd ..; echo "Download completed."; rm -- "$0"'
+    post_script = 'cd .. 2> /dev/null; echo "Download completed."; rm -- "$0"'
 end
 
 if o.download_dir == nil or o.download_dir == "" then
@@ -105,7 +140,12 @@ else
     o.download_dir = mp.command_native({"expand-path", o.download_dir})
 end
 
-function get_dirname()
+function osd_error(text)
+    msg.error(text)
+    mp.osd_message(text)
+end
+
+function get_basename()
     local date = os.date("*t")
     return ("%02d%02d%02d-%02d%02d%02d"):format(
         date.year-2000, date.month, date.day, date.hour, date.min, date.sec
@@ -133,9 +173,10 @@ function is_url(path)
     return path ~= nil and string.find(path, '://') ~= nil
 end
 
-function get_download_script_content(current)
+function get_download_script_content(current, audio)
     local playlist = mp.get_property_native('playlist')
     if #playlist == 0 then return nil end
+    local command = audio and o.download_audio_command or o.download_command
 
     local script = ''
     local j = current == true and mp.get_property_number('playlist-pos', 0) or 0
@@ -144,18 +185,20 @@ function get_download_script_content(current)
     for i=j+1, k+1 do
         local path = playlist[i].filename
         if is_url(path) then
-            script = script..o.download_command..' "'..path..'"\n'
+            script = script..command..' "'..path..'"\n'
             count = count+1
         end
     end
 
-    -- Need to replace $DIRNAME, $DOWNLOAD_DIR, and $FILE_COUNT
+    -- Need to replace $BASENAME, $DIRNAME, and $COUNT
     if count ~= 0 then
-        local dirname = get_dirname()
+        local basename = o.download_to_time_dir and get_basename() or ''
+        local count_and_type = 
+            audio and tostring(count)..' audio' or tostring(count)
         local my_pre_script = pre_script
-            :gsub('$DIRNAME', dirname)
-            :gsub('$DOWNLOAD_DIR', o.download_dir)
-            :gsub('$FILE_COUNT', tostring(count))
+            :gsub('$BASENAME', basename)
+            :gsub('$DIRNAME', o.download_dir)
+            :gsub('$COUNT', count_and_type)
         return my_pre_script..script..post_script
     else
         return nil
@@ -203,8 +246,8 @@ function get_my_script_command(path)
     end
 end
 
-function download(current)
-    local content = get_download_script_content(current)
+function download(current, audio)
+    local content = get_download_script_content(current, audio)
 
     if not content then
         if current then
@@ -227,20 +270,35 @@ function download(current)
 
     if command == nil or command == '' then
         os.remove(path)
-        mp.osd_message(
-            'Failed to get download command in "'
-            ..mp.command_native({"expand-path", "~~/"})
-            ..'/script-opts/web-download.conf".',
+        osd_error(
+            'Failed to read download command from "'
+                ..mp.command_native({"expand-path", "~~/"})
+                ..'/script-opts/web-download.conf".',
             5
             )
     else
-        os.execute(command)
+        local ret = os.execute(command)
+        if not ret then
+            msg.error('failed: '..command)
+        else
+            msg.info(command)
+        end
     end
 end
 
 bind_keys(o.download_current_track_keybind, 'download-current-track', function()
-    download(true)
+    download(true, false)
 end)
 bind_keys(o.download_playlist_keybind, 'download-playlist', function()
-    download(false)
+    download(false, false)
 end)
+bind_keys(
+    o.download_current_track_audio_keybind, 
+    'download-current-track-audio',
+    function() download(true, true) end
+    )
+bind_keys(
+    o.download_playlist_audio_keybind, 
+    'download-playlist-audio', 
+    function() download(false, true) end
+    )
