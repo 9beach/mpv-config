@@ -56,6 +56,9 @@ else
     local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
     o.playlist_dir = o.playlist_dir:gsub('%$HOME', home_dir)
     o.playlist_dir = mp.command_native({"expand-path", o.playlist_dir})
+    if o.device == 'windows' then
+        o.playlist_dir =  o.playlist_dir:gsub('/', '\\')
+    end
 end
 
 math.randomseed(os.time())

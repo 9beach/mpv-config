@@ -126,6 +126,7 @@ if o.device == 'windows' then
     post_script = [[
 IF NOT "%BASENAME%"=="" CD ..
 ECHO Download completed. Press any key to quit.
+
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
@@ -139,6 +140,9 @@ else
     local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
     o.download_dir = o.download_dir:gsub('%$HOME', home_dir)
     o.download_dir = mp.command_native({"expand-path", o.download_dir})
+    if o.device == 'windows' then
+        o.download_dir =  o.download_dir:gsub('/', '\\')
+    end
 end
 
 function osd_error(text)
