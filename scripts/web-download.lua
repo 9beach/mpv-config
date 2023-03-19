@@ -123,9 +123,7 @@ end
 local post_script
 if o.device == 'windows' then
     post_script = [[
-
 IF NOT "%BASENAME%"=="" CD ..
-
 ECHO Download completed. Press any key to quit.
 PAUSE >NUL & DEL %0 & EXIT
 ]]
