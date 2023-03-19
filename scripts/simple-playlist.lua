@@ -36,6 +36,7 @@ local msg = require 'mp.msg'
 
 local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
+    -- Supports `$HOME` for Microsoft Windows also.
     playlist_dir = '~~desktop/',
 }
 
@@ -52,6 +53,8 @@ end
 if o.playlist_dir == nil or o.playlist_dir == "" then
     o.playlist_dir = mp.command_native({"expand-path", "~~/"}).."/playlists"
 else
+    local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
+    o.playlist_dir = o.playlist_dir:gsub('%$HOME', home_dir)
     o.playlist_dir = mp.command_native({"expand-path", o.playlist_dir})
 end
 
@@ -257,8 +260,9 @@ function create_dir(dir)
 
         local res = utils.subprocess({args=args, cancellable=false})
         return res.status == 0
+    else
+        return true
     end
-    return true
 end
 
 function save_playlist()

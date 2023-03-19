@@ -23,7 +23,8 @@ local msg = require 'mp.msg'
 
 local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
-    download_dir = '~~desktop/',
+    -- Supports `$HOME` for Microsoft Windows also.
+    download_dir = '$HOME/Downloads',
     -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
     download_to_time_dir = false,
     -- More detailed subtitle download options here.
@@ -135,6 +136,8 @@ if o.download_dir == nil or o.download_dir == "" then
     o.download_dir = mp.command_native({"expand-path", "~~/"})..
                      (o.device == 'windows' and "\\downloads" or "/downloads")
 else
+    local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
+    o.download_dir = o.download_dir:gsub('%$HOME', home_dir)
     o.download_dir = mp.command_native({"expand-path", o.download_dir})
 end
 
@@ -244,6 +247,26 @@ function get_my_script_command(path)
     end
 end
 
+function create_dir(dir)
+    if utils.readdir(dir) == nil then
+        local args
+        if o.device == 'windows' then
+            args = {
+                'powershell', '-NoProfile', '-Command', 'mkdir', dir
+            }
+        else
+            args = {'mkdir', dir}
+        end
+
+        local res = utils.subprocess({args=args, cancellable=false})
+        return res.status == 0
+    else
+        return true
+    end
+end
+
+local is_first = true
+
 function download(current, audio)
     local content = get_download_script_content(current, audio)
 
@@ -254,6 +277,16 @@ function download(current, audio)
             mp.osd_message("No URLs in the playlist.")
         end
         return
+    end
+
+    if is_first then
+        is_first = false
+        if create_dir(o.download_dir) == false then
+            osd_error(
+                'Failed to create download directory "'..o.download_dir..'"'
+                )
+            return
+        end
     end
 
     local path = make_download_script(content)
