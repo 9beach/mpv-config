@@ -105,7 +105,10 @@ This script provides script messages below:
 - script-message simple-playlist sort date-desc startover
 
 `simple-playlist sort` also support `size-asc`, `size-desc`, `name-asc`,
-`name-desc` with or without `startover`.
+`name-desc` with or without `startover`. It's quite fast. Of course,
+the time complexity of my sorting algorithm is **O(nlog n)** for **Lua** data,
+but for the **mpv** system call, i.e., `mp.commandv('playlist-move', i, j)`,
+the time complexity is **O(n)**.
 
 - script-message simple-playlist shuffle
 - script-message simple-playlist reverse
