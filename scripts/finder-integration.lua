@@ -58,13 +58,19 @@ function is_local_file(path)
     return path ~= nil and string.find(path, '://') == nil
 end
 
+function table.shallow_copy(t)
+    local t2 = {}
+    for k,v in pairs(t) do t2[k] = v end
+    return t2
+end
+
 function reveal_in_finder()
     local path = mp.get_property_native('path')
 
     if not is_local_file(path) then return end
     if o.os == 'windows' then path = string.gsub(path, '/', '\\') end
 
-    local my_finder = { table.unpack(o.finder) }
+    local my_finder = table.shallow_copy(o.finder)
     my_finder[#my_finder+1] = path
 
     mp.command_native( {name='subprocess', args=my_finder} )
