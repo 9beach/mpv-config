@@ -27,12 +27,15 @@ local o = {
     download_dir = '$HOME/Downloads',
     -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
     download_to_time_dir = false,
-    -- More detailed subtitle download options here.
+    -- To preserve chapter markers, you need to install `ffmpeg` and change 
+    -- below to `yt-dlp --no-mtime --write-sub --embed-chapters`.
     download_command = 'yt-dlp --no-mtime --write-sub',
     -- `ba` for 'best audio'. With YouTubes VP9 codec this file will most likely
     -- be .webm or .opus extension. To save the highest quality audio as an 
     -- mp3 file you need to install `ffmpeg` and change below to 
     -- `yt-dlp --no-mtime -f ba -x --audio-format mp3`.
+    -- To preserve chapter markers, you need to install `ffmpeg` and change 
+    -- below to `yt-dlp --no-mtime -f ba --embed-chapters`.
     download_audio_command = 'yt-dlp --no-mtime -f ba',
     linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',
