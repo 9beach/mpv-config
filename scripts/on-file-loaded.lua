@@ -85,6 +85,7 @@ end
 local show_osd_bar = mp.get_property_bool("options/osd-bar")
 local osd_on_seek =  mp.get_property_native("osd-on-seek")
 local geometry = mp.get_property_native("geometry")
+local autofit = mp.get_property_native("autofit")
 
 -- Shows OSC alwalys when an audio file is loaded.
 function change_osc_visibility(is_audio)
@@ -111,7 +112,8 @@ function on_file_loaded()
         change_osc_visibility(is_audio)
     end
     if o.reset_geometry_on_video and not is_audio then
-        msg.info("reset geometry: "..path)
+        msg.info("reset geometry and autofit: "..autofit)
+        mp.set_property_native("autofit", autofit)
         mp.set_property_native("geometry", geometry)
     end
 
