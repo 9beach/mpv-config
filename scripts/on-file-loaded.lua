@@ -75,10 +75,16 @@ local show_osd_bar = mp.get_property_bool("options/osd-bar")
 local osd_on_seek =  mp.get_property_native("osd-on-seek")
 local geometry = mp.get_property_native("geometry")
 
+-- When first loading file (double-clicked in Finder.app) is audio, geometry
+-- is not changed. I don't know why. So we change geometry to o.audio_geometry
+-- as a default.
 mp.set_property_native("geometry", o.audio_geometry)
 
+-- For opening mpv in idle state and cliking ESC.
+-- Fails to recover geometry on mpv state from audio to idle in Windows.
 mp.observe_property('idle-active', 'bool', function(name, val)
-    mp.set_property_native("geometry", val and "" or o.audio_geometry)
+    local g = val and geometry or o.audio_geometry
+    mp.set_property_native("geometry", g)
 end)
 
 -- Shows OSC alwalys when an audio file is loaded.
@@ -101,10 +107,12 @@ function on_file_loaded()
 
     -- Shows OSC alwalys when an audio file is loaded.
     local is_audio = is_audio_file(path)
-    change_osc_visibility(is_audio)
-    mp.set_property_native(
-        "geometry", is_audio and o.audio_geometry or geometry
-        )
+    if o.osc_always_on_audio then
+        change_osc_visibility(is_audio)
+        mp.set_property_native(
+            "geometry", is_audio and o.audio_geometry or geometry
+            )
+    end
 
     -- From here till end of the function, checks sub-visibility.
     --
@@ -143,7 +151,5 @@ function on_file_loaded()
 
     mp.set_property_bool("sub-visibility", sub_visible)
 end
-
-local is_first = true
 
 mp.register_event("file-loaded", on_file_loaded)

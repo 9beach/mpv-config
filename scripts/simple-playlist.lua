@@ -268,13 +268,20 @@ function create_dir(dir)
     end
 end
 
+local is_first = true
+
 function save_playlist()
     local playlist = mp.get_property_native('playlist')
     if #playlist == 0 then return end
 
-    if create_dir(o.playlist_dir) == false then
-        osd_error('Failed to create playlist directory "'..o.playlist_dir..'"')
-        return
+    if is_first then
+        is_first = false
+        if create_dir(o.playlist_dir) == false then
+            osd_error(
+                'Failed to create playlist directory "'..o.playlist_dir..'"'
+                )
+            return
+        end
     end
 
     local date = os.date("*t")
