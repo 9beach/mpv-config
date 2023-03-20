@@ -15,7 +15,7 @@ First [install mpv](https://mpv.io/installation/) and then download and unzip
 [this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
 
 In Mac or Linux, run the following from the terminal. Then it installs
-`9beach/mpv-config` to your **mpv** configuration directory. Your original 
+`9beach/mpv-config` to your **mpv** configuration directory. Your original
 **mpv** settings are copied to `~/Downloads` directory if it exists.
 
 ```console
@@ -130,11 +130,21 @@ Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 
 This script provides the functions below:
 
-* When an audio file is loaded, **mpv** becomes small rectangle.
-* Shows OSC always when an audio file is loaded.
-* Plays even in paused state when a new file is loaded.
-* Does not show subtitle if lower-case path matches given patterns.
-* Does not show subtitle if audio language matches given values.
+- Shows OSC always when an audio file (that is of known audio extensions or
+  has no video) is loaded.
+- Plays even in paused state when a new file is loaded.
+- Does not show subtitle if lower-case path matches given patterns.
+- Does not show subtitle if audio language matches given values.
+
+* Resets **mpv** geometry when an non-audio file (that is not of known audio
+  extensions and has no video) is loaded. With this feature, **mpv** can
+  escape from small rectable when a webm media has video even if `mpv.conf` has
+  settings below.
+  
+  ```
+  [extension.webm]
+  geometry=800x800+100%+100%
+  ```
 
 `watch_later` setting for each file overrides subtitle visibilities above.
 So if you change the visibility of subtitle in a file, **mpv** remembers it
@@ -159,7 +169,7 @@ You can edit the settings in `script-opts/finder-integration.conf`.
 
 This script provides the functions below:
 
-* Saves and restores sound volume level
+- Saves and restores sound volume level
 
 `watch_later` setting for each file overrides sound volume level above.
 So if you change the sound volume level of a file, **mpv** remembers it just

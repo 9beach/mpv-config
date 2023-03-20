@@ -3,11 +3,20 @@ https://github.com/9beach/mpv-config/blob/master/scripts/on-file-loaded.lua
 
 This script provides the functions below:
 
-* When an audio file is loaded, **mpv** becomes small rectangle. 
-* Shows OSC always when an audio file is loaded.
+* Shows OSC always when an audio file (that is of known audio extensions or 
+  has no video) is loaded.
 * Plays even in paused state when a new file is loaded.
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
+* Resets **mpv** geometry when an non-audio file (that is not of known audio 
+  extensions and has no video) is loaded. With this feature, **mpv** can 
+  escape from small rectable when a webm media has video even if `mpv.conf` has 
+  settings below.
+
+  ```
+  [extension.webm]
+  geometry=800x800+100%+100%
+  ```
 
 `watch_later` setting for each file overrides subtitle visibilities above.
 So if you change the visibility of subtitle in a file, **mpv** remembers it
@@ -21,8 +30,12 @@ local msg = require 'mp.msg'
 local utils = require 'mp.utils'
 
 local o = {
-    -- No video, so small geometry.
-    audio_geometry = '800x800+100%+100%',
+    -- Escapes from small rectable when a webm media has video even if 
+    -- `mpv.conf` has settings below.
+    --
+    -- [extension.webm]
+    -- geometry=800x800+100%+100%
+    reset_geometry_on_video = true,
     -- Plays even in paused state when a new file is loaded.
     play_on_loaded = true,
     -- Shows OSC alwalys when an audio file is loaded.
@@ -57,10 +70,8 @@ end
 
 function is_audio_file(path)
     local vid = mp.get_property("vid")
-    if vid == "no" then
-        msg.info('no video: '..path)
-        return true
-    end
+    msg.info('vid: '..vid..' '..path)
+    if vid == "no" then return true end
 
     local ext = path:match("^.+%.(.+)$")
     if (ext ~= nil) then
@@ -74,18 +85,6 @@ end
 local show_osd_bar = mp.get_property_bool("options/osd-bar")
 local osd_on_seek =  mp.get_property_native("osd-on-seek")
 local geometry = mp.get_property_native("geometry")
-
--- When first loading file (double-clicked in Finder.app) is audio, geometry
--- is not changed. I don't know why. So we change geometry to o.audio_geometry
--- as a default.
-mp.set_property_native("geometry", o.audio_geometry)
-
--- For opening mpv in idle state and cliking ESC.
--- Fails to recover geometry on mpv state from audio to idle in Windows.
-mp.observe_property('idle-active', 'bool', function(name, val)
-    local g = val and geometry or o.audio_geometry
-    mp.set_property_native("geometry", g)
-end)
 
 -- Shows OSC alwalys when an audio file is loaded.
 function change_osc_visibility(is_audio)
@@ -107,11 +106,13 @@ function on_file_loaded()
 
     -- Shows OSC alwalys when an audio file is loaded.
     local is_audio = is_audio_file(path)
+
     if o.osc_always_on_audio then
         change_osc_visibility(is_audio)
-        mp.set_property_native(
-            "geometry", is_audio and o.audio_geometry or geometry
-            )
+    end
+    if o.reset_geometry_on_video and not is_audio then
+        msg.info("reset geometry: "..path)
+        mp.set_property_native("geometry", geometry)
     end
 
     -- From here till end of the function, checks sub-visibility.
