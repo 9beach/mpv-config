@@ -66,7 +66,7 @@ if o.device == 'windows' then
 SET PATH=%PATH%;%CD%
 SET BASENAME=$BASENAME
 
-WHERE ffmpeg >NUL 2> NUL
+WHERE ffmpeg >NUL 2>NUL
 IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=$FFMPEG_OPTS
 
 CD "$DIRNAME"

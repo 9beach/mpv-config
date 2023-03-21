@@ -9,7 +9,7 @@ This script provides the functions below:
 * Does not show subtitle if lower-case path matches given patterns.
 * Does not show subtitle if audio language matches given values.
 * Resets **mpv** geometry when an non-audio file (that is not of known audio 
-  extensions and has no video) is loaded. With this feature, **mpv** can 
+  extensions and has video) is loaded. With this feature, **mpv** can 
   escape from small rectable when a webm media has video even if `mpv.conf` has 
   settings below.
 
@@ -35,7 +35,7 @@ local o = {
     --
     -- [extension.webm]
     -- geometry=800x800+100%+100%
-    reset_geometry_on_video = true,
+    reset_geometry_on_video = false,
     -- Plays even in paused state when a new file is loaded.
     play_on_loaded = true,
     -- Shows OSC alwalys when an audio file is loaded.
