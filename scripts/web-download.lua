@@ -27,13 +27,17 @@ local o = {
     download_dir = '$HOME/Downloads',
     -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
     download_to_subdir = false,
-    -- `yt-dlp` options for downloading.
-    download_command = 'yt-dlp -S ext:mp4:m4a:webm --no-mtime --write-sub',
-    -- `ba` stands for 'best audio'.
-    download_audio_command = 'yt-dlp -S ext:mp4:m4a:webm --no-mtime -f ba',
-    -- If `ffmpeg` is installed, automatically adds the options below. 
-    -- Default is `--embed-chapters` to preserve chapter markers.
-    options_if_ffmpeg_exists = '--embed-chapters',
+    -- `yt-dlp` options for downloading video.
+    -- `ba` for 'best audio', `bv` for 'best video'.
+    download_command = 'yt-dlp -f "bv+ba" --no-mtime --write-sub',
+    -- `yt-dlp` options for downloading audio.
+    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime',
+    -- If `ffmpeg` is installed, adds the options below to download commands. 
+    --
+    -- `-f "bv+ba" --embed-chapters` for quality and chapter markers.
+    ffmpeg_options = '-f "bv+ba" --embed-chapters',
+    -- `--embed-chapters` for chapter markers.
+    ffmpeg_audio_options = '--embed-chapters',
     linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',
     mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$download_script\'\\\"" -e end',
@@ -213,12 +217,14 @@ function get_download_script_content(current, audio)
     if count ~= 0 then
         local basename = o.download_to_subdir and get_basename() or ''
         local count_and_type = 
-            audio and tostring(count)..' audio' or tostring(count)
+            audio == true and tostring(count)..' audio' or tostring(count)
         -- WARNING: Do not replace `$FFMPEG_OPTS` in script, replace them
         -- only in pre_script.
+        local ffmpeg_options = 
+            audio == true and o.ffmpeg_audio_options or o.ffmpeg_options
         local my_pre_script = pre_script
             :gsub('$BASENAME', basename)
-            :gsub('$FFMPEG_OPTS', o.options_if_ffmpeg_exists)
+            :gsub('$FFMPEG_OPTS', ffmpeg_options)
             :gsub('$DIRNAME', o.download_dir)
             :gsub('$COUNT', count_and_type)
         return my_pre_script..script..post_script

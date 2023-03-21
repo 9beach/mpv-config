@@ -15,7 +15,7 @@ if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
 			grep -v '^# *osx *:' | grep -v '^# *nvidia *:'
 		}
 	fi
-elif [[ `uname` == "Darwin" ]]; then
+elif [ `uname` = "Darwin" ]; then
 	if [ "$MPV_CONF_PATH" = "" ]; then
 		MPV_CONF_PATH="$HOME/.config/mpv"
 	fi
@@ -44,6 +44,12 @@ mv "$MPV_CONF_PATH" "$BACKUP_DIR" 2> /dev/null \
 
 mkdir -p "$MPV_CONF_PATH"
 cp -R fonts script-opts scripts input.conf "$MPV_CONF_PATH"
+
+# Applies new version of `osx-scripts/ytdl_hook.lua` to the system 
+# before **mpv** for OSX patched.
+if [ `uname` = "Darwin" ]; then
+	cp -R osx-scripts/ytdl_hook.lua "$MPV_CONF_PATH/scripts"
+fi
 cat mpv.conf | my_filter > "$MPV_CONF_PATH"/mpv.conf
 mv "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH" 2> /dev/null
 mv "$BACKUP_DIR/.volume" "$MPV_CONF_PATH" 2> /dev/null
