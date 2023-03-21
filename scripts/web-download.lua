@@ -222,6 +222,9 @@ function get_download_script_content(current, audio)
         -- only in pre_script.
         local ffmpeg_options = 
             audio == true and o.ffmpeg_audio_options or o.ffmpeg_options
+        if o.device ~= 'windows' then
+            ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
+        end
         local my_pre_script = pre_script
             :gsub('$BASENAME', basename)
             :gsub('$FFMPEG_OPTS', ffmpeg_options)
