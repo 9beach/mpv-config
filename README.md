@@ -61,8 +61,6 @@ for more information.
 
 With this script, you can download media files of **mpv** playlist from web
 sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
-You need to install `ffmpeg` to download the highest resolution videos, and
-preserve chapter markers.
 
 You can edit key bindings below in `script-opts/web-download.conf`:
 
@@ -73,8 +71,11 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
-For _Microsoft Windows_ users, just download `yt-dlp.exe` and move it to
+For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
 `C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
+
+To download the highest resolution videos, and preserve chapter markers,
+you need to install [ffmpeg](https://ffmpeg.org).
 
 ### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
 
