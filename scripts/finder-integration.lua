@@ -24,16 +24,21 @@ local o = {
     reveal_in_finder_keybind='META+f CTRL+f',
 }
 
+if os.getenv('windir') ~= nil then
+    o.platform = 'windows'
+elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+    o.platform = 'darwin'
+else
+    o.platform = 'linux'
+end
+
 options.read_options(o, "finder-integration")
 
-if os.getenv('windir') ~= nil then
-    o.os = 'windows'
+if o.platform == 'windows' then
     o.finder = utils.parse_json(o.windows_finder)
-elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-    o.os = 'mac'
+elseif o.platform == 'darwin' then
     o.finder = utils.parse_json(o.mac_finder)
 else
-    o.os = 'linux'
     o.finder = utils.parse_json(o.linux_finder)
 end
 
@@ -68,7 +73,7 @@ function reveal_in_finder()
     local path = mp.get_property_native('path')
 
     if not is_local_file(path) then return end
-    if o.os == 'windows' then path = string.gsub(path, '/', '\\') end
+    if o.platform == 'windows' then path = string.gsub(path, '/', '\\') end
 
     local my_finder = table.shallow_copy(o.finder)
     my_finder[#my_finder+1] = path
@@ -81,11 +86,14 @@ bind_keys(o.reveal_in_finder_keybind, 'reveal-in-finder', reveal_in_finder)
 function touch(path)
     local cmd = nil
 
-    if o.os == 'windows' then
+    if o.platform == 'windows' then
+        -- Hey Bill, WTF!
+        path = path:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''")
         cmd = {
             'powershell',
             '-command',
-            '(Get-Item "'..path..'").LastWriteTime=(Get-Date)'
+            "(Get-Item '"..path.."').LastWriteTime=(Get-Date)"
         }
     else
         cmd = {'touch', path}
@@ -98,7 +106,7 @@ function touch_file()
     local path = mp.get_property_native('path')
 
     if not is_local_file(path) then return end
-    if o.os == 'windows' then path = string.gsub(path, '/', '\\') end
+    if o.platform == 'windows' then path = string.gsub(path, '/', '\\') end
 
     local r = touch(path)
     if r.status == 0 then

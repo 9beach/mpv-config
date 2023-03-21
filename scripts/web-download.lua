@@ -54,19 +54,19 @@ local o = {
     download_playlist_audio_keybind = 'Ctrl+Shift+e Meta+Shift+e',
 }
 
-options.read_options(o, "web-download")
-
 if os.getenv('windir') ~= nil then
-    o.device = 'windows'
+    o.platform = 'windows'
 elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-    o.device = 'mac'
+    o.platform = 'darwin'
 else
-    o.device = 'linux'
+    o.platform = 'linux'
 end
+
+options.read_options(o, "web-download")
 
 -- Need to replace $BASENAME, $FFMPEG_OPTS, $DIRNAME, and $COUNT
 local pre_script
-if o.device == 'windows' then
+if o.platform == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
 @ECHO OFF
 
@@ -136,7 +136,7 @@ read -p 'Press any key to download $COUNT file(s) to "$DIRNAME/$BASENAME".'
 end
 
 local post_script
-if o.device == 'windows' then
+if o.platform == 'windows' then
     post_script = [[
 
 IF NOT "%BASENAME%"=="" CD ..
@@ -150,12 +150,12 @@ end
 
 if o.download_dir == nil or o.download_dir == "" then
     o.download_dir = mp.command_native({"expand-path", "~~/"})..
-                     (o.device == 'windows' and "\\downloads" or "/downloads")
+                     (o.platform == 'windows' and "\\downloads" or "/downloads")
 else
     local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
     o.download_dir = o.download_dir:gsub('%$HOME', home_dir)
     o.download_dir = mp.command_native({"expand-path", o.download_dir})
-    if o.device == 'windows' then
+    if o.platform == 'windows' then
         o.download_dir =  o.download_dir:gsub('/', '\\')
     end
 end
@@ -198,7 +198,7 @@ function get_download_script_content(current, audio)
     if #playlist == 0 then return nil end
     local command = audio and o.download_audio_command or o.download_command
 
-    if o.device == 'windows' then
+    if o.platform == 'windows' then
         command = command..' %FFMPEG_OPTS%'
     else
         command = command..' $FFMPEG_OPTS'
@@ -225,7 +225,7 @@ function get_download_script_content(current, audio)
         -- only in pre_script.
         local ffmpeg_options = 
             audio == true and o.ffmpeg_audio_options or o.ffmpeg_options
-        if o.device ~= 'windows' then
+        if o.platform ~= 'windows' then
             ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
         end
         local my_pre_script = pre_script
@@ -241,7 +241,7 @@ end
 
 function make_download_script(content)
     local path
-    if o.device ~= 'windows' then
+    if o.platform ~= 'windows' then
         path = o.download_dir..(os.tmpname():gsub('.*/', '/'))..'.sh'
     else
         path = o.download_dir..os.tmpname()
@@ -255,7 +255,7 @@ function make_download_script(content)
     file:write(content)
     file:close()
 
-    if o.device == 'windows' then
+    if o.platform == 'windows' then
         local new_path = path..'.bat'
         local cmd = "$PSDefaultParameterValues['Out-File:Encoding'] = 'oem';"
             .."Get-Content \""..path.."\" > \""..new_path.."\""
@@ -271,9 +271,9 @@ function make_download_script(content)
 end
 
 function get_my_script_command(path)
-    if o.device == 'windows' then
+    if o.platform == 'windows' then
         return o.windows_download:gsub('$download_script', path)
-    elseif o.device == 'mac' then
+    elseif o.platform == 'darwin' then
         return o.mac_download:gsub('$download_script', path)
     else
         return o.linux_download:gsub('$download_script', path)
@@ -283,7 +283,7 @@ end
 function create_dir(dir)
     if utils.readdir(dir) == nil then
         local args
-        if o.device == 'windows' then
+        if o.platform == 'windows' then
             args = {
                 'powershell', '-NoProfile', '-Command', 'mkdir', dir
             }
@@ -301,7 +301,6 @@ end
 local is_first = true
 
 function download(current, audio)
-    msg.error(mp.get_property_native("platform"))
     local content = get_download_script_content(current, audio)
 
     if not content then

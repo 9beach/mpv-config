@@ -16,24 +16,26 @@ local msg = require 'mp.msg'
 local opt = require 'mp.options'
 local utils = require 'mp.utils'
 
-if os.getenv('windir') ~= nil then
-    osp = 'windows'
-elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-    osp = 'mac'
-else
-    osp = 'linux'
-end
-
 function pipe_write(cmd, text)
     local f = io.popen(cmd, 'w')
     local s = f:write(text)
     f:close()
 end
 
+local platform
+
+if os.getenv('windir') ~= nil then
+    platform = 'windows'
+elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+    platform = 'darwin'
+else
+    platform = 'linux'
+end
+
 function set_clipboard(text)
-    if osp == 'linux' then
-        pipe_write('xclip -silent -selection clipboard -in', text)
-    elseif osp == 'windows' then
+    if platform == 'darwin' then
+        pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
+    elseif platform == 'windows' then
         local clip = 
             '"'..text:gsub('`', '``'):gsub('"', '`"'):gsub('%$', '`$')..'"'
         local args = {
@@ -41,8 +43,8 @@ function set_clipboard(text)
         }
         local res = utils.subprocess({args=args, cancellable=false})
         if res.error then msg.error('paste failed: '..res.error) end
-    elseif osp == 'mac' then
-        pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
+    else
+        pipe_write('xclip -silent -selection clipboard -in', text)
     end
 end
 

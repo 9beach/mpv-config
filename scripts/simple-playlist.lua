@@ -38,17 +38,18 @@ local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
     -- Supports `$HOME` for Microsoft Windows also.
     playlist_dir = '~~desktop/',
+    -- windows/darwin/...
 }
 
-options.read_options(o, "simple-playlist")
-
 if os.getenv('windir') ~= nil then
-    o.device = 'windows'
+    o.platform = 'windows'
 elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-    o.device = 'mac'
+    o.platform = 'darwin'
 else
-    o.device = 'linux'
+    o.platform = 'linux'
 end
+
+options.read_options(o, "simple-playlist")
 
 if o.playlist_dir == nil or o.playlist_dir == "" then
     o.playlist_dir = mp.command_native({"expand-path", "~~/"}).."/playlists"
@@ -56,7 +57,7 @@ else
     local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
     o.playlist_dir = o.playlist_dir:gsub('%$HOME', home_dir)
     o.playlist_dir = mp.command_native({"expand-path", o.playlist_dir})
-    if o.device == 'windows' then
+    if o.platform == 'windows' then
         o.playlist_dir =  o.playlist_dir:gsub('/', '\\')
     end
 end
@@ -253,7 +254,7 @@ end
 function create_dir(dir)
     if utils.readdir(dir) == nil then
         local args
-        if o.device == 'windows' then
+        if o.platform == 'windows' then
             args = {
                 'powershell', '-NoProfile', '-Command', 'mkdir', dir
             }
@@ -300,7 +301,7 @@ function save_playlist()
     file:write("#EXTM3U\n")
     local pwd = mp.get_property("working-directory")
 
-    local is_windows = o.device == 'windows'
+    local is_windows = o.platform == 'windows'
     for i=1, #playlist do
         local item_path = playlist[i].filename
         if is_local_file(item_path) then

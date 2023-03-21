@@ -45,17 +45,18 @@ local o = {
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
     idle_state_copy_script = 'script-message copy-quote',
+    -- windows/darwin/...
 }
 
-options.read_options(o, "copy-and-paste")
-
 if os.getenv('windir') ~= nil then
-    o.device = 'windows'
+    o.platform = 'windows'
 elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
-    o.device = 'mac'
+    o.platform = 'darwin'
 else
-    o.device = 'linux'
+    o.platform = 'linux'
 end
+
+options.read_options(o, "copy-and-paste")
 
 function osd_info(text)
     msg.info(text)
@@ -93,9 +94,9 @@ function pipe_write(cmd, text)
 end
 
 function get_clipboard()
-    if o.device == 'linux' then
-        return pipe_read(o.linux_paste)
-    elseif o.device == 'windows' then
+    if o.platform == 'darwin' then
+        return pipe_read('LC_CTYPE=UTF-8 pbpaste')
+    elseif o.platform == 'windows' then
         local script = [[
         & {
             Trap {
@@ -121,17 +122,17 @@ function get_clipboard()
             msg.error("args: "..utils.to_string(args))
             return ''
         end
-    elseif o.device == 'mac' then
-        return pipe_read('LC_CTYPE=UTF-8 pbpaste')
+    else
+        return pipe_read(o.linux_paste)
     end
 
     return ''
 end
 
 function set_clipboard(text)
-    if o.device == 'linux' then
-        pipe_write(o.linux_copy, text)
-    elseif o.device == 'windows' then
+    if o.platform == 'darwin' then
+        pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
+    elseif o.platform == 'windows' then
         local clip = 
             '"'..text:gsub('`', '``'):gsub('"', '`"'):gsub('%$', '`$')..'"'
         local args = {
@@ -139,15 +140,15 @@ function set_clipboard(text)
         }
         local res = utils.subprocess({args=args, cancellable=false})
         if res.error then msg.error('paste failed: '..res.error) end
-    elseif o.device == 'mac' then
-        pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
+    else
+        pipe_write(o.linux_copy, text)
     end
 end
 
 function copy()
     local path = mp.get_property('path')
     if path ~= nil then
-        if o.device == 'windows' and path:match('://') == nil then
+        if o.platform == 'windows' and path:match('://') == nil then
             path = string.gsub(path, '/', '\\')
         end
         set_clipboard(path)
