@@ -66,8 +66,8 @@ if o.device == 'windows' then
 SET PATH=%PATH%;%CD%
 SET BASENAME=$BASENAME
 
-WHERE ffmpeg >NLL
-IF %ERRORLEVEL% NEQ 0 SET FFMPEG_OPTS=$FFMPEG_OPTS
+WHERE ffmpeg >NUL 2> NUL
+IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=$FFMPEG_OPTS
 
 CD "$DIRNAME"
 IF %ERRORLEVEL% == 0 GOTO S1
@@ -97,6 +97,7 @@ CD "$BASENAME"
 :S2
 ECHO Press any key to download $COUNT file(s) to "$DIRNAME\$BASENAME".
 PAUSE >NUL
+
 ]]
 else
     pre_script = [[
@@ -123,12 +124,14 @@ if [ ! "$BASENAME" = "" ]; then
     cd "$BASENAME"
 fi
 read -p 'Press any key to download $COUNT file(s) to "$DIRNAME/$BASENAME".'
+
 ]]
 end
 
 local post_script
 if o.device == 'windows' then
     post_script = [[
+
 IF NOT "%BASENAME%"=="" CD ..
 ECHO Download completed. Press any key to quit.
 
