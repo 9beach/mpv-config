@@ -3,6 +3,8 @@ https://github.com/9beach/mpv-config/blob/main/scripts/web-download.lua
 
 With this script, you can download media files of **mpv** playlist from web
 sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
+You need to install `ffmpeg` to download the highest resolution videos, and 
+preserve chapter markers.
 
 You can edit key bindings below in `script-opts/web-download.conf`:
 
