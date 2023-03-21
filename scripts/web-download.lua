@@ -26,17 +26,14 @@ local o = {
     -- Supports `$HOME` for Microsoft Windows also.
     download_dir = '$HOME/Downloads',
     -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
-    download_to_time_dir = false,
-    -- To preserve chapter markers, you need to install `ffmpeg` and change 
-    -- below to `yt-dlp --no-mtime --write-sub --embed-chapters`.
-    download_command = 'yt-dlp --no-mtime --write-sub',
-    -- `ba` for 'best audio'. With YouTubes VP9 codec this file will most likely
-    -- be .webm or .opus extension. To save the highest quality audio as an 
-    -- mp3 file you need to install `ffmpeg` and change below to 
-    -- `yt-dlp --no-mtime -f ba -x --audio-format mp3`.
-    -- To preserve chapter markers, you need to install `ffmpeg` and change 
-    -- below to `yt-dlp --no-mtime -f ba --embed-chapters`.
-    download_audio_command = 'yt-dlp --no-mtime -f ba',
+    download_to_subdir = false,
+    -- `yt-dlp` options for downloading.
+    download_command = 'yt-dlp -S ext:mp4:m4a:webm --no-mtime --write-sub',
+    -- `ba` stands for 'best audio'.
+    download_audio_command = 'yt-dlp -S ext:mp4:m4a:webm --no-mtime -f ba',
+    -- If `ffmpeg` is installed, automatically adds the options below. 
+    -- Default is `--embed-chapters` to preserve chapter markers.
+    options_if_ffmpeg_exists = '--embed-chapters',
     linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
     windows_download = 'start cmd /c "$download_script"',
     mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$download_script\'\\\"" -e end',
@@ -60,7 +57,7 @@ else
     o.device = 'linux'
 end
 
--- Need to replace $BASENAME, $DIRNAME, and $COUNT
+-- Need to replace $BASENAME, $FFMPEG_OPTS, $DIRNAME, and $COUNT
 local pre_script
 if o.device == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
@@ -68,6 +65,9 @@ if o.device == 'windows' then
 
 SET PATH=%PATH%;%CD%
 SET BASENAME=$BASENAME
+
+WHERE ffmpeg >NLL
+IF %ERRORLEVEL% NEQ 0 SET FFMPEG_OPTS=$FFMPEG_OPTS
 
 CD "$DIRNAME"
 IF %ERRORLEVEL% == 0 GOTO S1
@@ -100,6 +100,8 @@ PAUSE >NUL
 ]]
 else
     pre_script = [[
+type ffmpeg > /dev/null 2>&1 && FFMPEG_OPTS=$FFMPEG_OPTS
+
 cd "$DIRNAME"
 if [ $? -ne 0 ]; then
     read -p 'Failed to go to "$DIRNAME". Press any key to quit.'
@@ -186,6 +188,12 @@ function get_download_script_content(current, audio)
     if #playlist == 0 then return nil end
     local command = audio and o.download_audio_command or o.download_command
 
+    if o.device == 'windows' then
+        command = command..' %FFMPEG_OPTS%'
+    else
+        command = command..' $FFMPEG_OPTS'
+    end
+
     local script = ''
     local j = current == true and mp.get_property_number('playlist-pos', 0) or 0
     local k = current == true and j or (#playlist-1)
@@ -200,11 +208,14 @@ function get_download_script_content(current, audio)
 
     -- Need to replace $BASENAME, $DIRNAME, and $COUNT
     if count ~= 0 then
-        local basename = o.download_to_time_dir and get_basename() or ''
+        local basename = o.download_to_subdir and get_basename() or ''
         local count_and_type = 
             audio and tostring(count)..' audio' or tostring(count)
+        -- WARNING: Do not replace `$FFMPEG_OPTS` in script, replace them
+        -- only in pre_script.
         local my_pre_script = pre_script
             :gsub('$BASENAME', basename)
+            :gsub('$FFMPEG_OPTS', o.options_if_ffmpeg_exists)
             :gsub('$DIRNAME', o.download_dir)
             :gsub('$COUNT', count_and_type)
         return my_pre_script..script..post_script
@@ -275,6 +286,7 @@ end
 local is_first = true
 
 function download(current, audio)
+    msg.error(mp.get_property_native("platform"))
     local content = get_download_script_content(current, audio)
 
     if not content then
