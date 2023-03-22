@@ -31,8 +31,6 @@ local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
     -- Supports `$HOME` also for Microsoft Windows.
     download_dir = '$HOME/Downloads',
-    -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
-    download_to_subdir = false,
     -- `yt-dlp` options for downloading video.
     download_command = 'yt-dlp --no-mtime --write-sub',
     -- If `ffmpeg` is installed, adds the options below to download commands. 
@@ -73,7 +71,7 @@ end
 
 options.read_options(o, "web-download")
 
--- To be replaced __DLCMD, __BASENAME, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
+-- To be replaced __DLCMD, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
 local pre_script
 if o.platform == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
@@ -87,32 +85,15 @@ IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
 ECHO Download command: __DLCMD %FFMPEG_OPTS%
 
 CD "__DIRNAME"
-IF %ERRORLEVEL% == 0 GOTO S1
-ECHO Failed to go to "__DIRNAME". Press any key to quit.
-PAUSE >NUL
-EXIT
 
-:S1
+IF %ERRORLEVEL% == 0 GOTO CD_OK
+ECHO Failed to go to "__DIRNAME". Press ENTER to quit.
 
-IF "__BASENAME"=="" GOTO S2
+PAUSE >NUL & DEL %0 & EXIT 1
 
-IF EXIST "__BASENAME" (
-    ECHO "__DIRNAME\__BASENAME" already exists. Press any key to quit.
-    PAUSE >NUL
-    EXIT
-)
+:CD_OK
 
-MKDIR "__BASENAME"
-IF NOT EXIST "__BASENAME" (
-    ECHO Failed to create "__DIRNAME\__BASENAME". Press any key to quit.
-    PAUSE >NUL
-    EXIT
-)
-
-CD "__BASENAME"
-
-:S2
-ECHO Press any key to download __COUNT file(s) to "__DIRNAME\__BASENAME".
+ECHO Press ENTER to download __COUNT file(s) to "__DIRNAME".
 PAUSE >NUL
 
 ]]
@@ -125,26 +106,11 @@ echo Download command: __DLCMD $FFMPEG_OPTS
 cd "__DIRNAME"
 
 if [ $? -ne 0 ]; then
-    read -p 'Failed to go to "__DIRNAME". Press any key to quit.'
+    read -p 'Failed to go to "__DIRNAME". Press ENTER to quit.'
     exit 1
 fi
 
-if [ ! "__BASENAME" = "" ]; then
-    if [ -d "__BASENAME" ] || [ -f "__BASENAME" ]; then
-        read -p '"__DIRNAME/__BASENAME" already exists. Press any key to quit.'
-        exit
-    fi
-    
-    mkdir "__BASENAME"
-    if [ ! -d "__BASENAME" ]; then
-        read -p 'Failed to create "__DIRNAME/__BASENAME". Press any key to quit.'
-        exit
-    fi
-    
-    cd "__BASENAME"
-fi
-
-read -p 'Press any key to download __COUNT file(s) to "__DIRNAME/__BASENAME".'
+read -p 'Press ENTER to download __COUNT file(s) to "__DIRNAME".'
 
 ]]
 end
@@ -155,7 +121,7 @@ if o.platform == 'windows' then
 
 CD .. 2>NUL
 
-IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press any key to quit.) ELSE (ECHO Something wrong but completed. Press any key to quit.)
+IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Something wrong but completed. Press ENTER to quit.)
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
@@ -189,13 +155,6 @@ end
 function osd_error(text)
     msg.error(text)
     mp.osd_message(text)
-end
-
-function get_basename()
-    local date = os.date("*t")
-    return ("%02d%02d%02d-%02d%02d%02d"):format(
-        date.year-2000, date.month, date.day, date.hour, date.min, date.sec
-        )
 end
 
 function bind_keys(keys, name, func, opts)
@@ -250,9 +209,8 @@ function get_download_script_content(current, dl_mode)
         end
     end
 
-    -- Replaces __DLCMD, __BASENAME, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
+    -- Replaces __DLCMD, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
     if count ~= 0 then
-        local basename = o.download_to_subdir and get_basename() or ''
         local count_and_type = 
             'audio' == dl_mode and tostring(count)..' audio' or tostring(count)
         local ffmpeg_options
@@ -268,10 +226,14 @@ function get_download_script_content(current, dl_mode)
             ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
         end
 
-        local dlcmd_escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
+        local dlcmd_escaped
+        if o.platform == 'windows' then
+            dlcmd_escaped = dlcmd
+        else
+            dlcmd_escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
+        end
         return (pre_script..script..post_script)
             :gsub('__DLCMD', dlcmd_escaped)
-            :gsub('__BASENAME', basename)
             :gsub('__FFMPEG_OPTS', ffmpeg_options)
             :gsub('__DIRNAME', o.download_dir)
             :gsub('__COUNT', count_and_type)
