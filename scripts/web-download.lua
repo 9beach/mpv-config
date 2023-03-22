@@ -10,6 +10,9 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 - Downloads all media of **mpv** playlist. (`Ctrl+D, Meta+D`)
 - Downloads currently playing media as a audio file. (`Ctrl+e, Meta+e`)
 - Downloads all media of **mpv** playlist as audio files. (`Ctrl+E, Meta+E`)
+- Downloads currently playing media with alternative option. (`Ctrl+y, Meta+y`)
+- Downloads all media of **mpv** playlist with alternative option.
+  (`Ctrl+Y, Meta+Y`)
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
@@ -32,13 +35,17 @@ local o = {
     download_to_subdir = false,
     -- `yt-dlp` options for downloading video.
     download_command = 'yt-dlp --no-mtime --write-sub',
-    -- `yt-dlp` options for downloading audio.
-    -- `ba` for 'best audio'.
-    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime',
     -- If `ffmpeg` is installed, adds the options below to download commands. 
     -- `--embed-chapters` for chapter markers.
     ffmpeg_options = '--embed-chapters',
+    -- `yt-dlp` options for downloading audio.
+    -- `ba` for 'best audio'.
+    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime',
     ffmpeg_audio_options = '--embed-chapters',
+    -- `yt-dlp` options for alternative downloading.
+    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub',
+    ffmpeg_alternative_options = '--embed-chapters',
+    linux_download = 'gnome-terminal -e "bash \'$DL_SCRIPT\'"',
     linux_download = 'gnome-terminal -e "bash \'$DL_SCRIPT\'"',
     windows_download = 'start cmd /c "$DL_SCRIPT"',
     mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$DL_SCRIPT\'\\\"" -e end',
@@ -50,6 +57,10 @@ local o = {
     download_current_track_audio_keybind = 'Ctrl+e Meta+e',
     -- Keybind for downloading all media of playlist as audio files.
     download_playlist_audio_keybind = 'Ctrl+Shift+e Meta+Shift+e',
+    -- Keybind for alternative downloading currently playing media.
+    download_current_track_alternative_keybind = 'Ctrl+y Meta+e',
+    -- Keybind for alternative downloading all media of playlist.
+    download_playlist_alternative_keybind = 'Ctrl+Shift+y Meta+Shift+e',
 }
 
 if os.getenv('windir') ~= nil then
@@ -62,7 +73,7 @@ end
 
 options.read_options(o, "web-download")
 
--- Need to replace __BASENAME, __FFMPEG_OPTS, __DIRNAME, and __COUNT
+-- To be replaced __DLCMD, __BASENAME, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
 local pre_script
 if o.platform == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
@@ -72,6 +83,8 @@ SET PATH=%PATH%;%CD%
 
 WHERE ffmpeg >NUL 2>NUL
 IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
+
+ECHO Download command: __DLCMD
 
 CD "__DIRNAME"
 IF %ERRORLEVEL% == 0 GOTO S1
@@ -107,6 +120,8 @@ else
     pre_script = [[
 type ffmpeg > /dev/null 2>&1 && FFMPEG_OPTS=__FFMPEG_OPTS
 
+echo Download command: __DLCMD
+
 cd "__DIRNAME"
 
 if [ $? -ne 0 ]; then
@@ -139,12 +154,24 @@ if o.platform == 'windows' then
     post_script = [[
 
 CD .. 2>NULL
-ECHO Press any key to quit.
+
+IF %ERRORLEVEL% == 0 (ECHO Completed! Press any key to quit.) ELSE (ECHO Something wrong, but completed. Press any key to quit.)
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
-    post_script = "\ncd .. 2> /dev/null; echo Bye.; rm -- \"$0\""
+    post_script = [[
+
+cd .. 2> /dev/null
+
+if [ $? -eq 0 ]; then
+    echo Completed! Bye.
+else
+    echo Something wrong, but completed. Bye.
+fi
+
+rm -- "$0"
+]]
 end
 
 if o.download_dir == nil or o.download_dir == "" then
@@ -192,15 +219,22 @@ function is_url(path)
     return path ~= nil and string.find(path, '://') ~= nil
 end
 
-function get_download_script_content(current, audio)
+function get_download_script_content(current, dl_mode)
     local playlist = mp.get_property_native('playlist')
     if #playlist == 0 then return nil end
-    local command = audio and o.download_audio_command or o.download_command
+    local dlcmd
+    if (dl_mode == 'video') then
+        dlcmd = o.download_command
+    elseif (dl_mode == 'audio') then
+        dlcmd = o.download_audio_command
+    else
+        dlcmd = o.download_alternative_command
+    end
 
     if o.platform == 'windows' then
-        command = command..' %FFMPEG_OPTS%'
+        dlcmd = dlcmd..' %FFMPEG_OPTS%'
     else
-        command = command..' $FFMPEG_OPTS'
+        dlcmd = dlcmd..' $FFMPEG_OPTS'
     end
 
     local script = ''
@@ -210,22 +244,32 @@ function get_download_script_content(current, audio)
     for i=j+1, k+1 do
         local path = playlist[i].filename
         if is_url(path) then
-            script = script..command..' "'..path..'"\n'
+            script = script..dlcmd..' "'..path..'"\n'
             count = count+1
         end
     end
 
-    -- Need to replace __BASENAME, __DIRNAME, and __COUNT
+    -- Replaces __DLCMD, __BASENAME, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
     if count ~= 0 then
         local basename = o.download_to_subdir and get_basename() or ''
         local count_and_type = 
-            audio == true and tostring(count)..' audio' or tostring(count)
-        local ffmpeg_options = 
-            audio == true and o.ffmpeg_audio_options or o.ffmpeg_options
+            'audio' == dl_mode and tostring(count)..' audio' or tostring(count)
+        local ffmpeg_options
+        if (dl_mode == 'video') then
+            ffmpeg_options = o.ffmpeg_options
+        elseif (dl_mode == 'audio') then
+            ffmpeg_options = o.ffmpeg_audio_options
+        else
+            ffmpeg_options = o.ffmpeg_alternative_options
+        end
+
         if o.platform ~= 'windows' then
             ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
         end
+
+        local escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
         return (pre_script..script..post_script)
+            :gsub('__DLCMD', escaped)
             :gsub('__BASENAME', basename)
             :gsub('__FFMPEG_OPTS', ffmpeg_options)
             :gsub('__DIRNAME', o.download_dir)
@@ -296,8 +340,8 @@ end
 
 local is_first = true
 
-function download(current, audio)
-    local content = get_download_script_content(current, audio)
+function download(current, dl_mode)
+    local content = get_download_script_content(current, dl_mode)
 
     if not content then
         if current then
@@ -347,18 +391,28 @@ function download(current, audio)
 end
 
 bind_keys(o.download_current_track_keybind, 'download-current-track', function()
-    download(true, false)
+    download(true, 'video')
 end)
 bind_keys(o.download_playlist_keybind, 'download-playlist', function()
-    download(false, false)
+    download(false, 'video')
 end)
 bind_keys(
     o.download_current_track_audio_keybind, 
     'download-current-track-audio',
-    function() download(true, true) end
+    function() download(true, 'audio') end
     )
 bind_keys(
     o.download_playlist_audio_keybind, 
     'download-playlist-audio', 
-    function() download(false, true) end
+    function() download(false, 'audio') end
+    )
+bind_keys(
+    o.download_current_track_alternative_keybind, 
+    'download-current-track-alternative',
+    function() download(true, 'alternative') end
+    )
+bind_keys(
+    o.download_playlist_alternative_keybind, 
+    'download-playlist-alternative', 
+    function() download(false, 'alternative') end
     )
