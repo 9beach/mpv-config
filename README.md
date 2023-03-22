@@ -144,9 +144,9 @@ This script provides the functions below:
 - Does not show subtitle if lower-case path matches given patterns.
 - Does not show subtitle if audio language matches given values.
 - Resets **mpv** geometry when an non-audio file (that is not of known audio
-  extensions and has video) is loaded. With this feature, **mpv** can escape
-  from small rectable when a webm media has video even if `mpv.conf` has
-  settings below.
+  extensions and has video) is loaded. When you turn on this feature, **mpv**
+  can escape from small rectangle when a `webm` media has video even if 
+  `mpv.conf` has settings below.
 
   ```
   [extension.webm]
