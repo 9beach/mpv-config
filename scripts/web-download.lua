@@ -84,7 +84,7 @@ SET PATH=%PATH%;%CD%
 WHERE ffmpeg >NUL 2>NUL
 IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
 
-ECHO Download command: __DLCMD
+ECHO Download command: __DLCMD %FFMPEG_OPTS%
 
 CD "__DIRNAME"
 IF %ERRORLEVEL% == 0 GOTO S1
@@ -120,7 +120,7 @@ else
     pre_script = [[
 type ffmpeg > /dev/null 2>&1 && FFMPEG_OPTS=__FFMPEG_OPTS
 
-echo Download command: __DLCMD
+echo Download command: __DLCMD $FFMPEG_OPTS
 
 cd "__DIRNAME"
 
@@ -155,7 +155,7 @@ if o.platform == 'windows' then
 
 CD .. 2>NUL
 
-IF %ERRORLEVEL% == 0 (ECHO Completed! Press any key to quit.) ELSE (ECHO Something wrong but completed. Press any key to quit.)
+IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press any key to quit.) ELSE (ECHO Something wrong but completed. Press any key to quit.)
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
@@ -165,7 +165,7 @@ else
 cd .. 2> /dev/null
 
 if [ $? -eq 0 ]; then
-    echo Completed! Bye.
+    echo Successfully completed! Bye.
 else
     echo Something wrong but completed. Bye.
 fi
@@ -231,10 +231,11 @@ function get_download_script_content(current, dl_mode)
         dlcmd = o.download_alternative_command
     end
 
+    local dlcmd_opts
     if o.platform == 'windows' then
-        dlcmd = dlcmd..' %FFMPEG_OPTS%'
+        dlcmd_opts = dlcmd..' %FFMPEG_OPTS%'
     else
-        dlcmd = dlcmd..' $FFMPEG_OPTS'
+        dlcmd_opts = dlcmd..' $FFMPEG_OPTS'
     end
 
     local script = ''
@@ -244,7 +245,7 @@ function get_download_script_content(current, dl_mode)
     for i=j+1, k+1 do
         local path = playlist[i].filename
         if is_url(path) then
-            script = script..dlcmd..' "'..path..'"\n'
+            script = script..dlcmd_opts..' "'..path..'"\n'
             count = count+1
         end
     end
@@ -267,12 +268,9 @@ function get_download_script_content(current, dl_mode)
             ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
         end
 
-        local escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
-            :gsub('FFMPEG_OPTS', '%%FFMPEG_OPTS%%') -- % disapeared while gsub.
-                                                    -- So make it again.
-                                                    -- Poor Lua.
+        local dlcmd_escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
         return (pre_script..script..post_script)
-            :gsub('__DLCMD', escaped)
+            :gsub('__DLCMD', dlcmd_escaped)
             :gsub('__BASENAME', basename)
             :gsub('__FFMPEG_OPTS', ffmpeg_options)
             :gsub('__DIRNAME', o.download_dir)
@@ -387,8 +385,6 @@ function download(current, dl_mode)
         local ret = os.execute(command)
         if not ret then
             msg.error('failed: '..command)
-        else
-            msg.info(command)
         end
     end
 end
