@@ -153,9 +153,9 @@ local post_script
 if o.platform == 'windows' then
     post_script = [[
 
-CD .. 2>NULL
+CD .. 2>NUL
 
-IF %ERRORLEVEL% == 0 (ECHO Completed! Press any key to quit.) ELSE (ECHO Something wrong, but completed. Press any key to quit.)
+IF %ERRORLEVEL% == 0 (ECHO Completed! Press any key to quit.) ELSE (ECHO Something wrong but completed. Press any key to quit.)
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
@@ -167,7 +167,7 @@ cd .. 2> /dev/null
 if [ $? -eq 0 ]; then
     echo Completed! Bye.
 else
-    echo Something wrong, but completed. Bye.
+    echo Something wrong but completed. Bye.
 fi
 
 rm -- "$0"
@@ -268,6 +268,9 @@ function get_download_script_content(current, dl_mode)
         end
 
         local escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
+            :gsub('FFMPEG_OPTS', '%%FFMPEG_OPTS%%') -- % disapeared while gsub.
+                                                    -- So make it again.
+                                                    -- Poor Lua.
         return (pre_script..script..post_script)
             :gsub('__DLCMD', escaped)
             :gsub('__BASENAME', basename)
@@ -284,7 +287,7 @@ function make_download_script(content)
     if o.platform ~= 'windows' then
         path = o.download_dir..(os.tmpname():gsub('.*/', '/wdl-'))..'.sh'
     else
-        path = o.download_dir..(os.tmpname():gsub('.*/', '/wdl-'))
+        path = o.download_dir..(os.tmpname():gsub('.*\\', '\\wdl-'))
     end
 
     local file, err = io.open(path, "w")

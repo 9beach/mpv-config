@@ -87,7 +87,7 @@ function touch(path)
     local cmd = nil
 
     if o.platform == 'windows' then
-        -- Hey Bill, WTF!
+        -- Bill, WTF!
         path = path:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
                    :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''")
         cmd = {

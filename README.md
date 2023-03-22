@@ -68,6 +68,9 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 - Downloads all media of **mpv** playlist. (`Ctrl+D, Meta+D`)
 - Downloads currently playing media as a audio file. (`Ctrl+e, Meta+e`)
 - Downloads all media of **mpv** playlist as audio files. (`Ctrl+E, Meta+E`)
+- Downloads currently playing media with alternative option. (`Ctrl+y, Meta+y`)
+- Downloads all media of **mpv** playlist with alternative option.
+  (`Ctrl+Y, Meta+Y`)
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
