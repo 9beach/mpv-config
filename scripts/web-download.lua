@@ -26,24 +26,22 @@ local msg = require 'mp.msg'
 
 local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
-    -- Supports `$HOME` for Microsoft Windows also.
+    -- Supports `$HOME` also for Microsoft Windows.
     download_dir = '$HOME/Downloads',
     -- If yes, download to `$HOME/Desktop/230319-034313`, or `$HOME/Desktop/`.
     download_to_subdir = false,
     -- `yt-dlp` options for downloading video.
-    -- `ba` for 'best audio', `bv` for 'best video'.
-    download_command = 'yt-dlp -f "bv+ba" --no-mtime --write-sub',
+    download_command = 'yt-dlp --no-mtime --write-sub',
     -- `yt-dlp` options for downloading audio.
+    -- `ba` for 'best audio'.
     download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime',
     -- If `ffmpeg` is installed, adds the options below to download commands. 
-    --
-    -- `-f "bv+ba" --embed-chapters` for quality and chapter markers.
-    ffmpeg_options = '-f "bv+ba" --embed-chapters',
     -- `--embed-chapters` for chapter markers.
+    ffmpeg_options = '--embed-chapters',
     ffmpeg_audio_options = '--embed-chapters',
-    linux_download = 'gnome-terminal -e "bash \'$download_script\'"',
-    windows_download = 'start cmd /c "$download_script"',
-    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$download_script\'\\\"" -e end',
+    linux_download = 'gnome-terminal -e "bash \'$DL_SCRIPT\'"',
+    windows_download = 'start cmd /c "$DL_SCRIPT"',
+    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$DL_SCRIPT\'\\\"" -e end',
     -- Keybind for downloading currently playing media.
     download_current_track_keybind = 'Ctrl+d Meta+d',
     -- Keybind for downloading all media of playlist.
@@ -64,73 +62,74 @@ end
 
 options.read_options(o, "web-download")
 
--- Need to replace $BASENAME, $FFMPEG_OPTS, $DIRNAME, and $COUNT
+-- Need to replace __BASENAME, __FFMPEG_OPTS, __DIRNAME, and __COUNT
 local pre_script
 if o.platform == 'windows' then
     pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
 @ECHO OFF
 
 SET PATH=%PATH%;%CD%
-SET BASENAME=$BASENAME
 
 WHERE ffmpeg >NUL 2>NUL
-IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=$FFMPEG_OPTS
+IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
 
-CD "$DIRNAME"
+CD "__DIRNAME"
 IF %ERRORLEVEL% == 0 GOTO S1
-ECHO Failed to go to "$DIRNAME". Press any key to quit.
+ECHO Failed to go to "__DIRNAME". Press any key to quit.
 PAUSE >NUL
 EXIT
 
 :S1
 
-IF "%BASENAME%"=="" GOTO S2
+IF "__BASENAME"=="" GOTO S2
 
-IF EXIST "$BASENAME" (
-    ECHO "$DIRNAME\$BASENAME" already exists. Press any key to quit.
+IF EXIST "__BASENAME" (
+    ECHO "__DIRNAME\__BASENAME" already exists. Press any key to quit.
     PAUSE >NUL
     EXIT
 )
 
-MKDIR "$BASENAME"
-IF NOT EXIST "$BASENAME" (
-    ECHO Failed to create "$DIRNAME\$BASENAME". Press any key to quit.
+MKDIR "__BASENAME"
+IF NOT EXIST "__BASENAME" (
+    ECHO Failed to create "__DIRNAME\__BASENAME". Press any key to quit.
     PAUSE >NUL
     EXIT
 )
 
-CD "$BASENAME"
+CD "__BASENAME"
 
 :S2
-ECHO Press any key to download $COUNT file(s) to "$DIRNAME\$BASENAME".
+ECHO Press any key to download __COUNT file(s) to "__DIRNAME\__BASENAME".
 PAUSE >NUL
 
 ]]
 else
     pre_script = [[
-type ffmpeg > /dev/null 2>&1 && FFMPEG_OPTS=$FFMPEG_OPTS
+type ffmpeg > /dev/null 2>&1 && FFMPEG_OPTS=__FFMPEG_OPTS
 
-cd "$DIRNAME"
+cd "__DIRNAME"
+
 if [ $? -ne 0 ]; then
-    read -p 'Failed to go to "$DIRNAME". Press any key to quit.'
+    read -p 'Failed to go to "__DIRNAME". Press any key to quit.'
     exit 1
 fi
 
-if [ ! "$BASENAME" = "" ]; then
-    if [ -d "$BASENAME" ] || [ -f "$BASENAME" ]; then
-        read -p '"$DIRNAME/$BASENAME" already exists. Press any key to quit.'
+if [ ! "__BASENAME" = "" ]; then
+    if [ -d "__BASENAME" ] || [ -f "__BASENAME" ]; then
+        read -p '"__DIRNAME/__BASENAME" already exists. Press any key to quit.'
         exit
     fi
     
-    mkdir "$BASENAME"
-    if [ ! -d "$BASENAME" ]; then
-        read -p 'Failed to create "$DIRNAME/$BASENAME". Press any key to quit.'
+    mkdir "__BASENAME"
+    if [ ! -d "__BASENAME" ]; then
+        read -p 'Failed to create "__DIRNAME/__BASENAME". Press any key to quit.'
         exit
     fi
     
-    cd "$BASENAME"
+    cd "__BASENAME"
 fi
-read -p 'Press any key to download $COUNT file(s) to "$DIRNAME/$BASENAME".'
+
+read -p 'Press any key to download __COUNT file(s) to "__DIRNAME/__BASENAME".'
 
 ]]
 end
@@ -139,13 +138,13 @@ local post_script
 if o.platform == 'windows' then
     post_script = [[
 
-IF NOT "%BASENAME%"=="" CD ..
-ECHO Download completed. Press any key to quit.
+CD .. 2>NULL
+ECHO Press any key to quit.
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
-    post_script = 'cd .. 2> /dev/null; echo "Download completed."; rm -- "$0"'
+    post_script = "\ncd .. 2> /dev/null; echo Bye.; rm -- \"$0\""
 end
 
 if o.download_dir == nil or o.download_dir == "" then
@@ -216,24 +215,21 @@ function get_download_script_content(current, audio)
         end
     end
 
-    -- Need to replace $BASENAME, $DIRNAME, and $COUNT
+    -- Need to replace __BASENAME, __DIRNAME, and __COUNT
     if count ~= 0 then
         local basename = o.download_to_subdir and get_basename() or ''
         local count_and_type = 
             audio == true and tostring(count)..' audio' or tostring(count)
-        -- WARNING: Do not replace `$FFMPEG_OPTS` in script, replace them
-        -- only in pre_script.
         local ffmpeg_options = 
             audio == true and o.ffmpeg_audio_options or o.ffmpeg_options
         if o.platform ~= 'windows' then
             ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
         end
-        local my_pre_script = pre_script
-            :gsub('$BASENAME', basename)
-            :gsub('$FFMPEG_OPTS', ffmpeg_options)
-            :gsub('$DIRNAME', o.download_dir)
-            :gsub('$COUNT', count_and_type)
-        return my_pre_script..script..post_script
+        return (pre_script..script..post_script)
+            :gsub('__BASENAME', basename)
+            :gsub('__FFMPEG_OPTS', ffmpeg_options)
+            :gsub('__DIRNAME', o.download_dir)
+            :gsub('__COUNT', count_and_type)
     else
         return nil
     end
@@ -242,9 +238,9 @@ end
 function make_download_script(content)
     local path
     if o.platform ~= 'windows' then
-        path = o.download_dir..(os.tmpname():gsub('.*/', '/'))..'.sh'
+        path = o.download_dir..(os.tmpname():gsub('.*/', '/wdl-'))..'.sh'
     else
-        path = o.download_dir..os.tmpname()
+        path = o.download_dir..(os.tmpname():gsub('.*/', '/wdl-'))
     end
 
     local file, err = io.open(path, "w")
@@ -272,11 +268,11 @@ end
 
 function get_my_script_command(path)
     if o.platform == 'windows' then
-        return o.windows_download:gsub('$download_script', path)
+        return o.windows_download:gsub('$DL_SCRIPT', path)
     elseif o.platform == 'darwin' then
-        return o.mac_download:gsub('$download_script', path)
+        return o.mac_download:gsub('$DL_SCRIPT', path)
     else
-        return o.linux_download:gsub('$download_script', path)
+        return o.linux_download:gsub('$DL_SCRIPT', path)
     end
 end
 

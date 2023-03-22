@@ -103,29 +103,31 @@ For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
 
 This script provides script messages below:
 
-- script-message simple-playlist sort date-desc
-- script-message simple-playlist sort date-asc
-- script-message simple-playlist sort date-desc startover
+- script-message simple-playlist sort name-asc (`Ctrl+n, Meta+n`)
+- script-message simple-playlist sort name-asc startover (`Ctrl+N, Meta+N`)
+- script-message simple-playlist sort date-desc (`Ctrl+g, Meta+g`)
+- script-message simple-playlist sort date-desc startover (`Ctrl+G, Meta+G`)
 
-`simple-playlist sort` also support `size-asc`, `size-desc`, `name-asc`,
+`simple-playlist sort` also support `size-asc`, `size-desc`, `date-asc`,
 `name-desc` with or without `startover`. It's quite fast. Of course,
 the time complexity of my sorting algorithm is **O(nlog n)** for **Lua** data,
 but for the **mpv** system call, i.e., `mp.commandv('playlist-move', i, j)`,
 the time complexity is **O(n)**.
 
-- script-message simple-playlist shuffle
-- script-message simple-playlist reverse
-- script-message simple-playlist show-text 5
-- script-message simple-playlist show-osc 5
-- script-message simple-playlist hide
-- script-message simple-playlist playfirst
-- script-message simple-playlist playlast
-- script-message simple-playlist save
+- script-message simple-playlist shuffle (`Ctrl+s, Meta+s`)
+- script-message simple-playlist reverse (`Ctrl+V, Meta+V`)
+- script-message simple-playlist show-text 5 (`Ctrl+p, Meta+p`)
+- script-message simple-playlist show-osc 5 (`Ctrl+l, Meta+l`)
+- script-message simple-playlist hide (`Ctrl+k, Meta+k`)
+- script-message simple-playlist playfirst (`Ctrl+a, Meta+a`)
+- script-message simple-playlist playlast (`Ctrl+z, Meta+z`)
+- script-message simple-playlist save (`Ctrl+P, Meta+P`)
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
 simple, the playlist is not refreshed automatically, so another `show-text` or
-`show-osc` is needed to refresh the playlist. You can edit key bindings in
-`input.conf`.
+`show-osc` is needed to refresh the playlist.
+
+You can edit key bindings in `input.conf`.
 
 Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 
@@ -138,12 +140,11 @@ This script provides the functions below:
 - Plays even in paused state when a new file is loaded.
 - Does not show subtitle if lower-case path matches given patterns.
 - Does not show subtitle if audio language matches given values.
-
-* Resets **mpv** geometry when an non-audio file (that is not of known audio
-  extensions and has video) is loaded. With this feature, **mpv** can escape 
+- Resets **mpv** geometry when an non-audio file (that is not of known audio
+  extensions and has video) is loaded. With this feature, **mpv** can escape
   from small rectable when a webm media has video even if `mpv.conf` has
   settings below.
-  
+
   ```
   [extension.webm]
   geometry=800x800+100%+100%
@@ -172,7 +173,7 @@ You can edit the settings in `script-opts/finder-integration.conf`.
 
 This script provides the functions below:
 
-- Saves and restores sound volume level
+- Saves and restores sound volume level automatically.
 
 `watch_later` setting for each file overrides sound volume level above.
 So if you change the sound volume level of a file, **mpv** remembers it just

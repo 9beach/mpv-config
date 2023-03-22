@@ -40,17 +40,18 @@ fi
 BACKUP_DIR="$HOME/Downloads/mpv-$(date "+%m%d%H%M%Y.%S")"
 
 mv "$MPV_CONF_PATH" "$BACKUP_DIR" 2> /dev/null \
-	&& echo "moved old mpv config to \"$BACKUP_DIR\""
+	&& echo "old mpv config to \"$BACKUP_DIR\""
 
 mkdir -p "$MPV_CONF_PATH"
 cp -R fonts script-opts scripts input.conf "$MPV_CONF_PATH"
 
-# Applies new version of `osx-scripts/ytdl_hook.lua` to the system 
-# before **mpv** for OSX patched.
+# By setting `ytdl=no` and copying `osx-scripts/ytdl_hook.lua` to
+# `scripts`, applies patched `ytdl_hook.lua` over **mpv** internal version
+# before patched OSX **mpv** releases.
 if [ `uname` = "Darwin" ]; then
 	cp -R osx-scripts/ytdl_hook.lua "$MPV_CONF_PATH/scripts"
 fi
 cat mpv.conf | my_filter > "$MPV_CONF_PATH"/mpv.conf
 mv "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH" 2> /dev/null
 mv "$BACKUP_DIR/.volume" "$MPV_CONF_PATH" 2> /dev/null
-echo "copied new mpv config to \"$MPV_CONF_PATH\""
+echo "new mpv config to \"$MPV_CONF_PATH\""
