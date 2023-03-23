@@ -43,10 +43,9 @@ local o = {
     -- `yt-dlp` options for alternative downloading.
     download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub',
     ffmpeg_alternative_options = '--embed-chapters',
-    linux_download = 'gnome-terminal -e "bash \'$DL_SCRIPT\'"',
-    linux_download = 'gnome-terminal -e "bash \'$DL_SCRIPT\'"',
-    windows_download = 'start cmd /c "$DL_SCRIPT"',
-    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$DL_SCRIPT\'\\\"" -e end',
+    linux_download = 'gnome-terminal -e "bash \'$SCRIPT\'"',
+    windows_download = 'start cmd /c "$SCRIPT"',
+    mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$SCRIPT\'\\\"" -e end',
     -- Keybind for downloading currently playing media.
     download_current_track_keybind = 'Ctrl+d Meta+d',
     -- Keybind for downloading all media of playlist.
@@ -78,20 +77,21 @@ if o.platform == 'windows' then
 @ECHO OFF
 
 SET PATH=%PATH%;%CD%
+SET DLCMD=__DLCMD
 
 WHERE ffmpeg >NUL 2>NUL
 IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
 
-ECHO Download command: __DLCMD %FFMPEG_OPTS%
+ECHO Download command: %DLCMD% %FFMPEG_OPTS%
 
 CD "__DIRNAME"
 
-IF %ERRORLEVEL% == 0 GOTO CD_OK
+IF %ERRORLEVEL% == 0 GOTO DOWNLOAD_DIR
 ECHO Failed to go to "__DIRNAME". Press ENTER to quit.
 
 PAUSE >NUL & DEL %0 & EXIT 1
 
-:CD_OK
+:DOWNLOAD_DIR
 
 ECHO Press ENTER to download __COUNT file(s) to "__DIRNAME".
 PAUSE >NUL
@@ -99,9 +99,17 @@ PAUSE >NUL
 ]]
 else
     pre_script = [[
-type ffmpeg > /dev/null 2>&1 && FFMPEG_OPTS=__FFMPEG_OPTS
-
-echo Download command: __DLCMD $FFMPEG_OPTS
+type ffmpeg > /dev/null 2>&1
+FFMPEG_INST=$?
+if [ $FFMPEG_INST -eq 0 ]; then
+cat <<EOF
+Download command: __DLCMD __FFMPEG_OPTS
+EOF
+else
+cat <<EOF
+Download command: __DLCMD
+EOF
+fi
 
 cd "__DIRNAME"
 
@@ -119,16 +127,12 @@ local post_script
 if o.platform == 'windows' then
     post_script = [[
 
-CD .. 2>NUL
-
 IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Something wrong but completed. Press ENTER to quit.)
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
     post_script = [[
-
-cd .. 2> /dev/null
 
 if [ $? -eq 0 ]; then
     echo Successfully completed! Bye.
@@ -178,9 +182,41 @@ function is_url(path)
     return path ~= nil and string.find(path, '://') ~= nil
 end
 
+local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
+
+string.quote = function(str)
+    return str:gsub(quotepattern, "%%%1")
+end
+
 function get_download_script_content(current, dl_mode)
     local playlist = mp.get_property_native('playlist')
     if #playlist == 0 then return nil end
+
+    local script = ''
+
+    local j = current == true and mp.get_property_number('playlist-pos', 0) or 0
+    local k = current == true and j or (#playlist-1)
+    local count = 0
+    for i=j+1, k+1 do
+        local path = playlist[i].filename
+        if is_url(path) then
+            if o.platform ~= 'windows' then
+                script = script..
+                         'if [ $FFMPEG_INST -eq 0 ]; then\n'..
+                         '    __DLCMD __FFMPEG_OPTS "'..path..'"\n'..
+                         'else\n'..
+                         '    __DLCMD "'..path..'"\n'..
+                         'fi\n'
+            else
+                script = script..'%DLCMD% %FFMPEG_OPTS% "'..path..'"\n'
+            end
+            count = count+1
+        end
+    end
+
+    if count == 0 then return nil end
+
+    -- Replaces __DLCMD, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
     local dlcmd
     if (dl_mode == 'video') then
         dlcmd = o.download_command
@@ -189,57 +225,37 @@ function get_download_script_content(current, dl_mode)
     else
         dlcmd = o.download_alternative_command
     end
-
-    local dlcmd_opts
     if o.platform == 'windows' then
-        dlcmd_opts = dlcmd..' %FFMPEG_OPTS%'
+        -- `%` is special character in `.bat`
+        dlcmd = dlcmd:gsub('%%', '%%%%')
+    end
+
+    local count_and_type = 
+        'audio' == dl_mode and tostring(count)..' audio' or tostring(count)
+
+    local ffmpeg_options
+    if (dl_mode == 'video') then
+        ffmpeg_options = o.ffmpeg_options
+    elseif (dl_mode == 'audio') then
+        ffmpeg_options = o.ffmpeg_audio_options
     else
-        dlcmd_opts = dlcmd..' $FFMPEG_OPTS'
+        ffmpeg_options = o.ffmpeg_alternative_options
+    end
+    if o.platform == 'windows' then
+        -- `%` is special character in `.bat`
+        ffmpeg_options = ffmpeg_options:gsub('%%', '%%%%')
     end
 
-    local script = ''
-    local j = current == true and mp.get_property_number('playlist-pos', 0) or 0
-    local k = current == true and j or (#playlist-1)
-    local count = 0
-    for i=j+1, k+1 do
-        local path = playlist[i].filename
-        if is_url(path) then
-            script = script..dlcmd_opts..' "'..path..'"\n'
-            count = count+1
-        end
-    end
-
-    -- Replaces __DLCMD, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
-    if count ~= 0 then
-        local count_and_type = 
-            'audio' == dl_mode and tostring(count)..' audio' or tostring(count)
-        local ffmpeg_options
-        if (dl_mode == 'video') then
-            ffmpeg_options = o.ffmpeg_options
-        elseif (dl_mode == 'audio') then
-            ffmpeg_options = o.ffmpeg_audio_options
-        else
-            ffmpeg_options = o.ffmpeg_alternative_options
-        end
-
-        if o.platform ~= 'windows' then
-            ffmpeg_options = ffmpeg_options:gsub(' ', '\\ ')
-        end
-
-        local dlcmd_escaped
-        if o.platform == 'windows' then
-            dlcmd_escaped = dlcmd
-        else
-            dlcmd_escaped = dlcmd:gsub("'", "\\'"):gsub('"', '\\"')
-        end
-        return (pre_script..script..post_script)
-            :gsub('__DLCMD', dlcmd_escaped)
-            :gsub('__FFMPEG_OPTS', ffmpeg_options)
-            :gsub('__DIRNAME', o.download_dir)
-            :gsub('__COUNT', count_and_type)
-    else
-        return nil
-    end
+    -- No plain string replacement functioin, poor Lua!
+    local qdlcmd = string.quote(dlcmd)
+    local qffmpeg_options = string.quote(ffmpeg_options)
+    local qdownload_dir = string.quote(o.download_dir)
+    local qcount_and_type = string.quote(count_and_type)
+    return (pre_script..script..post_script)
+        :gsub('__DLCMD', qdlcmd)
+        :gsub('__FFMPEG_OPTS', qffmpeg_options)
+        :gsub('__DIRNAME', qdownload_dir)
+        :gsub('__COUNT', qcount_and_type)
 end
 
 function make_download_script(content)
@@ -275,11 +291,11 @@ end
 
 function get_my_script_command(path)
     if o.platform == 'windows' then
-        return o.windows_download:gsub('$DL_SCRIPT', path)
+        return o.windows_download:gsub('$SCRIPT', path)
     elseif o.platform == 'darwin' then
-        return o.mac_download:gsub('$DL_SCRIPT', path)
+        return o.mac_download:gsub('$SCRIPT', path)
     else
-        return o.linux_download:gsub('$DL_SCRIPT', path)
+        return o.linux_download:gsub('$SCRIPT', path)
     end
 end
 
