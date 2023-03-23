@@ -55,9 +55,9 @@ local o = {
     -- Keybind for downloading all media of playlist as audio files.
     download_playlist_audio_keybind = 'Ctrl+Shift+e Meta+Shift+e',
     -- Keybind for alternative downloading currently playing media.
-    download_current_track_alternative_keybind = 'Ctrl+y Meta+e',
+    download_current_track_alternative_keybind = 'Ctrl+y Meta+y',
     -- Keybind for alternative downloading all media of playlist.
-    download_playlist_alternative_keybind = 'Ctrl+Shift+y Meta+Shift+e',
+    download_playlist_alternative_keybind = 'Ctrl+Shift+y Meta+Shift+y',
 }
 
 if os.getenv('windir') ~= nil then
