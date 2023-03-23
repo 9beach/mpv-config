@@ -96,6 +96,8 @@ PAUSE >NUL & DEL %0 & EXIT 1
 ECHO Press ENTER to download __COUNT file(s) to "__DIRNAME".
 PAUSE >NUL
 
+SET FAILURES=0
+
 ]]
 else
     pre_script = [[
@@ -120,6 +122,8 @@ fi
 
 read -p 'Press ENTER to download __COUNT file(s) to "__DIRNAME".'
 
+FAILURES=0
+
 ]]
 end
 
@@ -127,14 +131,14 @@ local post_script
 if o.platform == 'windows' then
     post_script = [[
 
-IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Something wrong but completed. Press ENTER to quit.)
+IF %FAILURES% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Something wrong but completed. Press ENTER to quit.)
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
     post_script = [[
 
-if [ $? -eq 0 ]; then
+if [ $FAILURES -eq 0 ]; then
     echo Successfully completed! Bye.
 else
     echo Something wrong but completed. Bye.
@@ -202,13 +206,18 @@ function get_download_script_content(current, dl_mode)
         if is_url(path) then
             if o.platform ~= 'windows' then
                 script = script..
-                         'if [ $FFMPEG_INST -eq 0 ]; then\n'..
-                         '    __DLCMD __FFMPEG_OPTS "'..path..'"\n'..
-                         'else\n'..
-                         '    __DLCMD "'..path..'"\n'..
-                         'fi\n'
+                    'if [ $FFMPEG_INST -eq 0 ]; then\n'..
+                    '    __DLCMD __FFMPEG_OPTS "'..path..'"\n'..
+                    'else\n'..
+                    '    __DLCMD "'..path..'"\n'..
+                    'fi\n'..
+                    'if [ $? -ne 0 ]; then\n'..
+                    '    FAILURES=$((FAILURES+1))\n'..
+                    'fi\n'
             else
-                script = script..'%DLCMD% %FFMPEG_OPTS% "'..path..'"\n'
+                script = script..
+                    '%DLCMD% %FFMPEG_OPTS% "'..path..'"\n'..
+                    'IF NOT %ERRORLEVEL% == 0 SET /A "FAILURES=%FAILURES%+1"\n'
             end
             count = count+1
         end
