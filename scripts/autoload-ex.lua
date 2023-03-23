@@ -18,6 +18,14 @@ videos=yes
 audio=yes
 ignore_hidden=yes
 
+https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua
+
+This script adds a simple feature to well-known `autoload.lua`.
+
+- `disabled=yes` as default value.
+- Adds a script message and keybinds, `find-and-add-files` and `Ctrl+m, Meta+m`.
+  So you can add all the files in a folder of currently playing file with a hot
+  key. If you want it automatically, set `disabled=no`.
 --]]
 
 MAXENTRIES = 5000
@@ -27,13 +35,15 @@ local options = require 'mp.options'
 local utils = require 'mp.utils'
 
 o = {
-    disabled = false,
+    disabled = true,
     images = true,
     videos = true,
     audio = true,
-    ignore_hidden = true
+    ignore_hidden = true,
+    find_and_add_files_keybind = 'Ctrl+m Meta+m'
 }
-options.read_options(o)
+
+options.read_options(o, "autoload-ex")
 
 function Set (t)
     local set = {}
@@ -130,10 +140,7 @@ function find_and_add_entries()
     local path = mp.get_property("path", "")
     local dir, filename = utils.split_path(path)
     msg.trace(("dir: %s, filename: %s"):format(dir, filename))
-    if o.disabled then
-        msg.verbose("stopping: autoload disabled")
-        return
-    elseif #dir == 0 then
+    if #dir == 0 then
         msg.verbose("stopping: not a local path")
         return
     end
@@ -218,4 +225,29 @@ function find_and_add_entries()
     add_files_at(pl_current, append[-1])
 end
 
-mp.register_event("start-file", find_and_add_entries)
+function bind_keys(keys, name, func, opts)
+    if not keys or keys == '' then
+        mp.add_forced_key_binding(nil, name, func, opts)
+        return
+    end
+
+    local i = 0
+    for key in string.gmatch(keys, "[^%s]+") do
+        i = i + 1
+        if i == 1 then
+            mp.add_forced_key_binding(key, name, func, opts)
+        else
+            mp.add_forced_key_binding(key, name .. i, func, opts)
+        end
+    end
+end
+
+if o.disabled == false then
+    mp.register_event("start-file", find_and_add_entries)
+end
+
+bind_keys(
+    o.find_and_add_files_keybind,
+    'find-and-add-files',
+    find_and_add_entries
+    )

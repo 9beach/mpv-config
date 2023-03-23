@@ -361,9 +361,7 @@ function download(current, dl_mode)
             )
     else
         local ret = os.execute(command)
-        if not ret then
-            msg.error('failed: '..command)
-        end
+        if not ret then msg.error('failed: '..command) end
     end
 end
 

@@ -204,10 +204,17 @@ favorite quotes to `script-opts/modernx-and-quotes.txt` file.
 To install **modernx-and-quotes**, please copy `scripts/modernx-and-quotes.lua`,
 `script-opts/osc.conf`, and `script-opts/modernx-and-quotes.txt` to your system.
 
-### autoload.lua
+### [autoload-ex.lua](https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua)
 
-This code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua). Nothing changed.
+The original code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua).
 
 > This script automatically loads playlist entries before and after the the
 > currently played file. It does so by scanning the directory a file is located
 > in when starting playback.
+
+This script adds a simple feature to well-known `autoload.lua`.
+
+- `disabled=yes` as default value.
+- Adds a script message and keybinds, `find-and-add-files` and `Ctrl+m, Meta+m`.
+  So you can add all the files in a folder of currently playing file with a hot
+  key. If you want it automatically, set `disabled=no`.
