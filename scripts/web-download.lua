@@ -87,9 +87,10 @@ IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
 ECHO Download command: %DLCMD% %FFMPEG_OPTS%
 
 CD "__DIRNAME"
-
 IF %ERRORLEVEL% == 0 GOTO DOWNLOAD_DIR
+
 ECHO Failed to go to "__DIRNAME". Press ENTER to quit.
+DEL %URLS_PATH%
 
 PAUSE >NUL & DEL %0 & EXIT 1
 
@@ -101,8 +102,9 @@ PAUSE >NUL
 %DLCMD% %FFMPEG_OPTS% -a %URLS_PATH%
 
 IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Not successful. Press ENTER to quit.)
+DEL %URLS_PATH%
 
-PAUSE >NUL & DEL %0 %URLS_PATH% & EXIT
+PAUSE >NUL & DEL %0 & EXIT
 ]]
 else
     script = [[
@@ -122,6 +124,7 @@ cd "__DIRNAME"
 
 if [ $? -ne 0 ]; then
     read -p 'Failed to go to "__DIRNAME". Press ENTER to quit.'
+    rm -- "$0" "__URLS_PATH"
     exit 1
 fi
 
@@ -195,7 +198,8 @@ function tmppath()
     end
 end
 
--- Returns code, content
+-- Returns code, content.
+--
 -- 0: Success.
 -- 1: No URLs.
 -- 2: Failed to create URLs file.
