@@ -23,7 +23,7 @@ https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua
 This script adds a simple feature to well-known `autoload.lua`.
 
 - `disabled=yes` as default value.
-- Adds a script message and keybinds, `find-and-add-files` and `Ctrl+m, Meta+m`.
+- Adds a script message and keybinds, `find-and-add-files` and `Ctrl+j, Meta+j`.
   So you can add all the files in a folder of currently playing file with a hot
   key. If you want it automatically, set `disabled=no`.
 --]]
