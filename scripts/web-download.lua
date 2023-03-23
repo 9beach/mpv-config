@@ -70,14 +70,16 @@ end
 
 options.read_options(o, "web-download")
 
--- To be replaced __DLCMD, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
-local pre_script
+-- To be replaced __DLCMD, __URLS_PATH, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
+local script
+
 if o.platform == 'windows' then
-    pre_script = string.char(0xEF, 0xBB, 0xBF)..[[
+    script = string.char(0xEF, 0xBB, 0xBF)..[[
 @ECHO OFF
 
 SET PATH=%PATH%;%CD%
 SET DLCMD=__DLCMD
+SET URLS_PATH="__URLS_PATH"
 
 WHERE ffmpeg >NUL 2>NUL
 IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
@@ -96,11 +98,14 @@ PAUSE >NUL & DEL %0 & EXIT 1
 ECHO Press ENTER to download __COUNT file(s) to "__DIRNAME".
 PAUSE >NUL
 
-SET FAILURES=0
+%DLCMD% %FFMPEG_OPTS% -a %URLS_PATH%
 
+IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Not successful. Press ENTER to quit.)
+
+PAUSE >NUL & DEL %0 %URLS_PATH% & EXIT
 ]]
 else
-    pre_script = [[
+    script = [[
 type ffmpeg > /dev/null 2>&1
 FFMPEG_INST=$?
 if [ $FFMPEG_INST -eq 0 ]; then
@@ -122,29 +127,19 @@ fi
 
 read -p 'Press ENTER to download __COUNT file(s) to "__DIRNAME".'
 
-FAILURES=0
-
-]]
-end
-
-local post_script
-if o.platform == 'windows' then
-    post_script = [[
-
-IF %FAILURES% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Something wrong but completed. Press ENTER to quit.)
-
-PAUSE >NUL & DEL %0 & EXIT
-]]
+if [ $FFMPEG_INST -eq 0 ]; then
+    __DLCMD __FFMPEG_OPTS -a "__URLS_PATH"
 else
-    post_script = [[
-
-if [ $FAILURES -eq 0 ]; then
-    echo Successfully completed! Bye.
-else
-    echo Something wrong but completed. Bye.
+    __DLCMD -a "__URLS_PATH"
 fi
 
-rm -- "$0"
+if [ $? -eq 0 ]; then
+    echo Successfully completed! Bye.
+else
+    echo Not successful, but bye.
+fi
+
+rm -- "$0" "__URLS_PATH"
 ]]
 end
 
@@ -192,44 +187,49 @@ string.quote = function(str)
     return str:gsub(quotepattern, "%%%1")
 end
 
-function get_download_script_content(current, dl_mode)
+function tmppath()
+    if o.platform ~= 'windows' then
+        return o.download_dir..(os.tmpname():gsub('.*/', '/.wdl-'))
+    else
+        return o.download_dir..(os.tmpname():gsub('.*\\', '\\.wdl-'))
+    end
+end
+
+-- Returns code, content
+-- 0: Success.
+-- 1: No URLs.
+-- 2: Failed to create URLs file.
+function get_download_script(current, dlmode, tmpname)
     local playlist = mp.get_property_native('playlist')
     if #playlist == 0 then return nil end
 
-    local script = ''
+    local urls = ''
 
     local j = current == true and mp.get_property_number('playlist-pos', 0) or 0
     local k = current == true and j or (#playlist-1)
     local count = 0
+
     for i=j+1, k+1 do
         local path = playlist[i].filename
         if is_url(path) then
-            if o.platform ~= 'windows' then
-                script = script..
-                    'if [ $FFMPEG_INST -eq 0 ]; then\n'..
-                    '    __DLCMD __FFMPEG_OPTS "'..path..'"\n'..
-                    'else\n'..
-                    '    __DLCMD "'..path..'"\n'..
-                    'fi\n'..
-                    'if [ $? -ne 0 ]; then\n'..
-                    '    FAILURES=$((FAILURES+1))\n'..
-                    'fi\n'
-            else
-                script = script..
-                    '%DLCMD% %FFMPEG_OPTS% "'..path..'"\n'..
-                    'IF NOT %ERRORLEVEL% == 0 SET /A "FAILURES=%FAILURES%+1"\n'
-            end
-            count = count+1
+            urls = urls..path.."\n"
+            count = count + 1
         end
     end
 
-    if count == 0 then return nil end
+    if count == 0 then return 1, nil end
 
-    -- Replaces __DLCMD, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
+    local urlspath = tmpname..'.urls'
+    local file, err = io.open(urlspath, "w")
+    if not file then return 2, nil end
+    file:write(urls)
+    file:close()
+
+    -- Replaces `__*`.
     local dlcmd
-    if (dl_mode == 'video') then
+    if (dlmode == 'video') then
         dlcmd = o.download_command
-    elseif (dl_mode == 'audio') then
+    elseif (dlmode == 'audio') then
         dlcmd = o.download_audio_command
     else
         dlcmd = o.download_alternative_command
@@ -240,12 +240,12 @@ function get_download_script_content(current, dl_mode)
     end
 
     local count_and_type = 
-        'audio' == dl_mode and tostring(count)..' audio' or tostring(count)
+        'audio' == dlmode and tostring(count)..' audio' or tostring(count)
 
     local ffmpeg_options
-    if (dl_mode == 'video') then
+    if (dlmode == 'video') then
         ffmpeg_options = o.ffmpeg_options
-    elseif (dl_mode == 'audio') then
+    elseif (dlmode == 'audio') then
         ffmpeg_options = o.ffmpeg_audio_options
     else
         ffmpeg_options = o.ffmpeg_alternative_options
@@ -257,23 +257,20 @@ function get_download_script_content(current, dl_mode)
 
     -- No plain string replacement functioin, poor Lua!
     local qdlcmd = string.quote(dlcmd)
+    local qurlspath = string.quote(urlspath)
     local qffmpeg_options = string.quote(ffmpeg_options)
     local qdownload_dir = string.quote(o.download_dir)
     local qcount_and_type = string.quote(count_and_type)
-    return (pre_script..script..post_script)
+    return 0, script
         :gsub('__DLCMD', qdlcmd)
         :gsub('__FFMPEG_OPTS', qffmpeg_options)
         :gsub('__DIRNAME', qdownload_dir)
         :gsub('__COUNT', qcount_and_type)
+        :gsub('__URLS_PATH', qurlspath)
 end
 
-function make_download_script(content)
-    local path
-    if o.platform ~= 'windows' then
-        path = o.download_dir..(os.tmpname():gsub('.*/', '/wdl-'))..'.sh'
-    else
-        path = o.download_dir..(os.tmpname():gsub('.*\\', '\\wdl-'))
-    end
+function make_download_script(content, tmpname)
+    local path = o.platform ~= 'windows' and tmpname..'.sh' or tmpname
 
     local file, err = io.open(path, "w")
     if not file then
@@ -285,8 +282,14 @@ function make_download_script(content)
 
     if o.platform == 'windows' then
         local new_path = path..'.bat'
+        local wnew_path = new_path:gsub('`', '``'):gsub('"', '``"')
+            :gsub('%$', '``$'):gsub('%[', '``['):gsub('%]', '``]')
+            :gsub("'", "''")
+        local wpath = path:gsub('`', '``'):gsub('"', '``"')
+            :gsub('%$', '``$'):gsub('%[', '``['):gsub('%]', '``]')
+            :gsub("'", "''")
         local cmd = "$PSDefaultParameterValues['Out-File:Encoding'] = 'oem';"
-            .."Get-Content \""..path.."\" > \""..new_path.."\""
+            .."Get-Content '"..wpath.."' > '"..wnew_path.."'"
         local args = {
             'powershell', '-NoProfile', '-Command', cmd
         }
@@ -311,9 +314,11 @@ end
 function create_dir(dir)
     if utils.readdir(dir) == nil then
         local args
+        local dir = dir:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                        :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''")
         if o.platform == 'windows' then
             args = {
-                'powershell', '-NoProfile', '-Command', 'mkdir', dir
+                'powershell', '-NoProfile', '-Command', 'mkdir', "'"..dir.."'"
             }
         else
             args = {'mkdir', dir}
@@ -328,18 +333,7 @@ end
 
 local is_first = true
 
-function download(current, dl_mode)
-    local content = get_download_script_content(current, dl_mode)
-
-    if not content then
-        if current then
-            mp.osd_message("Current track is not from internet.")
-        else
-            mp.osd_message("No URLs in the playlist.")
-        end
-        return
-    end
-
+function download(current, dlmode)
     if is_first then
         is_first = false
         if create_dir(o.download_dir) == false then
@@ -350,7 +344,21 @@ function download(current, dl_mode)
         end
     end
 
-    local path = make_download_script(content)
+    local tmpname = tmppath()
+    local ret, content = get_download_script(current, dlmode, tmpname)
+
+    if ret ~= 0 then
+        if ret == 2 then
+            mp.osd_message('Failed to create file: "'..tmpname..'".') 
+        elseif current then
+            mp.osd_message("Current track is not from internet.")
+        else
+            mp.osd_message("No URLs in the playlist.")
+        end
+        return
+    end
+
+    local path = make_download_script(content, tmpname)
     if not path then
         mp.osd_message(
             'Failed to create download script in "'..o.download_dir..'".'
@@ -364,9 +372,8 @@ function download(current, dl_mode)
         os.remove(path)
         osd_error(
             'Failed to read download command from "'
-                ..mp.command_native({"expand-path", "~~/"})
-                ..'/script-opts/web-download.conf".',
-            5
+            ..mp.command_native({"expand-path", "~~/"})
+            ..'/script-opts/web-download.conf".'
             )
     else
         local ret = os.execute(command)
