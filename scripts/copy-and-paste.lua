@@ -159,7 +159,6 @@ function copy()
                 path = string.gsub(path, '/', '\\')
             end
         end
-        osd_info(path)
         set_clipboard(path)
         if path:match('://') ~= nil then
             osd_info('URL copied')
@@ -168,7 +167,6 @@ function copy()
         end
     elseif (o.idle_state_copy_script ~= '') then
         mp.command(o.idle_state_copy_script)
-        osd_info('Copy message sent')
     end
 end
 

@@ -32,14 +32,18 @@ else
     platform = 'linux'
 end
 
+function ps_quote_string(str)
+    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
+end
+
 function set_clipboard(text)
     if platform == 'darwin' then
         pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
     elseif platform == 'windows' then
-        local clip = 
-            '"'..text:gsub('`', '``'):gsub('"', '`"'):gsub('%$', '`$')..'"'
         local args = {
-            'powershell', '-NoProfile', 'Set-Clipboard', '-value', clip
+            'powershell', '-NoProfile', 'Set-Clipboard', '-value', 
+            ps_quote_string(text)
         }
         local res = utils.subprocess({args=args, cancellable=false})
         if res.error then msg.error('paste failed: '..res.error) end

@@ -83,17 +83,20 @@ end
 
 bind_keys(o.reveal_in_finder_keybind, 'reveal-in-finder', reveal_in_finder)
 
+function ps_quote_string(str)
+    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
+end
+
 function touch(path)
     local cmd = nil
 
     if o.platform == 'windows' then
         -- Bill, WTF!
-        path = path:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
-                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''")
         cmd = {
             'powershell',
             '-command',
-            "(Get-Item '"..path.."').LastWriteTime=(Get-Date)"
+            "(Get-Item "..ps_quote_string(path)..").LastWriteTime=(Get-Date)"
         }
     else
         cmd = {'touch', path}
