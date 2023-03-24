@@ -186,8 +186,8 @@ end
 
 local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
 
-string.quote = function(str)
-    return str:gsub(quotepattern, "%%%1")
+function quote_luastring(str)
+    return (str:gsub(quotepattern, "%%%1"))
 end
 
 function tmppath()
@@ -260,17 +260,12 @@ function get_download_script(current, dlmode, tmpname)
     end
 
     -- No plain string replacement functioin, poor Lua!
-    local qdlcmd = string.quote(dlcmd)
-    local qurlspath = string.quote(urlspath)
-    local qffmpeg_options = string.quote(ffmpeg_options)
-    local qdownload_dir = string.quote(o.download_dir)
-    local qcount_and_type = string.quote(count_and_type)
     return 0, script
-        :gsub('__DLCMD', qdlcmd)
-        :gsub('__FFMPEG_OPTS', qffmpeg_options)
-        :gsub('__DIRNAME', qdownload_dir)
-        :gsub('__COUNT', qcount_and_type)
-        :gsub('__URLS_PATH', qurlspath)
+        :gsub('__DLCMD', quote_luastring(dlcmd))
+        :gsub('__FFMPEG_OPTS', quote_luastring(ffmpeg_options))
+        :gsub('__DIRNAME', quote_luastring(o.download_dir))
+        :gsub('__COUNT', quote_luastring(count_and_type))
+        :gsub('__URLS_PATH', quote_luastring(urlspath))
 end
 
 function make_download_script(content, tmpname)
@@ -286,14 +281,8 @@ function make_download_script(content, tmpname)
 
     if o.platform == 'windows' then
         local new_path = path..'.bat'
-        local wnew_path = new_path:gsub('`', '``'):gsub('"', '``"')
-            :gsub('%$', '``$'):gsub('%[', '``['):gsub('%]', '``]')
-            :gsub("'", "''")
-        local wpath = path:gsub('`', '``'):gsub('"', '``"')
-            :gsub('%$', '``$'):gsub('%[', '``['):gsub('%]', '``]')
-            :gsub("'", "''")
         local cmd = "$PSDefaultParameterValues['Out-File:Encoding'] = 'oem';"
-            .."Get-Content '"..wpath.."' > '"..wnew_path.."'"
+            .."Get-Content "..quote_pspath(path)..">"..quote_pspath(new_path)
         local args = {
             'powershell', '-NoProfile', '-Command', cmd
         }
@@ -315,14 +304,19 @@ function get_my_script_command(path)
     end
 end
 
+-- Quotes string for powershell path including "'"
+function quote_pspath(str)
+    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
+end
+
 function create_dir(dir)
     if utils.readdir(dir) == nil then
         local args
-        local dir = dir:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
-                        :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''")
         if o.platform == 'windows' then
             args = {
-                'powershell', '-NoProfile', '-Command', 'mkdir', "'"..dir.."'"
+                'powershell', '-NoProfile', '-Command', 'mkdir', 
+                quote_pspath(dir)
             }
         else
             args = {'mkdir', dir}
