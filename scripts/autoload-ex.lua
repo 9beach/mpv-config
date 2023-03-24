@@ -136,7 +136,7 @@ function get_playlist_filenames()
     return filenames
 end
 
-function find_and_add_entries()
+function find_and_add_entries(show_log)
     local path = mp.get_property("path", "")
     local dir, filename = utils.split_path(path)
     msg.trace(("dir: %s, filename: %s"):format(dir, filename))
@@ -153,6 +153,10 @@ function find_and_add_entries()
         return
     else
         autoloaded = true
+    end
+
+    if show_log == true then
+        mp.osd_message('Loading all files from the folder.')
     end
 
     local pl = mp.get_property_native("playlist", {})
@@ -223,6 +227,10 @@ function find_and_add_entries()
 
     add_files_at(pl_current + 1, append[1])
     add_files_at(pl_current, append[-1])
+
+    if show_log == true then
+        mp.osd_message(tostring(#files)..' files loaded.')
+    end
 end
 
 function bind_keys(keys, name, func, opts)
@@ -249,5 +257,5 @@ end
 bind_keys(
     o.find_and_add_files_keybind,
     'find-and-add-files',
-    find_and_add_entries
+    function () find_and_add_entries(true) end
     )
