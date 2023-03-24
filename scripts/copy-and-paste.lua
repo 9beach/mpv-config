@@ -129,14 +129,18 @@ function get_clipboard()
     return ''
 end
 
+function ps_quote_string(str)
+    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
+end
+
 function set_clipboard(text)
     if o.platform == 'darwin' then
         pipe_write('LC_CTYPE=UTF-8 pbcopy', text)
     elseif o.platform == 'windows' then
-        local clip = 
-            '"'..text:gsub('`', '``'):gsub('"', '`"'):gsub('%$', '`$')..'"'
         local args = {
-            'powershell', '-NoProfile', 'Set-Clipboard', '-value', clip
+            'powershell', '-NoProfile', 'Set-Clipboard', '-value', 
+            ps_quote_string(text)
         }
         local res = utils.subprocess({args=args, cancellable=false})
         if res.error then msg.error('paste failed: '..res.error) end
@@ -148,9 +152,14 @@ end
 function copy()
     local path = mp.get_property('path')
     if path ~= nil then
-        if o.platform == 'windows' and path:match('://') == nil then
-            path = string.gsub(path, '/', '\\')
+        if path:match('://') == nil then
+            local pwd = mp.get_property("working-directory")
+            path = utils.join_path(pwd, path)
+            if o.platform == 'windows' then
+                path = string.gsub(path, '/', '\\')
+            end
         end
+        osd_info(path)
         set_clipboard(path)
         if path:match('://') ~= nil then
             osd_info('URL copied')
