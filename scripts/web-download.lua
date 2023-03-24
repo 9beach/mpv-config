@@ -186,10 +186,6 @@ end
 
 local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
 
-function lua_quote_string(str)
-    return (str:gsub(quotepattern, "%%%1"))
-end
-
 function tmppath()
     if o.platform ~= 'windows' then
         return o.download_dir..(os.tmpname():gsub('.*/', '/.wdl-'))
@@ -198,14 +194,19 @@ function tmppath()
     end
 end
 
--- Returns code, content.
+function lua_quote_string(str)
+    return (str:gsub(quotepattern, "%%%1"))
+end
+
+-- Returns `return_code` and `script`.
 --
 -- 0: Success.
 -- 1: No URLs.
 -- 2: Failed to create URLs file.
+-- 3: Nothing loaded.
 function get_download_script(current, dlmode, tmpname)
     local playlist = mp.get_property_native('playlist')
-    if #playlist == 0 then return nil end
+    if #playlist == 0 then return 3 end
 
     local urls = ''
 
@@ -221,11 +222,11 @@ function get_download_script(current, dlmode, tmpname)
         end
     end
 
-    if count == 0 then return 1, nil end
+    if count == 0 then return 1 end
 
     local urlspath = tmpname..'.urls'
     local file, err = io.open(urlspath, "w")
-    if not file then return 2, nil end
+    if not file then return 2 end
     file:write(urls)
     file:close()
 
@@ -266,6 +267,12 @@ function get_download_script(current, dlmode, tmpname)
         :gsub('__DIRNAME', lua_quote_string(o.download_dir))
         :gsub('__COUNT', lua_quote_string(count_and_type))
         :gsub('__URLS_PATH', lua_quote_string(urlspath))
+end
+
+-- Quotes string for powershell path including "'"
+function ps_quote_string(str)
+    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
 end
 
 -- `cmd.exe` can't read UTF-8, so we need to convert it to oem encoding 
@@ -310,12 +317,6 @@ function get_my_script_command(path)
     end
 end
 
--- Quotes string for powershell path including "'"
-function ps_quote_string(str)
-    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
-                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
-end
-
 function create_dir(dir)
     if utils.readdir(dir) == nil then
         local args
@@ -354,6 +355,8 @@ function download(current, dlmode)
     if ret ~= 0 then
         if ret == 2 then
             mp.osd_message('Failed to create file: "'..tmpname..'".') 
+        elseif ret == 3 then
+            mp.osd_message('Nothing loaded in the playlist.')
         elseif current then
             mp.osd_message("Current track is not from internet.")
         else
