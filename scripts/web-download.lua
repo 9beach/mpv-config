@@ -100,9 +100,9 @@ ECHO Press ENTER to download __COUNT file(s) to "__DIRNAME".
 PAUSE >NUL
 
 %DLCMD% %FFMPEG_OPTS% -a %URLS_PATH%
+DEL %URLS_PATH%
 
 IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (ECHO Not successful. Press ENTER to quit.)
-DEL %URLS_PATH%
 
 PAUSE >NUL & DEL %0 & EXIT
 ]]
@@ -186,7 +186,7 @@ end
 
 local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
 
-function quote_luastring(str)
+function lua_quote_string(str)
     return (str:gsub(quotepattern, "%%%1"))
 end
 
@@ -261,11 +261,22 @@ function get_download_script(current, dlmode, tmpname)
 
     -- No plain string replacement functioin, poor Lua!
     return 0, script
-        :gsub('__DLCMD', quote_luastring(dlcmd))
-        :gsub('__FFMPEG_OPTS', quote_luastring(ffmpeg_options))
-        :gsub('__DIRNAME', quote_luastring(o.download_dir))
-        :gsub('__COUNT', quote_luastring(count_and_type))
-        :gsub('__URLS_PATH', quote_luastring(urlspath))
+        :gsub('__DLCMD', lua_quote_string(dlcmd))
+        :gsub('__FFMPEG_OPTS', lua_quote_string(ffmpeg_options))
+        :gsub('__DIRNAME', lua_quote_string(o.download_dir))
+        :gsub('__COUNT', lua_quote_string(count_and_type))
+        :gsub('__URLS_PATH', lua_quote_string(urlspath))
+end
+
+-- `cmd.exe` can't read UTF-8, so we need to convert it to oem encoding 
+-- with `powershell.exe`.
+function ps_iconv_to_oem(in_utf8_filepath, out_oem_filepath)
+    local cmd = "Get-Content "..ps_quote_string(in_utf8_filepath)..
+        " | Set-Content -Encoding oem "..ps_quote_string(out_oem_filepath)
+    local args = {
+        'powershell', '-NoProfile', '-Command', cmd
+    }
+    return utils.subprocess({args=args, cancellable=false})
 end
 
 function make_download_script(content, tmpname)
@@ -281,12 +292,7 @@ function make_download_script(content, tmpname)
 
     if o.platform == 'windows' then
         local new_path = path..'.bat'
-        local cmd = "$PSDefaultParameterValues['Out-File:Encoding'] = 'oem';"
-            .."Get-Content "..quote_pspath(path)..">"..quote_pspath(new_path)
-        local args = {
-            'powershell', '-NoProfile', '-Command', cmd
-        }
-        local res = utils.subprocess({args=args, cancellable=false})
+        ps_iconv_to_oem(path, new_path)
         os.remove(path)
         return new_path
     else
@@ -305,7 +311,7 @@ function get_my_script_command(path)
 end
 
 -- Quotes string for powershell path including "'"
-function quote_pspath(str)
+function ps_quote_string(str)
     return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
                    :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
 end
@@ -316,7 +322,7 @@ function create_dir(dir)
         if o.platform == 'windows' then
             args = {
                 'powershell', '-NoProfile', '-Command', 'mkdir', 
-                quote_pspath(dir)
+                ps_quote_string(dir)
             }
         else
             args = {'mkdir', dir}
