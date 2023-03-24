@@ -24,8 +24,8 @@ This script adds a simple feature to well-known `autoload.lua`.
 
 - `disabled=yes` as default value.
 - Adds a script message and keybinds, `find-and-add-files` and `Ctrl+j, Meta+j`.
-  So you can add all the files in a folder of currently playing file with a hot
-  key. If you want it automatically, set `disabled=no`.
+  So you can add all the files from the folder of currently playing file with
+  the hot keys. If you want it automatically, set `disabled=no`.
 --]]
 
 MAXENTRIES = 5000
