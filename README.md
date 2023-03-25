@@ -76,8 +76,9 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
-For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
-`C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
+For _Microsoft Windows_ users, just download
+[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+and copy it to `C:\Windows`. For _OSX_ users, run `brew install yt-dlp`.
 
 To download the highest resolution videos, and preserve chapter markers,
 you need to install [ffmpeg](https://ffmpeg.org).
