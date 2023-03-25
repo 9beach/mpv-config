@@ -1,3 +1,6 @@
+-- This file is distributed with `9beach/mpv-config` for `ytdl_hook.lua` in 
+-- OSX mpv has bugs. So it will be removed when patched OSX mpv releases.
+
 local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 local options = require 'mp.options'
