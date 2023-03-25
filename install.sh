@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd "$(dirname "$0")"
 
 # If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.

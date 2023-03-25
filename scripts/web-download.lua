@@ -136,10 +136,20 @@ else
     __DLCMD -a "__URLS_PATH"
 fi
 
-if [ $? -eq 0 ]; then
-    echo Successfully completed! Bye.
+LAST_ERROR=$?
+
+if [ "$(uname)" = "Darwin" ]; then
+    if [ $LAST_ERROR -eq 0 ]; then
+        echo Successfully completed! Bye.
+    else
+        echo Not successful, but bye.
+    fi
 else
-    echo Not successful, but bye.
+    if [ $LAST_ERROR -eq 0 ]; then
+        read -p 'Successfully completed! Press ENTER to quit.'
+    else
+        read -p 'Not successful. Press ENTER to quit.'
+    fi
 fi
 
 rm -- "$0" "__URLS_PATH"
@@ -184,8 +194,6 @@ function is_url(path)
     return path ~= nil and string.find(path, '://') ~= nil
 end
 
-local quotepattern = '(['..("%^$().[]*+-?"):gsub("(.)", "%%%1")..'])'
-
 function tmppath()
     if o.platform ~= 'windows' then
         return o.download_dir..(os.tmpname():gsub('.*/', '/.wdl-'))
@@ -194,8 +202,8 @@ function tmppath()
     end
 end
 
-function lua_quote_string(str)
-    return (str:gsub(quotepattern, "%%%1"))
+function lua_quote_string(text)
+    return (text:gsub("%%", "%%%1"))
 end
 
 -- Returns `return_code` and `script`.
