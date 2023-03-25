@@ -17,8 +17,7 @@ First [install mpv](https://mpv.io/installation/) and then
 To play and download media files from URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
 users, download
-[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.ex
-e)
+[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
 and copy it to `C:\Windows`.
 
 To download the highest resolution videos, and preserve chapter markers,
@@ -87,8 +86,7 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 To play and download media files from URLs, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
 users, download
-[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.ex
-e)
+[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
 and copy it to `C:\Windows`.
 
 To download the highest resolution videos, and preserve chapter markers,
