@@ -11,8 +11,18 @@ notice that the installation script is probably just for me, and also that
 subtitle settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for
 Koreans. Anyhow it installs all the scripts and settings of this repository.
 
-First [install mpv](https://mpv.io/installation/) and then download and unzip
-[this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+First [install mpv](https://mpv.io/installation/) and then 
+[download this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+
+To play and download media files from URLs, you need to install
+[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
+users, download
+[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.ex
+e)
+and copy it to `C:\Windows`.
+
+To download the highest resolution videos, and preserve chapter markers,
+you need to install [ffmpeg](https://ffmpeg.org).
 
 In Mac or Linux, run the following from the terminal. Then it installs
 `9beach/mpv-config` to your **mpv** configuration directory. Your original
@@ -74,11 +84,12 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 - Downloads all media of **mpv** playlist with alternative option.
   (`Alt+Y, Ctrl+Y, Meta+Y`)
 
-To download media files, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
-For _Microsoft Windows_ users, just download
-[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
-and copy it to `C:\Windows`. For _OSX_ users, run `brew install yt-dlp`.
+To play and download media files from URLs, you need to install
+[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
+users, download
+[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.ex
+e)
+and copy it to `C:\Windows`.
 
 To download the highest resolution videos, and preserve chapter markers,
 you need to install [ffmpeg](https://ffmpeg.org).
@@ -100,11 +111,6 @@ You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 For _OSX_ users, it's nice to know that when option key pressed, the context
 menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
 can paste the paths of local media to **mpv** with this.
-
-To download media files, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
-For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
-`C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 
