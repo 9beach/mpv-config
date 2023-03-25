@@ -38,7 +38,6 @@ local o = {
     -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
     -- Supports `$HOME` also for Microsoft Windows.
     playlist_dir = '~~desktop/',
-    -- windows/darwin/...
 }
 
 if os.getenv('windir') ~= nil then

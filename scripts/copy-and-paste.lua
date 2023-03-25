@@ -42,7 +42,6 @@ local o = {
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
     idle_state_copy_script = 'script-message copy-quote',
-    -- windows/darwin/...
 }
 
 if os.getenv('windir') ~= nil then
