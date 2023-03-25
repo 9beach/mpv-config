@@ -35,7 +35,7 @@ local o = {
     download_dir = '$HOME/Downloads',
     -- `yt-dlp` options for downloading video.
     download_command = 'yt-dlp --no-mtime --write-sub -o "%(title)s.%(ext)s"',
-    -- If `ffmpeg` is installed, adds the options below to download commands. 
+    -- If `ffmpeg` is installed, adds the options below to download commands.
     -- `--embed-chapters` for chapter markers.
     ffmpeg_options = '--embed-chapters',
     -- `yt-dlp` options for downloading audio.
@@ -59,8 +59,8 @@ local o = {
     -- Keybind for alternative downloading currently playing media.
     download_current_track_alternative_keybind = 'Ctrl+y Alt+y Meta+y',
     -- Keybind for alternative downloading all media of playlist.
-    download_playlist_alternative_keybind 
-        = 'Ctrl+Shift+y Alt+Shift+y Meta+Shift+y',
+    download_playlist_alternative_keybind =
+        'Ctrl+Shift+y Alt+Shift+y Meta+Shift+y',
 }
 
 if os.getenv('windir') ~= nil then
@@ -205,10 +205,6 @@ function tmppath()
     end
 end
 
-function lua_quote_string(text)
-    return (text:gsub("%%", "%%%1"))
-end
-
 -- Returns `return_code` and `script`.
 --
 -- 0: Success.
@@ -255,7 +251,7 @@ function get_download_script(current, dlmode, tmpname)
         dlcmd = dlcmd:gsub('%%', '%%%%')
     end
 
-    local count_and_type = 
+    local count_and_type =
         'audio' == dlmode and tostring(count)..' audio' or tostring(count)
 
     local ffmpeg_options
@@ -273,11 +269,11 @@ function get_download_script(current, dlmode, tmpname)
 
     -- No plain string replacement functioin, poor Lua!
     return 0, script
-        :gsub('__DLCMD', lua_quote_string(dlcmd))
-        :gsub('__FFMPEG_OPTS', lua_quote_string(ffmpeg_options))
-        :gsub('__DIRNAME', lua_quote_string(o.download_dir))
-        :gsub('__COUNT', lua_quote_string(count_and_type))
-        :gsub('__URLS_PATH', lua_quote_string(urlspath))
+        :gsub('__DLCMD', (dlcmd:gsub("%%", "%%%%")))
+        :gsub('__FFMPEG_OPTS', (ffmpeg_options:gsub("%%", "%%%%")))
+        :gsub('__DIRNAME', (o.download_dir:gsub("%%", "%%%%")))
+        :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
+        :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
 end
 
 -- Quotes string for powershell path including "'"
@@ -286,7 +282,7 @@ function ps_quote_string(str)
                    :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
 end
 
--- `cmd.exe` can't read UTF-8, so we need to convert it to oem encoding 
+-- `cmd.exe` can't read UTF-8, so we need to convert it to oem encoding
 -- with `powershell.exe`.
 function ps_iconv_to_oem(in_utf8_filepath, out_oem_filepath)
     local cmd = "Get-Content "..ps_quote_string(in_utf8_filepath)..
@@ -333,7 +329,7 @@ function create_dir(dir)
         local args
         if o.platform == 'windows' then
             args = {
-                'powershell', '-NoProfile', '-Command', 'mkdir', 
+                'powershell', '-NoProfile', '-Command', 'mkdir',
                 ps_quote_string(dir)
             }
         else
@@ -365,7 +361,7 @@ function download(current, dlmode)
 
     if ret ~= 0 then
         if ret == 2 then
-            mp.osd_message('Failed to create file: "'..tmpname..'".') 
+            mp.osd_message('Failed to create file: "'..tmpname..'".')
         elseif ret == 3 then
             mp.osd_message('Nothing loaded in the playlist.')
         elseif current then
@@ -406,22 +402,22 @@ bind_keys(o.download_playlist_keybind, 'download-playlist', function()
     download(false, 'video')
 end)
 bind_keys(
-    o.download_current_track_audio_keybind, 
+    o.download_current_track_audio_keybind,
     'download-current-track-audio',
     function() download(true, 'audio') end
     )
 bind_keys(
-    o.download_playlist_audio_keybind, 
-    'download-playlist-audio', 
+    o.download_playlist_audio_keybind,
+    'download-playlist-audio',
     function() download(false, 'audio') end
     )
 bind_keys(
-    o.download_current_track_alternative_keybind, 
+    o.download_current_track_alternative_keybind,
     'download-current-track-alternative',
     function() download(true, 'alternative') end
     )
 bind_keys(
-    o.download_playlist_alternative_keybind, 
-    'download-playlist-alternative', 
+    o.download_playlist_alternative_keybind,
+    'download-playlist-alternative',
     function() download(false, 'alternative') end
     )
