@@ -168,12 +168,11 @@ You can edit the settings in `script-opts/on-file-loaded.conf`.
 
 This script provides two script messages:
 
-1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
-   selected. If you want to reveal playing file in explorer.exe, it will help
-   you. (`Ctrl+x, Alt+x, Meta+x`)
-2. `touch-file` changes the `mdate` of playing file to current time. If you
-   want to mark playing file to delete later or do something else with, it will
-   help you. (`Ctrl+f, Alt+f, Meta+f`)
+1. `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with 
+   currently playing file selected. (`Ctrl+f, Alt+f, Meta+f`)
+2. `touch-file` updates the modification time of currently playing file. If you
+   want to mark it to delete later or do something else with, it will help you.
+   (`Ctrl+x, Alt+x, Meta+x`)
 
 You can edit the settings in `script-opts/finder-integration.conf`.
 
