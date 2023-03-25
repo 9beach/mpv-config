@@ -59,8 +59,7 @@ local o = {
     -- Keybind for alternative downloading currently playing media.
     download_current_track_alternative_keybind = 'Ctrl+y Alt+y Meta+y',
     -- Keybind for alternative downloading all media of playlist.
-    download_playlist_alternative_keybind =
-        'Ctrl+Shift+y Alt+Shift+y Meta+Shift+y',
+    download_playlist_alternative_keybind = 'Ctrl+Shift+y Alt+Shift+y Meta+Shift+y',
 }
 
 if os.getenv('windir') ~= nil then
@@ -167,7 +166,7 @@ else
     o.download_dir = o.download_dir:gsub('%$HOME', home_dir)
     o.download_dir = mp.command_native({"expand-path", o.download_dir})
     if o.platform == 'windows' then
-        o.download_dir =  o.download_dir:gsub('/', '\\')
+        o.download_dir = o.download_dir:gsub('/', '\\')
     end
 end
 
