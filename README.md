@@ -41,7 +41,7 @@ MPV_CONF_PATH="path-to-my-mpv/portable_config" ./install.sh
 ```
 
 In _Microsoft Windows_, run the following from the `Command Prompt`, or
-double-click `install.bat` from file explorer.
+double-click `install.bat` in file explorer.
 
 ```console
 C:\path-to\mpv-config-main> install.bat
