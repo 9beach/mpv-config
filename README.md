@@ -64,13 +64,15 @@ sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/web-download.conf`:
 
-- Downloads currently playing media. (`Ctrl+d, Meta+d`)
-- Downloads all media of **mpv** playlist. (`Ctrl+D, Meta+D`)
-- Downloads currently playing media as a audio file. (`Ctrl+e, Meta+e`)
-- Downloads all media of **mpv** playlist as audio files. (`Ctrl+E, Meta+E`)
-- Downloads currently playing media with alternative option. (`Ctrl+y, Meta+y`)
+- Downloads currently playing media. (`Alt+d, Ctrl+d, Meta+d`)
+- Downloads all media of **mpv** playlist. (`Alt+D, Ctrl+D, Meta+D`)
+- Downloads currently playing media as a audio file. (`Alt+e, Ctrl+e, Meta+e`)
+- Downloads all media of **mpv** playlist as audio files.
+  (`Alt+E, Ctrl+E, Meta+E`)
+- Downloads currently playing media with alternative option.
+  (`Alt+y, Ctrl+y, Meta+y`)
 - Downloads all media of **mpv** playlist with alternative option.
-  (`Ctrl+Y, Meta+Y`)
+  (`Alt+Y, Ctrl+Y, Meta+Y`)
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
@@ -88,10 +90,11 @@ HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 
-- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+V, Meta+V`)
-- Appends file paths or URLs in clipboard to playlist. (`Ctrl+b, Meta+b`)
-- Appends file paths or URLs in clipboard to current track. (`Ctrl+v, Meta+v`)
-- Copies file path or URL of current track. (`Ctrl+c, Meta+c`)
+- Pastes file paths or URLs in clipboard to playlist. (`Alt+V, Ctrl+V, Meta+V`)
+- Appends file paths or URLs in clipboard to playlist. (`Alt+b, Ctrl+b, Meta+b`)
+- Appends file paths or URLs in clipboard to current track.
+  (`Alt+v, Ctrl+v, Meta+v`)
+- Copies file path or URL of current track. (`Alt+c, Ctrl+c, Meta+c`)
 
 For _OSX_ users, it's nice to know that when option key pressed, the context
 menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
@@ -106,10 +109,12 @@ For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
 
 This script provides script messages below:
 
-- script-message simple-playlist sort name-asc (`Ctrl+n, Meta+n`)
-- script-message simple-playlist sort name-asc startover (`Ctrl+N, Meta+N`)
-- script-message simple-playlist sort date-desc (`Ctrl+g, Meta+g`)
-- script-message simple-playlist sort date-desc startover (`Ctrl+G, Meta+G`)
+- script-message simple-playlist sort name-asc (`Alt+n, Ctrl+n, Meta+n`)
+- script-message simple-playlist sort name-asc startover
+  (`Alt+N, Ctrl+N, Meta+N`)
+- script-message simple-playlist sort date-desc (`Alt+g, Ctrl+g, Meta+g`)
+- script-message simple-playlist sort date-desc startover
+  (`Alt+G, Ctrl+G, Meta+G`)
 
 `simple-playlist sort` also support `size-asc`, `size-desc`, `date-asc`,
 `name-desc` with or without `startover`. It's quite fast. Of course,
@@ -117,14 +122,14 @@ the time complexity of my sorting algorithm is **O(nlog n)** for **Lua** data,
 but for the **mpv** system call, i.e., `mp.commandv('playlist-move', i, j)`,
 the time complexity is **O(n)**.
 
-- script-message simple-playlist shuffle (`Ctrl+s, Meta+s`)
-- script-message simple-playlist reverse (`Ctrl+V, Meta+V`)
-- script-message simple-playlist show-text 5 (`Ctrl+p, Meta+p`)
-- script-message simple-playlist show-osc 5 (`Ctrl+l, Meta+l`)
-- script-message simple-playlist hide (`Ctrl+k, Meta+k`)
-- script-message simple-playlist playfirst (`Ctrl+a, Meta+a`)
-- script-message simple-playlist playlast (`Ctrl+z, Meta+z`)
-- script-message simple-playlist save (`Ctrl+P, Meta+P`)
+- script-message simple-playlist shuffle (`Alt+s, Ctrl+s, Meta+s`)
+- script-message simple-playlist reverse (`Alt+V, Ctrl+V, Meta+V`)
+- script-message simple-playlist show-text 5 (`Alt+p, Ctrl+p, Meta+p`)
+- script-message simple-playlist show-osc 5 (`Alt+l, Ctrl+l, Meta+l`)
+- script-message simple-playlist hide (`Alt+k, Ctrl+k, Meta+k`)
+- script-message simple-playlist playfirst (`Alt+a, Ctrl+a, Meta+a`)
+- script-message simple-playlist playlast (`Alt+z, Ctrl+z, Meta+z`)
+- script-message simple-playlist save (`Alt+P, Ctrl+P, Meta+P`)
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
 simple, the playlist is not refreshed automatically, so another `show-text` or
@@ -165,10 +170,10 @@ This script provides two script messages:
 
 1. `reveal-in-finder` runs explorer.exe/Finder.app/Nautilus with playing file
    selected. If you want to reveal playing file in explorer.exe, it will help
-   you. (`Meta+x, Ctrl+x`)
+   you. (`Ctrl+x, Alt+x, Meta+x`)
 2. `touch-file` changes the `mdate` of playing file to current time. If you
    want to mark playing file to delete later or do something else with, it will
-   help you. (`Meta+f, Ctrl+f`)
+   help you. (`Ctrl+f, Alt+f, Meta+f`)
 
 You can edit the settings in `script-opts/finder-integration.conf`.
 
@@ -215,6 +220,7 @@ The original code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blo
 This script adds a simple feature to well-known `autoload.lua`.
 
 - `disabled=yes` as default value.
-- Adds a script message and keybinds, `find-and-add-files` and `Ctrl+j, Meta+j`.
-  So you can add all the files from the folder of currently playing file with
-  the hot keys. If you want it automatically, set `disabled=no`.
+- Adds a script message and keybinds, `find-and-add-files` and 
+  `Ctrl+j, Alt+j, Meta+j`. So you can add all the files from the folder of 
+  currently playing file with the hot keys. If you want it automatically, 
+  set `disabled=no`.

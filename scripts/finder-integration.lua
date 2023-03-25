@@ -20,8 +20,8 @@ local o = {
     mac_finder = '["open", "-R"]',
     windows_finder = '["explorer.exe", "/select,"]',
     linux_finder = '["nautilus"]', -- Not tested yet
-    touch_file_keybind='Meta+x Alt+x',
-    reveal_in_finder_keybind='Meta+f Alt+f',
+    touch_file_keybind='Ctrl+x Alt+x Meta+x',
+    reveal_in_finder_keybind='Ctrl+f Alt+f Meta+f',
 }
 
 if os.getenv('windir') ~= nil then

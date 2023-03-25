@@ -6,13 +6,15 @@ sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/web-download.conf`:
 
-- Downloads currently playing media. (`Alt+d, Meta+d`)
-- Downloads all media of **mpv** playlist. (`Alt+D, Meta+D`)
-- Downloads currently playing media as a audio file. (`Alt+e, Meta+e`)
-- Downloads all media of **mpv** playlist as audio files. (`Alt+E, Meta+E`)
-- Downloads currently playing media with alternative option. (`Alt+y, Meta+y`)
+- Downloads currently playing media. (`Ctrl+d, Alt+d, Meta+d`)
+- Downloads all media of **mpv** playlist. (`Ctrl+D, Alt+D, Meta+D`)
+- Downloads currently playing media as a audio file. (`Ctrl+e, Alt+e, Meta+e`)
+- Downloads all media of **mpv** playlist as audio files.
+  (`Ctrl+E, Alt+E, Meta+E`)
+- Downloads currently playing media with alternative option.
+  (`Ctrl+y, Alt+y, Meta+y`)
 - Downloads all media of **mpv** playlist with alternative option.
-  (`Alt+Y, Meta+Y`)
+  (`Ctrl+Y, Alt+Y, Meta+Y`)
 
 To download media files, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
@@ -47,17 +49,18 @@ local o = {
     windows_download = 'start cmd /c "$SCRIPT"',
     mac_download = 'osascript -e \'tell application "Terminal"\' -e \'if not application "Terminal" is running then launch\' -e activate -e "do script \\\"bash \'$SCRIPT\'\\\"" -e end',
     -- Keybind for downloading currently playing media.
-    download_current_track_keybind = 'Alt+d Meta+d',
+    download_current_track_keybind = 'Ctrl+d Alt+d Meta+d',
     -- Keybind for downloading all media of playlist.
-    download_playlist_keybind = 'Alt+Shift+d Meta+Shift+d',
+    download_playlist_keybind = 'Ctrl+Shift+d Alt+Shift+d Meta+Shift+d',
     -- Keybind for downloading currently playing media as a audio file.
-    download_current_track_audio_keybind = 'Alt+e Meta+e',
+    download_current_track_audio_keybind = 'Ctrl+e Alt+e Meta+e',
     -- Keybind for downloading all media of playlist as audio files.
-    download_playlist_audio_keybind = 'Alt+Shift+e Meta+Shift+e',
+    download_playlist_audio_keybind = 'Ctrl+Shift+e Alt+Shift+e Meta+Shift+e',
     -- Keybind for alternative downloading currently playing media.
-    download_current_track_alternative_keybind = 'Alt+y Meta+y',
+    download_current_track_alternative_keybind = 'Ctrl+y Alt+y Meta+y',
     -- Keybind for alternative downloading all media of playlist.
-    download_playlist_alternative_keybind = 'Alt+Shift+y Meta+Shift+y',
+    download_playlist_alternative_keybind 
+        = 'Ctrl+Shift+y Alt+Shift+y Meta+Shift+y',
 }
 
 if os.getenv('windir') ~= nil then

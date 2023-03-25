@@ -7,10 +7,12 @@ HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
 
 You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 
-- Pastes file paths or URLs in clipboard to playlist. (`Alt+V, Meta+V`)
-- Appends file paths or URLs in clipboard to playlist. (`Alt+b, Meta+b`)
-- Appends file paths or URLs in clipboard to current track. (`Alt+v, Meta+v`)
-- Copies file path or URL of current track. (`Alt+c, Meta+c`)
+- Pastes file paths or URLs in clipboard to playlist. (`Ctrl+V, Alt+V, Meta+V`)
+- Appends file paths or URLs in clipboard to playlist.
+  (`Ctrl+b, Alt+b, Meta+b`)
+- Appends file paths or URLs in clipboard to current track.
+  (`Ctrl+v, Alt+v, Meta+v`)
+- Copies file path or URL of current track. (`Ctrl+c, Alt+c, Meta+c`)
 
 For _OSX_ users, it's nice to know that when option key pressed, the context 
 menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
@@ -34,13 +36,13 @@ local o = {
     -- Enables displaying osd messages when actions occur.
     osd_messages = true,
     -- Keybind for copy file path or URL of current track.
-    copy_current_track_keybind = 'Alt+c Meta+c',
+    copy_current_track_keybind = 'Ctrl+c Alt+c Meta+c',
     -- Keybind for paste file paths or URLs in clipboard to playlist.
-    paste_to_playlist_keybind = 'Alt+Shift+v Meta+Shift+v',
+    paste_to_playlist_keybind = 'Ctrl+Shift+v Alt+Shift+v Meta+Shift+v',
     -- Keybind for append file paths or URLs in clipboard to playlist.
-    append_to_playlist_keybind = 'Alt+b Meta+b',
+    append_to_playlist_keybind = 'Ctrl+b Alt+b Meta+b',
     -- Keybind for append file paths or URLs in clipboard to current track.
-    append_to_current_track_keybind = 'Alt+v Meta+v',
+    append_to_current_track_keybind = 'Ctrl+v Alt+v Meta+v',
     -- In idle state, there is no path or URL to copy. You can call something
     -- else with `idle_state_copy_script`. `copy-quote` is a script message
     -- of `modernx-and-quotes.lua`.
