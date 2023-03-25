@@ -28,7 +28,7 @@ If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
 If you prefer `portable_config`, run the following.
 
 ```
-MPV_CONF_PATH="path-to-my-mpv\portable_config" ./install.sh
+MPV_CONF_PATH="path-to-my-mpv/portable_config" ./install.sh
 ```
 
 In _Microsoft Windows_, run the following from the `Command Prompt` or
