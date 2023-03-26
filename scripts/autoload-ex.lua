@@ -175,7 +175,7 @@ function get_file_info(path)
 end
 
 function read_dir_by(dir, command, sort_id)
-    -- Reads files in the dir
+    -- Reads files in the dir.
     local files = utils.readdir(dir, "files")
     if files == nil then
         msg.verbose("no other files in directory")
@@ -183,9 +183,9 @@ function read_dir_by(dir, command, sort_id)
     end
 
     table.filter(files, function (v, k)
-        -- The current file could be a hidden file, ignoring it doesn't load other
-        -- files from the current directory.
-        if (o.ignore_hidden and not (v == filename) and string.match(v, "^%.")) then
+        -- The current file could be a hidden file, ignoring it doesn't load 
+        -- other files from the current directory.
+        if (o.ignore_hidden and v ~= filename and string.match(v, "^%.")) then
             return false
         end
         local ext = get_extension(v)
