@@ -38,11 +38,12 @@ local utils = require 'mp.utils'
 
 o = {
     disabled = true,
-    images = true,
+    images = false,
     videos = true,
     audio = true,
     ignore_hidden = true,
-    sort_command_on_autoload = 'name-asc',
+    -- shuffle, sort name-asc, sort date-asc, sort size-asc, sort name-desc, ...
+    sort_command_on_autoload = 'sort name-asc',
 }
 
 options.read_options(o, "autoload-ex")
