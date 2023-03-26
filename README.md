@@ -108,18 +108,19 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 - Downloads all media of **mpv** playlist with alternative option.
   (`Alt+Y, Ctrl+Y, Meta+Y`)
 
-To play and download media files from URLs, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
-users, download
-[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
-and copy it to `C:\Windows`.
+Please notice that:
 
-To download the highest resolution videos, and preserve chapter markers,
-you need to install [ffmpeg](https://ffmpeg.org).
+1. To play and download media from URLs with **mpv**, you need to install
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft
+   Windows_ users, download
+   [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+   and copy it to `C:\Windows`.
+2. To download the highest resolution media, and preserve chapter markers,
+   you need to install [ffmpeg](https://ffmpeg.org).
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 
-This script provides script messages below:
+This script provides the script messages below:
 
 - script-message simple-playlist sort name-asc (`Alt+n, Ctrl+n, Meta+n`)
 - script-message simple-playlist sort name-asc startover
@@ -177,15 +178,45 @@ You can edit the settings in `script-opts/on-file-loaded.conf`.
 
 ### [finder-integration.lua](https://github.com/9beach/mpv-config/blob/main/scripts/finder-integration.lua)
 
-This script provides two script messages:
+This script provides the script messages below:
 
-1. `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with
-   currently playing file selected. (`Ctrl+f, Alt+f, Meta+f`)
-2. `touch-file` updates the modification time of currently playing file. If you
-   want to mark it to delete later or do something else with, it will help you.
-   (`Ctrl+x, Alt+x, Meta+x`)
+- `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with
+  currently playing file selected. (`Ctrl+f, Alt+f, Meta+f`)
+- `touch-file` updates the modification time of currently playing file. If you
+  want to mark it to delete later or do something else with, it will help you.
+  (`Ctrl+x, Alt+x, Meta+x`)
 
 You can edit the settings in `script-opts/finder-integration.conf`.
+
+### [autoload-ex.lua](https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua)
+
+If you set `disabled=no` in `script-opts/autoload-ex.conf`, this script 
+automatically loads playlist entries by scanning the directory a file is 
+located in when starting playback. But unlike well-known `autoload.lua`, 
+`disabled=yes` is default in this script. You can edit it, but I recommend that
+you do it manually by keybinds.
+
+This script provides the script messages below:
+
+- script-message autoload-ex shuffle (`Alt+S, Ctrl+S, Meta+S`)
+- script-message autoload-ex shuffle startover
+- script-message autoload-ex sort name-asc (`Alt+N, Ctrl+N, Meta+N`)
+- script-message autoload-ex sort name-desc
+- script-message autoload-ex sort name-asc startover
+- script-message autoload-ex sort name-desc startover
+- script-message autoload-ex sort date-asc
+- script-message autoload-ex sort date-desc (`Alt+T, Ctrl+T, Meta+T`)
+- script-message autoload-ex sort date-asc startover
+- script-message autoload-ex sort date-desc startover
+- script-message autoload-ex sort size-asc
+- script-message autoload-ex sort size-desc
+- script-message autoload-ex sort size-asc startover
+- script-message autoload-ex sort size-desc startover
+
+You can edit key bindings in `input.conf`.
+
+Many parts in my code are from
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
 
@@ -218,28 +249,3 @@ favorite quotes to `script-opts/modernx-and-quotes.txt` file.
 
 To install **modernx-and-quotes**, please copy `scripts/modernx-and-quotes.lua`,
 `script-opts/osc.conf`, and `script-opts/modernx-and-quotes.txt` to your system.
-
-### [autoload-ex.lua](https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua)
-
-This script adds several features to well-known `autoload.lua`. Sets `disabled=yes` as
-default value, and adds script messages below:
-
-- script-message autoload-ex shuffle (`Alt+S, Ctrl+S, Meta+S`)
-- script-message autoload-ex shuffle startover
-- script-message autoload-ex sort name-asc (`Alt+N, Ctrl+N, Meta+N`)
-- script-message autoload-ex sort name-desc
-- script-message autoload-ex sort name-asc startover
-- script-message autoload-ex sort name-desc startover
-- script-message autoload-ex sort date-asc
-- script-message autoload-ex sort date-desc (`Alt+T, Ctrl+T, Meta+T`)
-- script-message autoload-ex sort date-asc startover
-- script-message autoload-ex sort date-desc startover
-- script-message autoload-ex sort size-asc
-- script-message autoload-ex sort size-desc
-- script-message autoload-ex sort size-asc startover
-- script-message autoload-ex sort size-desc startover
-
-You can edit key bindings in `input.conf`.
-
-Many parts in my code are from
-<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.

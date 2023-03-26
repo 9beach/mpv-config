@@ -1,8 +1,13 @@
 --[[
 https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua
 
-This script adds several features to well-known `autoload.lua`. Sets `disabled=yes` as
-default value, and adds script messages below:
+If you set `disabled=no` in `script-opts/autoload-ex.conf`, this script
+automatically loads playlist entries by scanning the directory a file is
+located in when starting playback. But unlike well-known `autoload.lua`,
+`disabled=yes` is default in this script. You can edit it, but I recommend that
+you do it manually by keybinds.
+
+This script provides the script messages below:
 
 - script-message autoload-ex shuffle
 - script-message autoload-ex shuffle startover

@@ -19,12 +19,12 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 Please notice that:
 
 1. To play and download media from URLs with **mpv**, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
-users, download
-[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
-and copy it to `C:\Windows`.
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft 
+   Windows_ users, download
+   [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+   and copy it to `C:\Windows`.
 2. To download the highest resolution media, and preserve chapter markers,
-you need to install [ffmpeg](https://ffmpeg.org).
+   you need to install [ffmpeg](https://ffmpeg.org).
 ]]
 
 local options = require 'mp.options'

@@ -1,13 +1,13 @@
 --[[
 https://github.com/9beach/mpv-config/blob/master/scripts/finder-integration.lua
 
-This script provides two script messages:
+This script provides the script messages below:
 
-1. `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with
-   currently playing file selected. (`Ctrl+f, Alt+f, Meta+f`)
-2. `touch-file` updates the modification time of currently playing file. If you
-   want to mark it to delete later or do something else with, it will help you.
-   (`Ctrl+x, Alt+x, Meta+x`)
+- `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with
+  currently playing file selected. (`Ctrl+f, Alt+f, Meta+f`)
+- `touch-file` updates the modification time of currently playing file. If you
+  want to mark it to delete later or do something else with, it will help you.
+  (`Ctrl+x, Alt+x, Meta+x`)
 ]]
 
 local mp = require 'mp'
