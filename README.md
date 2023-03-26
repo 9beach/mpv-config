@@ -13,7 +13,7 @@ Koreans. Anyhow it installs all the scripts and settings of this repository.
 
 First [install mpv](https://mpv.io/installation/) and then download
 [`9beach/mpv-config`](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
-Before install it. Please notice that:
+Before install it, please notice that:
 
 1. To play and download media from URLs with **mpv**, you need to install
    [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For
