@@ -132,13 +132,14 @@ the time complexity of my sorting algorithm is **O(nlog n)** for **Lua** data,
 but for the **mpv** system call, i.e., `mp.commandv('playlist-move', i, j)`,
 the time complexity is **O(n)**.
 
-- script-message simple-playlist shuffle (`Alt+s, Ctrl+s, Meta+s`)
+- script-message simple-playlist shuffle
+- script-message simple-playlist shuffle startover (`Alt+s, Ctrl+s, Meta+s`)
 - script-message simple-playlist reverse (`Alt+R, Ctrl+R, Meta+R`)
+- script-message simple-playlist playfirst (`Alt+a, Ctrl+a, Meta+a`)
+- script-message simple-playlist playlast (`Alt+z, Ctrl+z, Meta+z`)
 - script-message simple-playlist show-text 5 (`Alt+p, Ctrl+p, Meta+p`)
 - script-message simple-playlist show-osc 5 (`Alt+l, Ctrl+l, Meta+l`)
 - script-message simple-playlist hide (`Alt+k, Ctrl+k, Meta+k`)
-- script-message simple-playlist playfirst (`Alt+a, Ctrl+a, Meta+a`)
-- script-message simple-playlist playlast (`Alt+z, Ctrl+z, Meta+z`)
 - script-message simple-playlist save (`Alt+P, Ctrl+P, Meta+P`)
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code

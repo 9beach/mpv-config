@@ -3,9 +3,9 @@ https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua
 
 This script provides script messages below:
 
-* script-message simple-playlist sort date-desc
-* script-message simple-playlist sort date-asc
-* script-message simple-playlist sort date-desc startover
+- script-message simple-playlist sort date-desc
+- script-message simple-playlist sort date-asc
+- script-message simple-playlist sort date-desc startover
 
 `simple-playlist sort` also support `size-asc`, `size-desc`, `name-asc`,
 `name-desc` with or without `startover`. It's quite fast. Of course,
@@ -13,14 +13,15 @@ the time complexity of my sorting algorithm is **O(nlog n)** for **Lua** data,
 but for the **mpv** system call, i.e., `mp.commandv('playlist-move', i, j)`, 
 the time complexity is **O(n)**.
 
-* script-message simple-playlist shuffle
-* script-message simple-playlist reverse
-* script-message simple-playlist playfirst
-* script-message simple-playlist playlast
-* script-message simple-playlist save
-* script-message simple-playlist show-text 5
-* script-message simple-playlist show-osc 5
-* script-message simple-playlist hide
+- script-message simple-playlist shuffle
+- script-message simple-playlist shuffle startover
+- script-message simple-playlist reverse
+- script-message simple-playlist playfirst
+- script-message simple-playlist playlast
+- script-message simple-playlist show-text 5
+- script-message simple-playlist show-osc 5
+- script-message simple-playlist hide
+- script-message simple-playlist save
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
 simple, the playlist is not refreshed automatically, so another `show-text` or
@@ -182,17 +183,20 @@ function reverse_playlist()
 end
 
 -- Always starts over.
-function shuffle_playlist()
+function shuffle_playlist(startover)
     local length = mp.get_property_number('playlist-count', 0)
     if length < 2 then return end
 
-    local pos = mp.get_property_number('playlist-pos', 0)
-
     mp.command("playlist-shuffle")
-    mp.commandv("playlist-move", pos, math.random(0, length-1))
+
+    if startover then
+        mp.set_property('playlist-pos', 0)
+    else
+        local pos = mp.get_property_number('playlist-pos', 0)
+        mp.commandv("playlist-move", pos, 0)
+    end
 
     mp.osd_message("Playlist shuffled")
-    mp.set_property('playlist-pos', 0)
 end
 
 function swap_playlist_items(i, j)
@@ -246,7 +250,7 @@ function sort_playlist_by(sort_id, startover)
 
     mp.osd_message("Playlist sorted by "..sort_modes[index].title)
 
-    if startover == 'startover' then
+    if startover == true then
         mp.set_property('playlist-pos', 0)
     end
 end
@@ -320,9 +324,9 @@ end
 
 mp.register_script_message("simple-playlist", function (param1, param2, param3)
     if param1 == 'sort' then
-        sort_playlist_by(param2, param3)
+        sort_playlist_by(param2, param3 == 'startover')
     elseif param1 == 'shuffle' then
-        shuffle_playlist()
+        shuffle_playlist(param2 == 'startover')
     elseif param1 == 'reverse' then
         reverse_playlist()
     elseif param1 == 'show-text' then
