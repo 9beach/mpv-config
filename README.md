@@ -16,12 +16,12 @@ First [install mpv](https://mpv.io/installation/) and then download
 Before install it. Please notice that:
 
 1. To play and download media from URLs with **mpv**, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
-users, download
-[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
-and copy it to `C:\Windows`.
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For 
+   _Microsoft Windows_ users, download
+   [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+   and copy it to `C:\Windows`.
 2. To download the highest resolution media, and preserve chapter markers,
-you need to install [ffmpeg](https://ffmpeg.org).
+   you need to install [ffmpeg](https://ffmpeg.org).
 
 In Mac or Linux, run the following from the terminal. Then it installs
 `9beach/mpv-config` to your **mpv** configuration directory. Your original
@@ -66,6 +66,31 @@ see [https://mpv.io/manual/master/#files](https://mpv.io/manual/master/#files)
 and [https://mpv.io/manual/master/#script-location](https://mpv.io/manual/master/#script-location)
 for more information.
 
+### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
+
+This script gives **mpv** the capability to copy and paste file paths and URLs.
+You can paste and play multiple lines of media file paths, media URLs, and
+HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
+
+You can edit key bindings below in `script-opts/copy-and-paste.conf`:
+
+- Pastes file paths or URLs in clipboard to playlist. (`Alt+V, Ctrl+V, Meta+V`)
+- Appends file paths or URLs in clipboard to playlist. (`Alt+b, Ctrl+b, Meta+b`)
+- Appends file paths or URLs in clipboard to current track.
+  (`Alt+v, Ctrl+v, Meta+v`)
+- Copies file path or URL of current track. (`Alt+c, Ctrl+c, Meta+c`)
+
+Please notice that:
+
+1. To play and download media from URLs with **mpv**, you need to install
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For 
+   _Microsoft Windows_ users, download
+   [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+   and copy it to `C:\Windows`.
+2. For _OSX_ users, when option key pressed, the context menu of a file
+   reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
+   can paste the pull paths of local media to **mpv** with this.
+
 ### [web-download.lua](https://github.com/9beach/mpv-config/blob/main/scripts/web-download.lua)
 
 With this script, you can download media files of **mpv** playlist from web
@@ -91,24 +116,6 @@ and copy it to `C:\Windows`.
 
 To download the highest resolution videos, and preserve chapter markers,
 you need to install [ffmpeg](https://ffmpeg.org).
-
-### [copy-and-paste.lua](https://github.com/9beach/mpv-config/blob/main/scripts/copy-and-paste.lua)
-
-This script gives **mpv** the capability to copy and paste file paths and URLs.
-You can paste and play multiple lines of media file paths, media URLs, and
-HTML page URLs including YouTube, Twitter, Twitch.tv, Naver, Kakao...
-
-You can edit key bindings below in `script-opts/copy-and-paste.conf`:
-
-- Pastes file paths or URLs in clipboard to playlist. (`Alt+V, Ctrl+V, Meta+V`)
-- Appends file paths or URLs in clipboard to playlist. (`Alt+b, Ctrl+b, Meta+b`)
-- Appends file paths or URLs in clipboard to current track.
-  (`Alt+v, Ctrl+v, Meta+v`)
-- Copies file path or URL of current track. (`Alt+c, Ctrl+c, Meta+c`)
-
-For _OSX_ users, it's nice to know that when option key pressed, the context
-menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
-can paste the paths of local media to **mpv** with this.
 
 ### [simple-playlist.lua](https://github.com/9beach/mpv-config/blob/main/scripts/simple-playlist.lua)
 

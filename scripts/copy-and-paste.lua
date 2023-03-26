@@ -14,9 +14,16 @@ You can edit key bindings below in `script-opts/copy-and-paste.conf`:
   (`Ctrl+v, Alt+v, Meta+v`)
 - Copies file path or URL of current track. (`Ctrl+c, Alt+c, Meta+c`)
 
-For _OSX_ users, it's nice to know that when option key pressed, the context 
-menu of a file reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
-can paste the paths of local media to **mpv** with this.
+Please notice that:
+
+1. To play and download media from URLs with **mpv**, you need to install
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For 
+   _Microsoft Windows_ users, download
+   [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+   and copy it to `C:\Windows`.
+2. For _OSX_ users, when option key pressed, the context menu of a file
+   reveals `Copy as pathname` menu item (or just press `⌘⌥C`). You
+   can paste the pull paths of local media to **mpv** with this.
 ]]
 
 local options = require 'mp.options'
