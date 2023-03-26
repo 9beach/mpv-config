@@ -24,8 +24,9 @@ the time complexity is **O(n)**.
 
 `5` in `show-text` and `show-osc` is the duration in seconds. To keep the code
 simple, the playlist is not refreshed automatically, so another `show-text` or
-`show-osc` is needed to refresh the playlist. You can edit key bindings in
-`input.conf`.
+`show-osc` is needed to refresh the playlist.
+
+You can edit key bindings in `input.conf`.
 
 Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 ]]

@@ -1,32 +1,28 @@
--- This script automatically loads playlist entries before and after the
--- the currently played file. It does so by scanning the directory a file is
--- located in when starting playback. It sorts the directory entries
--- alphabetically, and adds entries before and after the current file to
--- the internal playlist. (It stops if it would add an already existing
--- playlist entry at the same position - this makes it "stable".)
--- Add at most 5000 * 2 files when starting a file (before + after).
-
 --[[
-To configure this script use file autoload.conf in directory script-opts (the "script-opts"
-directory must be in the mpv configuration directory, typically ~/.config/mpv/).
-
-Example configuration would be:
-
-disabled=no
-images=no
-videos=yes
-audio=yes
-ignore_hidden=yes
-
 https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua
 
-This script adds a simple feature to well-known `autoload.lua`.
+This script adds several features to well-known `autoload.lua`. Sets `disabled=yes` as
+default value, and adds script messages below:
 
-- `disabled=yes` as default value.
-- Adds a script message and keybinds, `find-and-add-files` and 
-  `Ctrl+j, Alt+j, Meta+j`. So you can add all the files from the folder of 
-  currently playing file with the hot keys. If you want it automatically, 
-  set `disabled=no`.
+- script-message autoload-ex shuffle
+- script-message autoload-ex shuffle startover
+- script-message autoload-ex sort name-asc
+- script-message autoload-ex sort name-desc
+- script-message autoload-ex sort name-asc startover
+- script-message autoload-ex sort name-desc startover
+- script-message autoload-ex sort date-asc
+- script-message autoload-ex sort date-desc
+- script-message autoload-ex sort date-asc startover
+- script-message autoload-ex sort date-desc startover
+- script-message autoload-ex sort size-asc
+- script-message autoload-ex sort size-desc
+- script-message autoload-ex sort size-asc startover
+- script-message autoload-ex sort size-desc startover
+
+You can edit key bindings in `input.conf`.
+
+Many parts in my code are from
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
 --]]
 
 MAXENTRIES = 5000
@@ -41,7 +37,7 @@ o = {
     videos = true,
     audio = true,
     ignore_hidden = true,
-    find_and_add_files_keybind = 'Ctrl+m Alt+m Meta+m'
+    sort_command_on_autoload = 'name-asc',
 }
 
 options.read_options(o, "autoload-ex")
@@ -79,15 +75,6 @@ if o.videos then EXTENSIONS = SetUnion(EXTENSIONS, EXTENSIONS_VIDEO) end
 if o.audio then EXTENSIONS = SetUnion(EXTENSIONS, EXTENSIONS_AUDIO) end
 if o.images then EXTENSIONS = SetUnion(EXTENSIONS, EXTENSIONS_IMAGES) end
 
-function add_files_at(index, files)
-    index = index - 1
-    local oldcount = mp.get_property_number("playlist-count", 1)
-    for i = 1, #files do
-        mp.commandv("loadfile", files[i], "append")
-        mp.commandv("playlist-move", oldcount + i - 1, index + i - 1)
-    end
-end
-
 function get_extension(path)
     match = string.match(path, "%.([^%.]+)$" )
     if match == nil then
@@ -105,71 +92,88 @@ table.filter = function(t, iter)
     end
 end
 
--- alphanum sorting for humans in Lua
--- http://notebook.kulchenko.com/algorithms/alphanumeric-natural-sorting-for-humans-in-lua
-
-function alphanumsort(filenames)
-    local function padnum(n, d)
-        return #d > 0 and ("%03d%s%.12f"):format(#n, n, tonumber(d) / (10 ^ #d))
-            or ("%03d%s"):format(#n, n)
+math.randomseed(os.time())                                                  
+            
+function alphanum_compar(a, b)
+    local function padnum(d)
+        local dec, n = string.match(d, "(%.?)0*(.+)")
+        return #dec > 0 and ("%.12f"):format(d) or
+               ("%s%03d%s"):format(dec, #n, n)
     end
-
-    local tuples = {}
-    for i, f in ipairs(filenames) do
-        tuples[i] = {f:lower():gsub("0*(%d+)%.?(%d*)", padnum), f}
-    end
-    table.sort(tuples, function(a, b)
-        return a[1] == b[1] and #b[2] < #a[2] or a[1] < b[1]
-    end)
-    for i, tuple in ipairs(tuples) do filenames[i] = tuple[2] end
-    return filenames
+    return tostring(a):lower():gsub("%.?%d+",padnum)..("%3d"):format(#b) <
+           tostring(b):lower():gsub("%.?%d+",padnum)..("%3d"):format(#a)
 end
 
-local autoloaded = nil
+local sort_modes = {
+    {
+        id="name-asc",
+        title="name",
+        compar=function (a, b, pl)
+            return alphanum_compar(pl[a].filename, pl[b].filename)
+        end,
+    },
+    {
+        id="name-desc",
+        title="name in descending order",
+        compar=function (a, b, pl)
+            return alphanum_compar(pl[b].filename, pl[a].filename)
+        end,
+    },
+    {
+        id="date-asc",
+        title="date",
+        compar=function (a, b, pl)
+            return (pl[a].file_info.mtime or 0) < (pl[b].file_info.mtime or 0)
+        end,
+    },
+    {
+        id="date-desc",
+        title="date in descending order",
+        compar=function (a, b, pl)
+            return (pl[b].file_info.mtime or 0) < (pl[a].file_info.mtime or 0)
+        end,
+    },
+    {
+        id="date-desc",
+        title="date in descending order",
+        compar=function (a, b, pl)
+            return (pl[b].file_info.mtime or 0) < (pl[a].file_info.mtime or 0)
+        end,
+    },
+    {
+        id="size-asc",
+        title="size",
+        compar=function (a, b, pl)
+            return (pl[a].file_info.size or 0) < (pl[b].file_info.size or 0)
+        end,
+    },
+    {
+        id="size-desc",
+        title="size in descending order",
+        compar=function (a, b, pl)
+            return (pl[b].file_info.size or 0) < (pl[a].file_info.size or 0)
+        end,
+    },
+}
 
-function get_playlist_filenames()
-    local filenames = {}
-    for n = 0, pl_count - 1, 1 do
-        local filename = mp.get_property('playlist/'..n..'/filename')
-        local _, file = utils.split_path(filename)
-        filenames[file] = true
+function get_file_info(path)
+    local file_info = utils.file_info(path)
+    if not file_info then
+        msg.warn('failed to read file info for: '..path)
+        return {}
     end
-    return filenames
+
+    return file_info
 end
 
-function find_and_add_entries(show_log)
-    local path = mp.get_property("path", "")
-    local dir, filename = utils.split_path(path)
-    msg.trace(("dir: %s, filename: %s"):format(dir, filename))
-    if #dir == 0 then
-        msg.verbose("stopping: not a local path")
-        return
-    end
-
-    pl_count = mp.get_property_number("playlist-count", 1)
-    -- check if this is a manually made playlist
-    if (pl_count > 1 and autoloaded == nil) or
-       (pl_count == 1 and EXTENSIONS[string.lower(get_extension(filename))] == nil) then
-        msg.verbose("stopping: manually made playlist")
-        return
-    else
-        autoloaded = true
-    end
-
-    if show_log == true then
-        mp.osd_message('Loading all files from the folder.')
-    end
-
-    local pl = mp.get_property_native("playlist", {})
-    local pl_current = mp.get_property_number("playlist-pos-1", 1)
-    msg.trace(("playlist-pos-1: %s, playlist: %s"):format(pl_current,
-        utils.to_string(pl)))
-
+function read_dir_by(dir, command, sort_id)
+    -- Reads files in the dir
     local files = utils.readdir(dir, "files")
     if files == nil then
         msg.verbose("no other files in directory")
-        return
+        return {}
     end
+
     table.filter(files, function (v, k)
         -- The current file could be a hidden file, ignoring it doesn't load other
         -- files from the current directory.
@@ -182,81 +186,164 @@ function find_and_add_entries(show_log)
         end
         return EXTENSIONS[string.lower(ext)]
     end)
-    alphanumsort(files)
+
+    if command == 'shuffle' then
+        for i = #files, 2, -1 do
+            local j = math.random(i)
+            files[i], files[j] = files[j], files[i]
+        end
+        return files
+    end
+
+    local index = 1
+    for mode, sort_data in pairs(sort_modes) do
+        if sort_data.id == sort_id then
+            index = mode
+        end
+    end
+
+    local need_file_info = index ~= 1 and index ~= 2
+
+    local infos = {}
+    local sorted = {}
+
+    for i=1, #files do
+        sorted[i] = i
+        infos[i] = {["filename"] = files[i]}
+        if need_file_info then
+            infos[i].file_info = get_file_info(dir..files[i])
+        end
+    end
+
+    table.sort(sorted, function(a, b)
+        return sort_modes[index].compar(a, b, infos)
+    end)
+
+    for i=1, #files do
+        sorted[i] = files[sorted[i]]
+    end
+
+    return sorted
+end
+
+function split_string(inputstr, sep)
+    if sep == nil then
+        sep = "%s"
+    end
+    local t = {}
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+        table.insert(t, str)
+    end
+    return t
+end
+
+function autoload_ex(manually_called, command, sort_id, startover)
+    local path = mp.get_property("path", "")
+    local dir, filename = utils.split_path(path)
+
+    msg.trace(("dir: %s, filename: %s"):format(dir, filename))
+    if #dir == 0 then
+        msg.verbose("Stopping: not a local path")
+        return
+    end
+
+    local playlist = mp.get_property_native('playlist')
+    local count = #playlist
+
+    -- Checks if automatically called on `start-file` but already has many.
+    if not manually_called and count > 1 then
+        msg.verbose("Stopping: manually made playlist")
+        return
+    end
+
+    if manually_called == true then
+        mp.osd_message('Loading all the files from the folder.')
+    end
+
+    local sorted = read_dir_by(dir, command, sort_id, startover)
 
     if dir == "." then
         dir = ""
     end
 
-    -- Find the current pl entry (dir+"/"+filename) in the sorted dir list
+    -- Finds the current pl entry  in the sorted dir list.
     local current
-    for i = 1, #files do
-        if files[i] == filename then
+    for i = 1, #sorted do
+        if sorted[i] == filename then
             current = i
             break
         end
     end
     if current == nil then
-        return
+        msg.error("Can't find current file in loaded files: "..filename)
     end
-    msg.trace("current file position in files: "..current)
 
-    local append = {[-1] = {}, [1] = {}}
-    local filenames = get_playlist_filenames()
-    for direction = -1, 1, 2 do -- 2 iterations, with direction = -1 and +1
-        for i = 1, MAXENTRIES do
-            local file = files[current + i * direction]
-            if file == nil or file[1] == "." then
-                break
-            end
+    -- Moves current track to 0
+    local pos = mp.get_property_number('playlist-pos', 0)
+    mp.commandv("playlist-move", pos, 0)
 
-            local filepath = dir .. file
-            -- skip files already in playlist
-            if filenames[file] then break end
-
-            if direction == -1 then
-                if pl_current == 1 then -- never add additional entries in the middle
-                    msg.info("Prepending " .. file)
-                    table.insert(append[-1], 1, filepath)
-                end
-            else
-                msg.info("Adding " .. file)
-                table.insert(append[1], filepath)
-            end
+    -- Removes all the other tracks
+    if count > 1 then
+        for i = 2, count do
+            mp.command("playlist-remove 1")
         end
     end
 
-    add_files_at(pl_current + 1, append[1])
-    add_files_at(pl_current, append[-1])
-
-    if show_log == true then
-        mp.osd_message(tostring(#files)..' files loaded.')
-    end
-end
-
-function bind_keys(keys, name, func, opts)
-    if not keys or keys == '' then
-        mp.add_forced_key_binding(nil, name, func, opts)
-        return
+    local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
+    for i=1, max_count do
+        local file = sorted[i]
+        if file ~= filename then
+            mp.commandv("loadfile", dir..file, "append")
+        end
     end
 
-    local i = 0
-    for key in string.gmatch(keys, "[^%s]+") do
-        i = i + 1
-        if i == 1 then
-            mp.add_forced_key_binding(key, name, func, opts)
+    if current ~= 1 and (command ~= 'shuffle' or startover == true) then
+        local to
+        if current ~= nil and current <= max_count then
+            to = current
         else
-            mp.add_forced_key_binding(key, name .. i, func, opts)
+            to = max_count
         end
+        msg.info('current pos: '..current)
+        mp.commandv("playlist-move", 0, to)
+    end
+
+    if startover == true then
+        mp.set_property('playlist-pos', 0)                         
+    end
+
+    if manually_called == true then
+        mp.osd_message(tostring(#sorted)..' files loaded.')
     end
 end
+
+local in_process = false
 
 if o.disabled == false then
-    mp.register_event("start-file", find_and_add_entries)
+    local command = split_string(o.sort_command_on_autoload)
+    -- Startover automatically? Nonsense.
+    mp.register_event("start-file", function ()
+        if not in_process then
+            in_process = true
+            autoload_ex(
+                false, command[1], command[2], false
+                )
+            in_process = false
+        else
+            msg.info('autoload-ex is currently working.')
+        end
+    end)
 end
 
-bind_keys(
-    o.find_and_add_files_keybind,
-    'find-and-add-files',
-    function () find_and_add_entries(true) end
-    )
+mp.register_script_message("autoload-ex", function (p1, p2, p3)
+    if not in_process then
+        if p1 == 'shuffle' then
+            p2, p3 = p3, p2
+        end
+        in_process = true
+        autoload_ex(true, p1, p2, p3 == 'startover')
+        in_process = false
+    else
+        mp.osd_message('autoload-ex is currently working.')
+    end
+end)

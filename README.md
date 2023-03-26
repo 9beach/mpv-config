@@ -16,7 +16,7 @@ First [install mpv](https://mpv.io/installation/) and then download
 Before install it. Please notice that:
 
 1. To play and download media from URLs with **mpv**, you need to install
-   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For 
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For
    _Microsoft Windows_ users, download
    [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
    and copy it to `C:\Windows`.
@@ -83,7 +83,7 @@ You can edit key bindings below in `script-opts/copy-and-paste.conf`:
 Please notice that:
 
 1. To play and download media from URLs with **mpv**, you need to install
-   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For 
+   [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For
    _Microsoft Windows_ users, download
    [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
    and copy it to `C:\Windows`.
@@ -123,10 +123,8 @@ This script provides script messages below:
 
 - script-message simple-playlist sort name-asc (`Alt+n, Ctrl+n, Meta+n`)
 - script-message simple-playlist sort name-asc startover
-  (`Alt+N, Ctrl+N, Meta+N`)
-- script-message simple-playlist sort date-desc (`Alt+g, Ctrl+g, Meta+g`)
+- script-message simple-playlist sort date-desc (`Alt+t, Ctrl+t, Meta+t`)
 - script-message simple-playlist sort date-desc startover
-  (`Alt+G, Ctrl+G, Meta+G`)
 
 `simple-playlist sort` also support `size-asc`, `size-desc`, `date-asc`,
 `name-desc` with or without `startover`. It's quite fast. Of course,
@@ -135,7 +133,7 @@ but for the **mpv** system call, i.e., `mp.commandv('playlist-move', i, j)`,
 the time complexity is **O(n)**.
 
 - script-message simple-playlist shuffle (`Alt+s, Ctrl+s, Meta+s`)
-- script-message simple-playlist reverse (`Alt+V, Ctrl+V, Meta+V`)
+- script-message simple-playlist reverse (`Alt+R, Ctrl+R, Meta+R`)
 - script-message simple-playlist show-text 5 (`Alt+p, Ctrl+p, Meta+p`)
 - script-message simple-playlist show-osc 5 (`Alt+l, Ctrl+l, Meta+l`)
 - script-message simple-playlist hide (`Alt+k, Ctrl+k, Meta+k`)
@@ -162,7 +160,7 @@ This script provides the functions below:
 - Does not show subtitle if audio language matches given values.
 - Resets **mpv** geometry when an non-audio file (that is not of known audio
   extensions and has video) is loaded. When you turn on this feature, **mpv**
-  can escape from small rectangle when a `webm` media has video even if 
+  can escape from small rectangle when a `webm` media has video even if
   `mpv.conf` has settings below.
 
   ```
@@ -180,7 +178,7 @@ You can edit the settings in `script-opts/on-file-loaded.conf`.
 
 This script provides two script messages:
 
-1. `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with 
+1. `reveal-in-finder` runs `explorer.exe`/`Finder.app`/`Nautilus` with
    currently playing file selected. (`Ctrl+f, Alt+f, Meta+f`)
 2. `touch-file` updates the modification time of currently playing file. If you
    want to mark it to delete later or do something else with, it will help you.
@@ -222,16 +220,25 @@ To install **modernx-and-quotes**, please copy `scripts/modernx-and-quotes.lua`,
 
 ### [autoload-ex.lua](https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua)
 
-The original code is from [mpv-player/mpv](https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua).
+This script adds several features to well-known `autoload.lua`. Sets `disabled=yes` as
+default value, and adds script messages below:
 
-> This script automatically loads playlist entries before and after the the
-> currently played file. It does so by scanning the directory a file is located
-> in when starting playback.
+- script-message autoload-ex shuffle (`Alt+S, Ctrl+S, Meta+S`)
+- script-message autoload-ex shuffle startover
+- script-message autoload-ex sort name-asc (`Alt+N, Ctrl+N, Meta+N`)
+- script-message autoload-ex sort name-desc
+- script-message autoload-ex sort name-asc startover
+- script-message autoload-ex sort name-desc startover
+- script-message autoload-ex sort date-asc
+- script-message autoload-ex sort date-desc (`Alt+T, Ctrl+T, Meta+T`)
+- script-message autoload-ex sort date-asc startover
+- script-message autoload-ex sort date-desc startover
+- script-message autoload-ex sort size-asc
+- script-message autoload-ex sort size-desc
+- script-message autoload-ex sort size-asc startover
+- script-message autoload-ex sort size-desc startover
 
-This script adds a simple feature to well-known `autoload.lua`.
+You can edit key bindings in `input.conf`.
 
-- `disabled=yes` as default value.
-- Adds a script message and keybinds, `find-and-add-files` and 
-  `Ctrl+j, Alt+j, Meta+j`. So you can add all the files from the folder of 
-  currently playing file with the hot keys. If you want it automatically, 
-  set `disabled=no`.
+Many parts in my code are from
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
