@@ -16,12 +16,14 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 - Downloads all media of **mpv** playlist with alternative option.
   (`Ctrl+Y, Alt+Y, Meta+Y`)
 
-To download media files, you need to install
-[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases) in your system.
-For _Microsoft Windows_ users, just download `yt-dlp.exe` and copy it to
-`C:\Windows` or `mpv.exe` directory. For _OSX_ users, run `brew install yt-dlp`.
+Please notice that:
 
-To download the highest resolution videos, and preserve chapter markers,
+1. To play and download media from URLs with **mpv**, you need to install
+[yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
+users, download
+[yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
+and copy it to `C:\Windows`.
+2. To download the highest resolution media, and preserve chapter markers,
 you need to install [ffmpeg](https://ffmpeg.org).
 ]]
 

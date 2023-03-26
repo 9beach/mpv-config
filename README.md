@@ -1,8 +1,8 @@
 # My mpv settings
 
 This repository contains several [Lua](http://lua.org) scripts and settings
-I wrote for [mpv](https://mpv.io). Many parts in my code are from internet
-obviously.
+I wrote for open-source media player [mpv](https://mpv.io). Many parts in my
+code are from internet obviously.
 
 ## Installation
 
@@ -11,16 +11,16 @@ notice that the installation script is probably just for me, and also that
 subtitle settings of `mpv.conf` and `script-opts/on-file-loaded.conf` are for
 Koreans. Anyhow it installs all the scripts and settings of this repository.
 
-First [install mpv](https://mpv.io/installation/) and then 
-[download this repository](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+First [install mpv](https://mpv.io/installation/) and then download
+[`9beach/mpv-config`](https://github.com/9beach/mpv-config/archive/refs/heads/main.zip).
+Before install it. Please notice that:
 
-To play and download media files from URLs, you need to install
+1. To play and download media from URLs with **mpv**, you need to install
 [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft Windows_
 users, download
 [yt-dlp.exe](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
 and copy it to `C:\Windows`.
-
-To download the highest resolution videos, and preserve chapter markers,
+2. To download the highest resolution media, and preserve chapter markers,
 you need to install [ffmpeg](https://ffmpeg.org).
 
 In Mac or Linux, run the following from the terminal. Then it installs
