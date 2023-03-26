@@ -195,6 +195,7 @@ function read_dir_by(dir, command, sort_id)
         return files
     end
 
+    -- Shuffled gone, now sorts by sort_id.
     local index = 1
     for mode, sort_data in pairs(sort_modes) do
         if sort_data.id == sort_id then
@@ -260,7 +261,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
         mp.osd_message('Loading all the files from the folder.')
     end
 
-    local sorted = read_dir_by(dir, command, sort_id, startover)
+    local sorted = read_dir_by(dir, command, sort_id)
 
     if dir == "." then
         dir = ""
@@ -320,14 +321,12 @@ end
 local in_process = false
 
 if o.disabled == false then
-    local command = split_string(o.sort_command_on_autoload)
+    local p = split_string(o.sort_command_on_autoload)
     -- Startover automatically? Nonsense.
     mp.register_event("start-file", function ()
         if not in_process then
             in_process = true
-            autoload_ex(
-                false, command[1], command[2], false
-                )
+            autoload_ex(false, p[1], p[2], false)
             in_process = false
         else
             msg.info('autoload-ex is currently working.')
@@ -338,7 +337,7 @@ end
 mp.register_script_message("autoload-ex", function (p1, p2, p3)
     if not in_process then
         if p1 == 'shuffle' then
-            p2, p3 = p3, p2
+            p2, p3 = nil, p2
         end
         in_process = true
         autoload_ex(true, p1, p2, p3 == 'startover')

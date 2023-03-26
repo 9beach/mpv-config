@@ -182,7 +182,6 @@ function reverse_playlist()
     mp.osd_message("Playlist reversed")
 end
 
--- Always starts over.
 function shuffle_playlist(startover)
     local length = mp.get_property_number('playlist-count', 0)
     if length < 2 then return end
@@ -192,6 +191,7 @@ function shuffle_playlist(startover)
     if startover then
         mp.set_property('playlist-pos', 0)
     else
+        -- No startover, then current track is first track.
         local pos = mp.get_property_number('playlist-pos', 0)
         mp.commandv("playlist-move", pos, 0)
     end
@@ -250,7 +250,7 @@ function sort_playlist_by(sort_id, startover)
 
     mp.osd_message("Playlist sorted by "..sort_modes[index].title)
 
-    if startover == true then
+    if startover then
         mp.set_property('playlist-pos', 0)
     end
 end
