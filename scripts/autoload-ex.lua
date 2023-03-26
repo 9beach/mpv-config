@@ -5,7 +5,8 @@ If you set `disabled=no` in `script-opts/autoload-ex.conf`, this script
 automatically loads playlist entries by scanning the directory a file is
 located in when starting playback. But unlike well-known `autoload.lua`,
 `disabled=yes` is default in this script. You can edit it, but I recommend that
-you do it manually by keybinds.
+you do it manually by keybinds. Once manually loaded in a folder, again
+autoloaded in the same folder.
 
 This script provides the script messages below:
 
@@ -38,6 +39,7 @@ local utils = require 'mp.utils'
 
 o = {
     disabled = true,
+    loaded_then_autoload = true,
     images = false,
     videos = true,
     audio = true,
@@ -244,9 +246,15 @@ function split_string(inputstr, sep)
     return t
 end
 
+local prev_dir, prev_command, prev_sort_id 
+
 function autoload_ex(manually_called, command, sort_id, startover)
     local path = mp.get_property("path", "")
     local dir, filename = utils.split_path(path)
+
+    if o.disabled and not manually_called and prev_dir ~= dir then
+        return
+    end
 
     msg.trace(("dir: %s, filename: %s"):format(dir, filename))
     if #dir == 0 then
@@ -267,13 +275,27 @@ function autoload_ex(manually_called, command, sort_id, startover)
         mp.osd_message('Loading all the files from the folder.')
     end
 
-    local sorted = read_dir_by(dir, command, sort_id)
-
-    if dir == "." then
-        dir = ""
+    -- Maybe double-clicked in same dir.
+    local again 
+    if prev_dir == dir and not manually_called then
+        again = true
+        command = prev_command
+        sort_id = prev_sort_id
+    else
+        prev_dir = dir
+        prev_command = command
+        prev_sort_id = sort_id
     end
 
-    -- Finds the current pl entry  in the sorted dir list.
+    local sorted
+    if again then
+        sorted = prev_sorted
+    else
+        sorted = read_dir_by(dir, command, sort_id)
+        prev_sorted = sorted
+    end
+
+    -- Finds the current pl entry in the sorted dir list.
     local current
     for i = 1, #sorted do
         if sorted[i] == filename then
@@ -296,15 +318,20 @@ function autoload_ex(manually_called, command, sort_id, startover)
         end
     end
 
+    local my_dir = dir
+    if dir == "." then
+        my_dir = ""
+    end
+
     local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
     for i=1, max_count do
         local file = sorted[i]
         if file ~= filename then
-            mp.commandv("loadfile", dir..file, "append")
+            mp.commandv("loadfile", my_dir..file, "append")
         end
     end
 
-    if current ~= 1 and (command ~= 'shuffle' or startover == true) then
+    if again or (current ~= 1 and (command ~= 'shuffle' or startover)) then
         local to
         if current ~= nil and current <= max_count then
             to = current
@@ -325,20 +352,18 @@ function autoload_ex(manually_called, command, sort_id, startover)
 end
 
 local in_process = false
+local p = split_string(o.sort_command_on_autoload)
 
-if o.disabled == false then
-    local p = split_string(o.sort_command_on_autoload)
-    -- Startover automatically? Nonsense.
-    mp.register_event("start-file", function ()
-        if not in_process then
-            in_process = true
-            autoload_ex(false, p[1], p[2], false)
-            in_process = false
-        else
-            msg.info('autoload-ex is currently working.')
-        end
-    end)
-end
+mp.register_event("start-file", function ()
+    if not in_process then
+        in_process = true
+        -- Startover automatically? Nonsense.
+        autoload_ex(false, p[1], p[2], false)
+        in_process = false
+    else
+        msg.info('autoload-ex is currently working.')
+    end
+end)
 
 mp.register_script_message("autoload-ex", function (p1, p2, p3)
     if not in_process then

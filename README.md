@@ -194,7 +194,8 @@ If you set `disabled=no` in `script-opts/autoload-ex.conf`, this script
 automatically loads playlist entries by scanning the directory a file is 
 located in when starting playback. But unlike well-known `autoload.lua`, 
 `disabled=yes` is default in this script. You can edit it, but I recommend that
-you do it manually by keybinds.
+you do it manually by keybinds. Once manually loaded in a folder, again 
+autoloaded in the same folder.
 
 This script provides the script messages below:
 
