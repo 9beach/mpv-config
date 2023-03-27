@@ -149,6 +149,13 @@ simple, the playlist is not refreshed automatically, so another `show-text` or
 
 You can edit key bindings in `input.conf`.
 
+```
+META+t script-message simple-playlist sort date-desc
+META+n script-message simple-playlist sort name-asc
+META+s script-message simple-playlist shuffle startover
+...
+```
+
 Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 
 ### [on-file-loaded.lua](https://github.com/9beach/mpv-config/blob/main/scripts/on-file-loaded.lua)
@@ -190,16 +197,16 @@ You can edit the settings in `script-opts/finder-integration.conf`.
 
 ### [autoload-ex.lua](https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua)
 
-This script automatically loads playlist entries by scanning the directory a 
+This script automatically loads playlist entries by scanning the directory a
 file is located in when starting playback. But unlike well-known `autoload`,
 `autoload-ex` remembers the sorting states of **the directory**. So if you
 reload or sort again playlist entries in the directory with different sorting
-states with `autoload-ex` or `simple-playlist`, next time `autoload-ex`
-restores previous sorting states for the directory. Even if you set
-`disabled=yes` and manually call `autoload-ex`, in the future `autoload-ex`
-loads playlist entries of the directory automatically. If you set
-`disabled=no` and call `autoload-ex remove-others` for the directory, in the
-future `autoload-ex` does not load playlist entries for the directory.
+type, next time `autoload-ex` restores previous sorting states for the
+directory. Even if you set `disabled=yes` and manually call `autoload-ex`,
+in the future `autoload-ex` loads playlist entries of the directory
+automatically. If you set `disabled=no` and call `autoload-ex remove-others`
+for the directory, in the future `autoload-ex` does not load playlist entries
+for the directory.
 
 This script provides the script messages below:
 
@@ -221,14 +228,17 @@ This script provides the script messages below:
 - script-message autoload-ex alert _arg1_ _arg2_
 
 `alert` is for the other sorting scripts like `simple-playlist`. It helps
-for `autoload-ex` to save the previous states. See the example below.
-
-```
-script-message autoload-ex alert sort name-asc
-script-message autoload-ex alert shuffle
-```
+for `autoload-ex` to save the previous states.
 
 You can edit key bindings in `input.conf`.
+
+```
+META+SHIFT+n script-message autoload-ex sort name-asc
+META+SHIFT+t script-message autoload-ex sort date-desc
+META+SHIFT+s script-message autoload-ex shuffle startover
+META+SHIFT+r script-message autoload-ex remove-others
+...
+```
 
 Many parts in my code are from
 <https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>

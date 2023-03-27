@@ -20,12 +20,20 @@ local o = {
     save_and_restore_sound_volume = true,
 }
 
+if os.getenv('windir') ~= nil then
+    o.platform = 'windows'
+elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+    o.platform = 'darwin'
+else
+    o.platform = 'linux'
+end
+
 options.read_options(o, "on-startup-shutdown")
 
 if o.save_and_restore_sound_volume == false then return end
 
 local volume_filepath = 
-    mp.command_native({"expand-path", "~~/"}).."/.volume"
+    mp.command_native({"expand-path", "~~/"}).."/watch_later/.volume"
 
 local volume
 
@@ -39,7 +47,27 @@ if volume then
     mp.set_property_native('volume', volume)
 end
 
+function create_dir(dir)
+    if utils.readdir(dir) == nil then
+        local args
+        if o.platform == 'windows' then
+            args = {
+                'powershell', '-NoProfile', '-Command', 'mkdir',
+                ps_quote_string(dir)
+            }
+        else
+            args = {'mkdir', dir}
+        end
+
+        local res = utils.subprocess({args=args, cancellable=false})
+        return res.status == 0
+    else
+        return true
+    end
+end
+
 mp.register_event("shutdown", function()
+    create_dir(mp.command_native({"expand-path", "~~/"}).."/watch_later")
     local f = io.open(volume_filepath, "w+")
     if f then
         f:write(mp.get_property_native('volume'))

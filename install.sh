@@ -55,5 +55,4 @@ if [ `uname` = "Darwin" ]; then
 fi
 cat mpv.conf | my_filter > "$MPV_CONF_PATH"/mpv.conf
 mv "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH" 2> /dev/null
-mv "$BACKUP_DIR/.volume" "$MPV_CONF_PATH" 2> /dev/null
 echo "new mpv config to \"$MPV_CONF_PATH\""
