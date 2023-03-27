@@ -1,12 +1,16 @@
 --[[
 https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua
 
-If you set `disabled=no` in `script-opts/autoload-ex.conf`, this script
-automatically loads playlist entries by scanning the directory a file is
-located in when starting playback. But unlike well-known `autoload.lua`,
-`disabled=yes` is default in this script. You can edit it, but I recommend that
-you do it manually by keybinds. Once manually loaded in a folder, again
-autoloaded in the same folder.
+This script automatically loads playlist entries by scanning the directory a
+file is located in when starting playback. But unlike well-known `autoload`,
+`autoload-ex` remembers the sorting states of **the directory**. So if you
+reload or sort again playlist entries in the directory with different sorting
+states with `autoload-ex` or `simple-playlist`, next time `autoload-ex`
+restores previous sorting states for the directory. Even if you set
+`disabled=yes` and manually call `autoload-ex`, in the future `autoload-ex`
+loads playlist entries of the directory automatically. If you set
+`disabled=no` and call `autoload-ex remove-others` for the directory, in the
+future `autoload-ex` does not load playlist entries for the directory.
 
 This script provides the script messages below:
 
@@ -24,12 +28,25 @@ This script provides the script messages below:
 - script-message autoload-ex sort size-desc
 - script-message autoload-ex sort size-asc startover
 - script-message autoload-ex sort size-desc startover
+- script-message autoload-ex remove-others
+- script-message autoload-ex alert _arg1_ _arg2_
+
+`alert` is for the other sorting scripts like `simple-playlist`. It helps
+for `autoload-ex` to save the previous states. See the example below.
+
+```
+script-message autoload-ex alert sort name-asc
+script-message autoload-ex alert shuffle
+```
 
 You can edit key bindings in `input.conf`.
 
 Many parts in my code are from
 <https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
 --]]
+
+-- Minified code below defines `function sha256(message)`, and is a combination of <http://lua-users.org/wiki/SecureHashAlgorithm> and <https://www.snpedia.com/extensions/Scribunto/engines/LuaCommon/lualib/bit32.lua>.
+local sha256; do local b,c,d,e,f;if bit32 then b,c,d,e,f=bit32.band,bit32.rrotate,bit32.bxor,bit32.rshift,bit32.bnot else f=function(g)g=math.floor(tonumber(g))%0x100000000;return(-g-1)%0x100000000 end;local h={[0]={[0]=0,0,0,0},[1]={[0]=0,1,0,1},[2]={[0]=0,0,2,2},[3]={[0]=0,1,2,3}}local i={[0]={[0]=0,1,2,3},[1]={[0]=1,0,3,2},[2]={[0]=2,3,0,1},[3]={[0]=3,2,1,0}}local function j(k,l,m,n,o)for p=1,m do l[p]=math.floor(tonumber(l[p]))%0x100000000 end;local q=1;local r=0;for s=0,31,2 do local t=n;for p=1,m do t=o[t][l[p]%4]l[p]=math.floor(l[p]/4)end;r=r+t*q;q=q*4 end;return r end;b=function(...)return j('band',{...},select('#',...),3,h)end;d=function(...)return j('bxor',{...},select('#',...),0,i)end;e=function(g,u)g=math.floor(tonumber(g))%0x100000000;u=math.floor(tonumber(u))u=math.min(math.max(-32,u),32)return math.floor(g/2^u)%0x100000000 end;c=function(g,u)g=math.floor(tonumber(g))%0x100000000;u=-math.floor(tonumber(u))%32;local g=g*2^u;return g%0x100000000+math.floor(g/0x100000000)end end;local v={0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2}local function w(n)return string.gsub(n,".",function(t)return string.format("%02x",string.byte(t))end)end;local function x(y,z)local n=""for p=1,z do local A=y%256;n=string.char(A)..n;y=(y-A)/256 end;return n end;local function B(n,p)local z=0;for p=p,p+3 do z=z*256+string.byte(n,p)end;return z end;local function C(D,E)local F=-(E+1+8)%64;E=x(8*E,8)D=D.."\128"..string.rep("\0",F)..E;return D end;local function G(H)H[1]=0x6a09e667;H[2]=0xbb67ae85;H[3]=0x3c6ef372;H[4]=0xa54ff53a;H[5]=0x510e527f;H[6]=0x9b05688c;H[7]=0x1f83d9ab;H[8]=0x5be0cd19;return H end;local function I(D,p,H)local J={}for K=1,16 do J[K]=B(D,p+(K-1)*4)end;for K=17,64 do local L=J[K-15]local M=d(c(L,7),c(L,18),e(L,3))L=J[K-2]local N=d(c(L,17),c(L,19),e(L,10))J[K]=J[K-16]+M+J[K-7]+N end;local O,s,t,P,Q,R,S,T=H[1],H[2],H[3],H[4],H[5],H[6],H[7],H[8]for p=1,64 do local M=d(c(O,2),c(O,13),c(O,22))local U=d(b(O,s),b(O,t),b(s,t))local V=M+U;local N=d(c(Q,6),c(Q,11),c(Q,25))local W=d(b(Q,R),b(f(Q),S))local X=T+N+W+v[p]+J[p]T=S;S=R;R=Q;Q=P+X;P=t;t=s;s=O;O=X+V end;H[1]=b(H[1]+O)H[2]=b(H[2]+s)H[3]=b(H[3]+t)H[4]=b(H[4]+P)H[5]=b(H[5]+Q)H[6]=b(H[6]+R)H[7]=b(H[7]+S)H[8]=b(H[8]+T)end;local function Y(H)return w(x(H[1],4)..x(H[2],4)..x(H[3],4)..x(H[4],4)..x(H[5],4)..x(H[6],4)..x(H[7],4)..x(H[8],4))end;local Z={}sha256=function(D)D=C(D,#D)local H=G(Z)for p=1,#D,64 do I(D,p,H)end;return Y(H)end end
 
 MAXENTRIES = 5000
 
@@ -47,6 +64,14 @@ o = {
     -- shuffle, sort name-asc, sort date-asc, sort size-asc, sort name-desc, ...
     sort_command_on_autoload = 'sort name-asc',
 }
+
+if os.getenv('windir') ~= nil then
+    o.platform = 'windows'
+elseif os.execute '[ $(uname) = "Darwin" ]' == 0 then
+    o.platform = 'darwin'
+else
+    o.platform = 'linux'
+end
 
 options.read_options(o, "autoload-ex")
 
@@ -94,9 +119,7 @@ end
 
 table.filter = function(t, iter)
     for i = #t, 1, -1 do
-        if not iter(t[i]) then
-            table.remove(t, i)
-        end
+        if not iter(t[i]) then table.remove(t, i) end
     end
 end
 
@@ -246,108 +269,190 @@ function split_string(inputstr, sep)
     return t
 end
 
-local prev_dir, prev_command, prev_sort_id 
+-- Quotes string for powershell path including "'"
+function ps_quote_string(str)
+    return "'"..str:gsub('`', '``'):gsub('"', '``"'):gsub('%$', '``$')
+                   :gsub('%[', '``['):gsub('%]', '``]'):gsub("'", "''").."'"
+end
+
+function create_dir(dir)
+    if utils.readdir(dir) == nil then
+        local args
+        if o.platform == 'windows' then
+            args = {
+                'powershell', '-NoProfile', '-Command', 'mkdir',
+                ps_quote_string(dir)
+            }
+        else
+            args = {'mkdir', dir}
+        end
+
+        local res = utils.subprocess({args=args, cancellable=false})
+        return res.status == 0
+    else
+        return true
+    end
+end
+
+local watch_later = mp.command_native({"expand-path", "~~/"})..'/watch_later/'
+local first_read = true
+
+function read_sorting_states(dir)
+    if first_read then
+        first_read = false
+        create_dir(watch_later)
+    end
+
+    local states = {}
+    local path = watch_later..sha256(dir)
+    local f = io.open(path, "r")
+
+    local command, sort_id
+    if f then
+        for line in io.lines(path) do
+            k, v = line:match("([^=]+)=(.+)")
+            if k and k == 'command' then command = v end
+            if k and k == 'sort_id' then sort_id = v end
+        end
+        f:close()
+    end
+    return command, sort_id
+end
+
+function write_sorting_states(dir, command, sort_id)
+    local path = watch_later..sha256(dir)
+    local f = io.open(path, "w+")
+    if f then
+        local content = "command="..command.."\n"
+        if sort_id then content = content..'sort_id='..sort_id.."\n" end
+        f:write(content)
+        f:close()
+    end
+end
 
 function autoload_ex(manually_called, command, sort_id, startover)
     local path = mp.get_property("path", "")
     local dir, filename = utils.split_path(path)
 
-    if o.disabled and not manually_called and prev_dir ~= dir then
-        return
-    end
-
+    -- Maybe URL.
     msg.trace(("dir: %s, filename: %s"):format(dir, filename))
     if #dir == 0 then
-        msg.verbose("Stopping: not a local path")
+        msg.verbose("stopping: not a local path")
         return
     end
 
     local playlist = mp.get_property_native('playlist')
     local count = #playlist
 
-    -- Checks if automatically called on `start-file` but already has many.
-    if not manually_called and count > 1 then
-        msg.verbose("Stopping: manually made playlist")
+    if (count < 2 and 'remove-others' == command) then
+        msg.verbose("stopping: remove-others for single track entry")
         return
     end
 
-    if manually_called == true then
-        mp.osd_message('Loading all the files from the folder.')
+    if not manually_called and count > 1 then
+        msg.verbose("stopping: manually made playlist, or already called")
+        return
     end
 
-    -- Maybe double-clicked in same dir.
-    local again 
-    if prev_dir == dir and not manually_called then
-        again = true
-        command = prev_command
-        sort_id = prev_sort_id
+    local prev_command, prev_sort_id = read_sorting_states(dir)
+
+    -- `diabled=yes` and only one file, but checks if loaded previously.
+    if o.disabled and not manually_called then
+        if prev_command ~= 'sort' and prev_command ~= 'shuffle' then
+            return
+        end
+        msg.info(
+            'diabled=yes, but previously loaded: '..prev_command..' '..
+            (prev_sort_id and prev_sort_id or '')
+            )
+    end
+
+    -- `diabled=no` and only one file, but checks if unloaded previously.
+    if not o.disabled and not manually_called then
+        if prev_command == 'remove-others' then
+            msg.info('diabled=no, but remove-others called previously')
+            return
+        end
+    end
+
+    if manually_called then
+        write_sorting_states(dir, command, sort_id)
+        msg.info('process command: '..command..' '..(sort_id and sort_id or ''))
+    elseif prev_command ~= nil then
+        command, sort_id = prev_command, prev_sort_id
+        msg.info(
+            'process previous command: '..prev_command..' '..
+            (prev_sort_id and prev_sort_id or '')
+        )
     else
-        prev_dir = dir
-        prev_command = command
-        prev_sort_id = sort_id
+        msg.info(
+            'process start-file command: '..command..' '..
+            (sort_id and sort_id or '')
+            )
     end
 
     local sorted
-    if again and prev_sorted ~= nil then
-        sorted = prev_sorted
-    else
-        sorted = read_dir_by(dir, command, sort_id)
-        prev_sorted = sorted
-    end
-
-    -- Finds the current pl entry in the sorted dir list.
     local current
-    for i = 1, #sorted do
-        if sorted[i] == filename then
-            current = i
-            break
+    if command ~= 'remove-others' then
+        mp.osd_message('Loading all the files from the folder.')
+        sorted = read_dir_by(dir, command, sort_id)
+
+        -- Finds the current pl entry in the sorted dir list.
+        for i = 1, #sorted do
+            if sorted[i] == filename then
+                current = i
+                break
+            end
+        end
+        if current == nil then
+            msg.error("Can't find current file in loaded files: "..filename)
         end
     end
-    if current == nil then
-        msg.error("Can't find current file in loaded files: "..filename)
-    end
-
     -- Moves current track to 0
     local pos = mp.get_property_number('playlist-pos', 0)
     mp.commandv("playlist-move", pos, 0)
 
-    -- Removes all the other tracks
+    -- Removes all the other tracks.
     if count > 1 then
         for i = 2, count do
             mp.command("playlist-remove 1")
         end
     end
 
-    local my_dir = dir
-    if dir == "." then
-        my_dir = ""
-    end
-
-    local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
-    for i=1, max_count do
-        local file = sorted[i]
-        if file ~= filename then
-            mp.commandv("loadfile", my_dir..file, "append")
+    -- Add the sorted.
+    if command ~= 'remove-others' then
+        local my_dir = dir
+        if dir == "." then
+            my_dir = ""
         end
-    end
 
-    if again or (current > 1 and (command ~= 'shuffle' or startover)) then
-        local to
-        if current ~= nil and current <= max_count then
-            to = current
-        else
-            to = max_count
+        local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
+        for i=1, max_count do
+            local file = sorted[i]
+            if file ~= filename then
+                mp.commandv("loadfile", my_dir..file, "append")
+            end
         end
-        msg.info('current pos: '..current)
-        mp.commandv("playlist-move", 0, to)
-    end
 
-    if startover == true then
-        mp.set_property('playlist-pos', 0)                         
-    end
+        if again or (current > 1 and (command ~= 'shuffle' or startover)) then
+            local to
+            if current ~= nil and current <= max_count then
+                to = current
+            else
+                to = max_count
+            end
+            mp.commandv("playlist-move", 0, to)
+        end
 
-    if manually_called == true then
-        mp.osd_message(tostring(#sorted)..' files loaded.')
+        if startover == true then
+            mp.set_property('playlist-pos', 0)                         
+        end
+
+        if manually_called == true then
+            mp.osd_message(tostring(#sorted)..' files loaded.')
+        end
+    else
+        mp.osd_message('All the other files removed.')
     end
 end
 
@@ -366,6 +471,17 @@ mp.register_event("start-file", function ()
 end)
 
 mp.register_script_message("autoload-ex", function (p1, p2, p3)
+    if p1 == 'alert' then
+        local path = mp.get_property("path", "")
+        local dir, filename = utils.split_path(path)
+        local count = mp.get_property_number('playlist-count', 0)
+
+        if count > 2 and #dir ~= 0 and (p2 == 'sort' or p2 == 'shuffle') then
+            write_sorting_states(dir, p2, p3)
+        end
+        return
+    end
+
     if not in_process then
         if p1 == 'shuffle' then
             p2, p3 = nil, p2

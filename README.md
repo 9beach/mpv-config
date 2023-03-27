@@ -190,12 +190,16 @@ You can edit the settings in `script-opts/finder-integration.conf`.
 
 ### [autoload-ex.lua](https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua)
 
-If you set `disabled=no` in `script-opts/autoload-ex.conf`, this script 
-automatically loads playlist entries by scanning the directory a file is 
-located in when starting playback. But unlike well-known `autoload.lua`, 
-`disabled=yes` is default in this script. You can edit it, but I recommend that
-you do it manually by keybinds. Once manually loaded in a folder, again 
-autoloaded in the same folder.
+This script automatically loads playlist entries by scanning the directory a 
+file is located in when starting playback. But unlike well-known `autoload`,
+`autoload-ex` remembers the sorting states of **the directory**. So if you
+reload or sort again playlist entries in the directory with different sorting
+states with `autoload-ex` or `simple-playlist`, next time `autoload-ex`
+restores previous sorting states for the directory. Even if you set
+`disabled=yes` and manually call `autoload-ex`, in the future `autoload-ex`
+loads playlist entries of the directory automatically. If you set
+`disabled=no` and call `autoload-ex remove-others` for the directory, in the
+future `autoload-ex` does not load playlist entries for the directory.
 
 This script provides the script messages below:
 
@@ -213,11 +217,21 @@ This script provides the script messages below:
 - script-message autoload-ex sort size-desc
 - script-message autoload-ex sort size-asc startover
 - script-message autoload-ex sort size-desc startover
+- script-message autoload-ex remove-others (`Alt+R, Ctrl+R, META+R`)
+- script-message autoload-ex alert _arg1_ _arg2_
+
+`alert` is for the other sorting scripts like `simple-playlist`. It helps
+for `autoload-ex` to save the previous states. See the example below.
+
+```
+script-message autoload-ex alert sort name-asc
+script-message autoload-ex alert shuffle
+```
 
 You can edit key bindings in `input.conf`.
 
 Many parts in my code are from
-<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
 
