@@ -334,7 +334,6 @@ function autoload_ex(manually_called, command, sort_id, startover)
     local path = mp.get_property("path", "")
     local dir, filename = utils.split_path(path)
 
-    -- Maybe URL.
     msg.trace(("dir: %s, filename: %s"):format(dir, filename))
     if #dir == 0 then
         msg.verbose("stopping: not a local path")
@@ -350,45 +349,32 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     if not manually_called and count > 1 then
-        msg.verbose("stopping: manually made playlist, or already called")
+        msg.verbose("stopping: manually made playlist, or already scanned")
         return
     end
 
-    local prev_command, prev_sort_id = read_sorting_states(dir)
+    local p_command, p_sort_id = read_sorting_states(dir)
 
-    -- `diabled=yes` and only one file, but checks if loaded previously.
     if o.disabled and not manually_called then
-        if prev_command ~= 'sort' and prev_command ~= 'shuffle' then
-            return
-        end
-        msg.info(
-            'diabled=yes, but previously loaded: '..prev_command..' '..
-            (prev_sort_id and prev_sort_id or '')
-            )
+        if p_command ~= 'sort' and p_command ~= 'shuffle' then return end
+        msg.info('`disabled=yes`, but previously loaded:', p_command, p_sort_id)
     end
 
-    -- `diabled=no` and only one file, but checks if unloaded previously.
     if not o.disabled and not manually_called then
-        if prev_command == 'remove-others' then
-            msg.info('diabled=no, but remove-others called previously')
+        if p_command == 'remove-others' then
+            msg.info('`remove-others` called previously, so does not scan')
             return
         end
     end
 
     if manually_called then
         write_sorting_states(dir, command, sort_id)
-        msg.info('process command: '..command..' '..(sort_id and sort_id or ''))
-    elseif prev_command ~= nil then
-        command, sort_id = prev_command, prev_sort_id
-        msg.info(
-            'process previous command: '..prev_command..' '..
-            (prev_sort_id and prev_sort_id or '')
-        )
+        msg.info('process command:', command, sort_id)
+    elseif p_command ~= nil then
+        command, sort_id = p_command, p_sort_id
+        msg.info('process previous command:', p_command, p_sort_id)
     else
-        msg.info(
-            'process start-file command: '..command..' '..
-            (sort_id and sort_id or '')
-            )
+        msg.info('process `start-file` command:', command, sort_id)
     end
 
     local sorted
@@ -408,51 +394,53 @@ function autoload_ex(manually_called, command, sort_id, startover)
             msg.error("Can't find current file in loaded files: "..filename)
         end
     end
-    -- Moves current track to 0
+
+    -- Moves current track to 0 pos.
     local pos = mp.get_property_number('playlist-pos', 0)
     mp.commandv("playlist-move", pos, 0)
 
     -- Removes all the other tracks.
     if count > 1 then
-        for i = 2, count do
-            mp.command("playlist-remove 1")
+        for i = count-1, 1, -1 do
+            mp.command("playlist-remove "..i)
         end
     end
 
-    -- Add the sorted.
-    if command ~= 'remove-others' then
-        local my_dir = dir
-        if dir == "." then
-            my_dir = ""
-        end
-
-        local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
-        for i=1, max_count do
-            local file = sorted[i]
-            if file ~= filename then
-                mp.commandv("loadfile", my_dir..file, "append")
-            end
-        end
-
-        if again or (current > 1 and (command ~= 'shuffle' or startover)) then
-            local to
-            if current ~= nil and current <= max_count then
-                to = current
-            else
-                to = max_count
-            end
-            mp.commandv("playlist-move", 0, to)
-        end
-
-        if startover == true then
-            mp.set_property('playlist-pos', 0)                         
-        end
-
-        if manually_called == true then
-            mp.osd_message(tostring(#sorted)..' files loaded.')
-        end
-    else
+    if command == 'remove-others' then
         mp.osd_message('All the other files removed.')
+        return
+    end
+
+    -- Add the sorted to playlist.
+    local my_dir = dir
+    if dir == "." then
+        my_dir = ""
+    end
+
+    local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
+    for i=1, max_count do
+        local file = sorted[i]
+        if file ~= filename then
+            mp.commandv("loadfile", my_dir..file, "append")
+        end
+    end
+
+    if again or (current > 1 and (command ~= 'shuffle' or startover)) then
+        local to
+        if current ~= nil and current <= max_count then
+            to = current
+        else
+            to = max_count
+        end
+        mp.commandv("playlist-move", 0, to)
+    end
+
+    if startover == true then
+        mp.set_property('playlist-pos', 0)                         
+    end
+
+    if manually_called == true then
+        mp.osd_message(tostring(#sorted)..' files loaded.')
     end
 end
 

@@ -70,7 +70,6 @@ end
 
 function is_audio_file(path)
     local vid = mp.get_property("vid")
-    msg.info('vid: '..vid..' '..path)
     if vid == "no" then return true end
 
     local ext = path:match("^.+%.(.+)$")
