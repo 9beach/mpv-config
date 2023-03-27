@@ -288,7 +288,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     local sorted
-    if again then
+    if again and prev_sorted ~= nil then
         sorted = prev_sorted
     else
         sorted = read_dir_by(dir, command, sort_id)
@@ -331,7 +331,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
         end
     end
 
-    if again or (current ~= 1 and (command ~= 'shuffle' or startover)) then
+    if again or (current > 1 and (command ~= 'shuffle' or startover)) then
         local to
         if current ~= nil and current <= max_count then
             to = current
