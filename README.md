@@ -269,7 +269,7 @@ The original code is from [ModernX](https://github.com/cyl0/ModernX).
 > mirror the functionality of MPV's stock OSC while with a more modern-looking
 > interface.
 
-![img](https://github.com/cyl0/ModernX/blob/main/preview.png?raw=true)
+![img](modernx.png)
 
 I added a simple feature. In idle state, it shows a quote about writing and art.
 You can copy the text with `script-message copy-quote`, and also add your
