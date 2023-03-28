@@ -1,16 +1,21 @@
 --[[
 https://github.com/9beach/mpv-config/blob/main/scripts/autoload-ex.lua
 
-This script automatically loads playlist entries by scanning the directory a
-file is located in when starting playback. But unlike well-known `autoload`,
-`autoload-ex` remembers the sorting states of **the directory**. So if you
-reload or sort again playlist entries in the directory with different sorting
-type, next time `autoload-ex` restores previous sorting states for the 
-directory. Even if you set `disabled=yes` and manually call `autoload-ex`, 
-in the future `autoload-ex` loads playlist entries of the directory 
-automatically. If you set `disabled=no` and call `autoload-ex remove-others` 
-for the directory, in the future `autoload-ex` does not load playlist entries 
-for the directory.
+This script provides the functions below:
+
+- Like well-known `autoload`, automatically loads playlist entries by scanning
+  the directory a file is located in when starting playback.
+- Provides many sorting methods and shuffling when scanning the directory.
+- Provides keybinds for the functions of scannig the directory, sorting and
+  shuffling the files.
+- Remembers the sorting and shuffling states of the directory. So when you
+  open a file in the directory next time, `autoload-ex` restores previous
+  sorting states of the directory.
+- Even though you set `disabled=yes` in `script-opts/autoload-ex.conf` and
+  manually call `autoload-ex` by keybinds, `autoload-ex` scans entries of the
+  directory automatically next time.
+- If you set `disabled=no` and call `autoload-ex remove-others` for the
+  directory, `autoload-ex` does not scan entries of the directory next time.
 
 This script provides the script messages below:
 
@@ -31,8 +36,8 @@ This script provides the script messages below:
 - script-message autoload-ex remove-others
 - script-message autoload-ex alert _arg1_ _arg2_
 
-`alert` is for the other sorting scripts like `simple-playlist`. It helps
-for `autoload-ex` to save the previous states.
+`alert` is for the other sorting scripts like `simple-playlist`. It helps for 
+`autoload-ex` to save the previous states.
 
 You can edit key bindings in `input.conf`.
 
@@ -333,11 +338,17 @@ function write_sorting_states(dir, command, sort_id)
     end
 end
 
+function is_local_file(path)
+    return path ~= nil and string.find(path, '://') == nil
+end
+
 function autoload_ex(manually_called, command, sort_id, startover)
     local path = mp.get_property("path", "")
+    if not is_local_file(path) then return end
+
     local dir, filename = utils.split_path(path)
 
-    msg.trace(("dir: %s, filename: %s"):format(dir, filename))
+    msg.info(("dir: %s, filename: %s"):format(dir, filename))
     if #dir == 0 then
         msg.verbose("stopping: not a local path")
         return
@@ -432,9 +443,9 @@ function autoload_ex(manually_called, command, sort_id, startover)
         end
     end
 
-    if again or (current > 1 and (command ~= 'shuffle' or startover)) then
+    if (current and current > 1 and (command ~= 'shuffle' or startover)) then
         local to
-        if current ~= nil and current <= max_count then
+        if current <= max_count then
             to = current
         else
             to = max_count
@@ -468,6 +479,8 @@ end)
 mp.register_script_message("autoload-ex", function (p1, p2, p3)
     if p1 == 'alert' then
         local path = mp.get_property("path", "")
+        if not is_local_file(path) then return end
+
         local dir, filename = utils.split_path(path)
         local count = mp.get_property_number('playlist-count', 0)
 
