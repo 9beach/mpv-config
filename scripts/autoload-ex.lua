@@ -205,7 +205,7 @@ function get_file_info(path)
     return file_info
 end
 
-function read_dir_by(dir, command, sort_id)
+function readdir_by(dir, command, sort_id)
     -- Reads files in the dir.
     local files = utils.readdir(dir, "files")
     if files == nil then
@@ -342,13 +342,44 @@ function is_local_file(path)
     return path ~= nil and string.find(path, '://') == nil
 end
 
+function remove_others_silently(count)
+    -- Moves current track to 0 pos.
+    local pos = mp.get_property_number('playlist-pos', 0)
+    mp.commandv("playlist-move", pos, 0)
+
+    if count == nil then
+        count = mp.get_property_number('playlist-count', 0)
+    end
+
+    -- Removes all the other tracks.
+    if count > 1 then
+        for i = count-1, 1, -1 do mp.command("playlist-remove "..i) end
+    end
+
+    return count-1
+end
+
+-- commands: sort, shuffle, and remove-others.
 function autoload_ex(manually_called, command, sort_id, startover)
     local path = mp.get_property("path", "")
-    if not is_local_file(path) then return end
+    if not is_local_file(path) then
+        if manually_called and command == 'remove-others' then
+            if remove_others_silently() > 0 then
+                mp.osd_message('All the other tracks removed.')
+            end
+        end
+        return
+    end
 
     local dir, filename = utils.split_path(path)
 
-    msg.info(("dir: %s, filename: %s"):format(dir, filename))
+    local ext = get_extension(filename)
+    if ext == nil or not EXTENSIONS[string.lower(ext)] then
+        msg.info('skipping no interesting file:', path)
+        return
+    end
+
+    msg.verbose(("dir: %s, filename: %s"):format(dir, filename))
     if #dir == 0 then
         msg.verbose("stopping: not a local path")
         return
@@ -371,7 +402,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
 
     if o.disabled and not manually_called then
         if p_command ~= 'sort' and p_command ~= 'shuffle' then return end
-        msg.info('`disabled=yes`, but previously loaded:', p_command, p_sort_id)
+        msg.info('`disabled=yes`, but previously loaded')
     end
 
     if not o.disabled and not manually_called then
@@ -382,49 +413,46 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     if manually_called then
-        write_sorting_states(dir, command, sort_id)
-        msg.info('process command:', command, sort_id)
+        msg.info('processing command:', command, sort_id, startover)
     elseif p_command ~= nil then
         command, sort_id = p_command, p_sort_id
-        msg.info('process previous command:', p_command, p_sort_id)
+        msg.info('processing restored command:', p_command, p_sort_id)
     else
-        msg.info('process `start-file` command:', command, sort_id)
+        msg.info('processing `start-file` command:', command, sort_id)
     end
 
     local sorted
     local current
     if command ~= 'remove-others' then
-        if manually_called then
-            mp.osd_message('Loading all the files from the folder.')
-        end
-        sorted = read_dir_by(dir, command, sort_id)
+        sorted = readdir_by(dir, command, sort_id)
 
-        -- Finds the current pl entry in the sorted dir list.
+        -- Finds the current track in `sorted` and remove it.
         for i = 1, #sorted do
             if sorted[i] == filename then
                 current = i
                 break
             end
         end
+        if #sorted == 0 then
+            msg.error("it's impossible!:", filename)
+            return
+        end
         if current == nil then
-            msg.error("Can't find current file in loaded files: "..filename)
+            msg.error("can't find current file in loaded files: "..filename)
+        else
+            table.remove(sorted, current)
         end
     end
 
-    -- Moves current track to 0 pos.
-    local pos = mp.get_property_number('playlist-pos', 0)
-    mp.commandv("playlist-move", pos, 0)
+    remove_others_silently(count)
 
-    -- Removes all the other tracks.
-    if count > 1 then
-        for i = count-1, 1, -1 do
-            mp.command("playlist-remove "..i)
-        end
+    if manually_called and (command == 'remove-others' or #sorted > 0) then
+        write_sorting_states(dir, command, sort_id)
     end
 
     if command == 'remove-others' then
         if manually_called then
-            mp.osd_message('All the other files removed.')
+            mp.osd_message('All the other tracks removed.')
         end
         return
     end
@@ -437,10 +465,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
 
     local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
     for i=1, max_count do
-        local file = sorted[i]
-        if file ~= filename then
-            mp.commandv("loadfile", my_dir..file, "append")
-        end
+        mp.commandv("loadfile", my_dir..sorted[i], "append")
     end
 
     if (current and current > 1 and (command ~= 'shuffle' or startover)) then
@@ -453,12 +478,24 @@ function autoload_ex(manually_called, command, sort_id, startover)
         mp.commandv("playlist-move", 0, to)
     end
 
-    if startover == true then
+    if startover == true and #sorted > 0 then
         mp.set_property('playlist-pos', 0)                         
     end
 
-    if manually_called == true then
-        mp.osd_message(tostring(#sorted)..' files loaded.')
+    if manually_called == true and #sorted > 0 then
+        mp.osd_message(tostring(#sorted+1)..' files loaded.')
+    end
+end
+
+function alert(p1, p2)
+    local path = mp.get_property("path", "")
+    if not is_local_file(path) then return end
+
+    local dir, filename = utils.split_path(path)
+    local count = mp.get_property_number('playlist-count', 0)
+
+    if count > 2 and #dir ~= 0 and (p1 == 'sort' or p1 == 'shuffle') then
+        write_sorting_states(dir, p1, p2)
     end
 end
 
@@ -477,24 +514,17 @@ mp.register_event("start-file", function ()
 end)
 
 mp.register_script_message("autoload-ex", function (p1, p2, p3)
+    msg.info('script-message:', p1, p2, p3)
     if p1 == 'alert' then
-        local path = mp.get_property("path", "")
-        if not is_local_file(path) then return end
-
-        local dir, filename = utils.split_path(path)
-        local count = mp.get_property_number('playlist-count', 0)
-
-        if count > 2 and #dir ~= 0 and (p2 == 'sort' or p2 == 'shuffle') then
-            write_sorting_states(dir, p2, p3)
-        end
+        alert(p2, p3)
         return
     end
 
     if not in_process then
+        in_process = true
         if p1 == 'shuffle' then
             p2, p3 = nil, p2
         end
-        in_process = true
         autoload_ex(true, p1, p2, p3 == 'startover')
         in_process = false
     else
