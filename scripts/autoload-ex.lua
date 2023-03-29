@@ -420,7 +420,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
         msg.info('processing `start-file` command:', command, sort_id)
     end
 
-    -- First, remove others to prevent the modifications of other scripts.
+    -- First, removes the other tracks before some scripts modify my playlist.
     remove_others_silently(count)
 
     if command == 'remove-others' then
@@ -455,11 +455,12 @@ function autoload_ex(manually_called, command, sort_id, startover)
         msg.error("can't find current file in reloaded files:", filename)
     end
 
+    -- A directory with only one track needs to be remembered? I say No.
     if manually_called and #sorted > 0 then
         write_sorting_states(dir, command, sort_id)
     end
 
-    -- Add the sorted to playlist.
+    -- Adds `sorted` to playlist.
     local my_dir = dir == "." and "" or dir
     local max_count = #sorted > 5000 and 5000 or #sorted
 
@@ -467,16 +468,18 @@ function autoload_ex(manually_called, command, sort_id, startover)
         mp.commandv("loadfile", my_dir..sorted[i], "append")
     end
 
+    -- If shuffle and no startover, current track goes to the first.
     if (current and current > 1 and (command ~= 'shuffle' or startover)) then
         local pos_to = current <= max_count and current or max_count
         mp.commandv("playlist-move", 0, pos_to)
     end
 
+    -- The only and same track does not need to restart.
     if startover == true and #sorted > 0 then
         mp.set_property('playlist-pos', 0)                         
     end
 
-    if manually_called == true and #sorted > 0 then
+    if manually_called then
         if command == 'shuffle' then
             mp.osd_message('Load and shuffle '..(#sorted+1)..' files.')
         else
