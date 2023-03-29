@@ -16,6 +16,11 @@ This script provides the functions below:
   directory automatically next time.
 - If you set `disabled=no` and call `autoload-ex remove-others` manually by       keybinds, `autoload-ex` does not scan entries of the directory next time.
 
+Notice that when manually called, `autoload-ex` does not reload and sort
+current playlist entries. It just reload the files in the directory of current
+track. It means that `autoload-ex` remenbers the state of a directory, not
+that of a playlist.
+
 This script provides the script messages below:
 
 - script-message autoload-ex shuffle

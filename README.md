@@ -213,10 +213,15 @@ This script provides the functions below:
 - If you set `disabled=no` and call `autoload-ex remove-others` manually by 
   keybinds, `autoload-ex` does not scan entries of the directory next time.
 
+Notice that when manually called, `autoload-ex` does not reload and sort 
+current playlist entries. It just reload the files in the directory of current
+track. It means that `autoload-ex` remenbers the state of a directory, not 
+that of a playlist.
+
 This script provides the script messages below:
 
-- script-message autoload-ex shuffle (`Alt+S, Ctrl+S, Meta+S`)
-- script-message autoload-ex shuffle startover
+- script-message autoload-ex shuffle
+- script-message autoload-ex shuffle startover (`Alt+S, Ctrl+S, Meta+S`)
 - script-message autoload-ex sort name-asc (`Alt+N, Ctrl+N, Meta+N`)
 - script-message autoload-ex sort name-desc
 - script-message autoload-ex sort name-asc startover
@@ -242,7 +247,7 @@ META+SHIFT+r script-message autoload-ex remove-others
 ```
 
 Many parts in my code are from
-<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>- Notice that `autoload-ex`
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
 
@@ -254,7 +259,7 @@ This script provides the functions below:
 So if you change the sound volume level of a file, **mpv** remembers it just
 for that file if you resume to play it.
 
-You can edit the settings in `script-opts/on-startup-shutdown.lua`.
+You can edit the settings in `script-opts/on-startup-shutdown.conf`.
 
 ### [modernx-and-quotes.lua](https://github.com/9beach/mpv-config/blob/main/scripts/modernx-and-quotes.lua)
 
