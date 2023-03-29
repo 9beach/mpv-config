@@ -375,17 +375,17 @@ function autoload_ex(manually_called, command, sort_id, startover)
         return
     end
 
+    local on_start_file = not manually_called
     local dir, filename = utils.split_path(path)
 
     local ext = get_extension(filename)
     if ext == nil or not EXTENSIONS[string.lower(ext)] then
-        msg.info('skipping no interesting file:', path)
+        msg.info('stopping, no interesting file:', path)
         return
     end
 
-    msg.verbose(("dir: %s, filename: %s"):format(dir, filename))
     if #dir == 0 then
-        msg.verbose("stopping: not a local path")
+        msg.info("stopping, not a local path:", path)
         return
     end
 
@@ -393,23 +393,27 @@ function autoload_ex(manually_called, command, sort_id, startover)
     local count = #playlist
 
     if (count < 2 and 'remove-others' == command) then
-        msg.verbose("stopping: remove-others for single track entry")
+        msg.verbose("stopping, remove-others for single entry playlist")
         return
     end
 
-    if not manually_called and count > 1 then
-        msg.verbose("stopping: manually made playlist, or already scanned")
+    if on_start_file and count > 1 then
+        msg.info("stopping, already scanned, or manually made playlist")
         return
+    end
+
+    if manually_called then
+        mp.osd_message('Scanning dir: '..dir)
     end
 
     local p_command, p_sort_id = read_sorting_states(dir)
 
-    if o.disabled and not manually_called then
+    if o.disabled and on_start_file then
         if p_command ~= 'sort' and p_command ~= 'shuffle' then return end
         msg.info('`disabled=yes`, but previously loaded')
     end
 
-    if not o.disabled and not manually_called then
+    if not o.disabled and on_start_file then
         if p_command == 'remove-others' then
             msg.info('`remove-others` called previously, so does not scan')
             return
@@ -417,12 +421,12 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     if manually_called then
-        msg.info('processing command:', command, sort_id, startover)
+        msg.info('direct command:', command, sort_id, startover)
     elseif p_command ~= nil then
         command, sort_id = p_command, p_sort_id
-        msg.info('processing restored command:', p_command, p_sort_id)
+        msg.info('restored `start-file` command:', p_command, p_sort_id)
     else
-        msg.info('processing `start-file` command:', command, sort_id)
+        msg.info('`start-file` command:', command, sort_id)
     end
 
     -- First, removes the other tracks before some scripts modify my playlist.
