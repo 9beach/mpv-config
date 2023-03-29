@@ -345,6 +345,8 @@ function is_local_file(path)
 end
 
 function remove_others_silently(count)
+    if count and count == 1 then return end
+
     -- Moves current track to 0 pos.
     local pos = mp.get_property_number('playlist-pos', 0)
     mp.commandv("playlist-move", pos, 0)
@@ -362,12 +364,12 @@ function remove_others_silently(count)
 end
 
 -- commands: sort, shuffle, and remove-others.
-function autoload_ex(manually_called, command, sort_id, startover)
-    msg.info('called:', manually_called, command, sort_id, startover)
+function autoload_ex(on_start_file, command, sort_id, startover)
+    msg.info('called:', on_start_file, command, sort_id, startover)
 
     local path = mp.get_property("path", "")
     if not is_local_file(path) then
-        if manually_called and command == 'remove-others' then
+        if not on_start_file and command == 'remove-others' then
             if remove_others_silently() > 0 then
                 mp.osd_message('All the other tracks removed.')
             end
@@ -375,17 +377,16 @@ function autoload_ex(manually_called, command, sort_id, startover)
         return
     end
 
-    local on_start_file = not manually_called
     local dir, filename = utils.split_path(path)
 
     local ext = get_extension(filename)
     if ext == nil or not EXTENSIONS[string.lower(ext)] then
-        msg.info('stopping, no interesting file:', path)
+        msg.info('stopping: no interesting file,', path)
         return
     end
 
     if #dir == 0 then
-        msg.info("stopping, not a local path:", path)
+        msg.info("stopping: not a local path,", path)
         return
     end
 
@@ -393,16 +394,16 @@ function autoload_ex(manually_called, command, sort_id, startover)
     local count = #playlist
 
     if (count < 2 and 'remove-others' == command) then
-        msg.verbose("stopping, remove-others for single entry playlist")
+        msg.verbose("stopping: remove-others for single entry playlist")
         return
     end
 
     if on_start_file and count > 1 then
-        msg.info("stopping, already scanned, or manually made playlist")
+        msg.info("stopping: already scanned, or manually made playlist")
         return
     end
 
-    if manually_called then
+    if not on_start_file then
         mp.osd_message('Scanning dir: '..dir)
     end
 
@@ -410,17 +411,17 @@ function autoload_ex(manually_called, command, sort_id, startover)
 
     if o.disabled and on_start_file then
         if p_command ~= 'sort' and p_command ~= 'shuffle' then return end
-        msg.info('`disabled=yes`, but previously loaded')
+        msg.info('`disabled=yes`, but previously loaded, so scan dir')
     end
 
     if not o.disabled and on_start_file then
         if p_command == 'remove-others' then
-            msg.info('`remove-others` called previously, so does not scan')
+            msg.info('`remove-others` called previously, so does not scan dir')
             return
         end
     end
 
-    if manually_called then
+    if not on_start_file then
         msg.info('direct command:', command, sort_id, startover)
     elseif p_command ~= nil then
         command, sort_id = p_command, p_sort_id
@@ -433,7 +434,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
     remove_others_silently(count)
 
     if command == 'remove-others' then
-        if manually_called then
+        if not on_start_file then
             mp.osd_message('All the other tracks removed.')
             write_sorting_states(dir, command, sort_id)
         end
@@ -462,10 +463,11 @@ function autoload_ex(manually_called, command, sort_id, startover)
 
     if current == nil then
         msg.error("can't find current file in reloaded files:", filename)
+        current = 1
     end
 
     -- A directory with only one track needs to be remembered? I say No.
-    if manually_called and #sorted > 0 then
+    if not on_start_file and #sorted > 0 then
         write_sorting_states(dir, command, sort_id)
     end
 
@@ -478,23 +480,26 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     -- If shuffle and no startover, current track goes to the first.
-    -- It's essential for not manually_called case.
-    if (current and current > 1 and (command ~= 'shuffle' or startover)) then
+    -- It's essential for on_start_file case.
+    if (current > 1 and (command ~= 'shuffle' or startover)) then
         local pos_to = current <= max_count and current or max_count
         mp.commandv("playlist-move", 0, pos_to)
+        current = pos_to
+    else
+        current = 1
     end
 
     -- The only and same track does not need to restart.
-    if startover == true and #sorted > 0 then
+    if startover == true and current > 1 then
         mp.set_property('playlist-pos', 0)                         
     end
 
-    if manually_called then
+    if not on_start_file then
         if command == 'shuffle' then
-            mp.osd_message('Load and shuffle '..(#sorted+1)..' files.')
+            mp.osd_message('Shuffled '..(#sorted+1)..' files.')
         else
             mp.osd_message(
-                'Load '..(#sorted+1)..' files sorting by '..
+                'Loaded '..(#sorted+1)..' files sorted by '..
                 sort_modes[sortid2index(sort_id)].title.."."
                 )
         end
@@ -508,7 +513,7 @@ mp.register_event("start-file", function ()
     if not in_process then
         in_process = true
         -- Startover automatically? Nonsense.
-        autoload_ex(false, p[1], p[2], false)
+        autoload_ex(true, p[1], p[2], false)
         in_process = false
     else
         msg.info('autoload-ex is currently working.')
@@ -521,7 +526,7 @@ mp.register_script_message("autoload-ex", function (p1, p2, p3)
         if p1 == 'shuffle' then
             p2, p3 = nil, p2
         end
-        autoload_ex(true, p1, p2, p3 == 'startover')
+        autoload_ex(false, p1, p2, p3 == 'startover')
         in_process = false
     else
         mp.osd_message('autoload-ex is currently working.')
