@@ -213,10 +213,10 @@ This script provides the functions below:
 - If you set `disabled=no` and call `autoload-ex remove-others` manually by 
   keybinds, `autoload-ex` does not scan entries of the directory next time.
 
-Notice that when manually called, `autoload-ex` does not reload and sort 
-current playlist entries. It just reload the files in the directory of current
-track. It means that `autoload-ex` remenbers the state of a directory, not 
-that of a playlist.
+Notice that when manually called, `autoload-ex` does not reload and sort
+current playlist entries. It just reloads the files in the directory of the 
+current track. It means that `autoload-ex` remembers the state of a directory,
+not that of a playlist.
 
 This script provides the script messages below:
 
@@ -247,7 +247,7 @@ META+SHIFT+r script-message autoload-ex remove-others
 ```
 
 Many parts in my code are from
-<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>- Notice that `autoload-ex`
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
 
