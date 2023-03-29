@@ -213,10 +213,10 @@ This script provides the functions below:
 - If you set `disabled=no` and call `autoload-ex remove-others` manually by 
   keybinds, `autoload-ex` does not scan entries of the directory next time.
 
-Notice that when manually called, `autoload-ex` does not reload and sort
-current playlist entries. It just reloads the files in the directory of the 
-current track. It means that `autoload-ex` remembers the state of a directory,
-not that of a playlist.
+Notice that when manually called, `autoload-ex` does reload and sort not
+the current playlist entries, but the files in the directory of the current 
+track. It means that `autoload-ex` remembers the state of a directory, not 
+that of a playlist.
 
 This script provides the script messages below:
 
