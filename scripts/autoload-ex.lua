@@ -478,10 +478,10 @@ function autoload_ex(manually_called, command, sort_id, startover)
 
     if manually_called == true and #sorted > 0 then
         if command == 'shuffle' then
-            mp.osd_message('Reload and shuffle '..(#sorted+1)..' files.')
+            mp.osd_message('Load and shuffle '..(#sorted+1)..' files.')
         else
             mp.osd_message(
-                'Reload '..(#sorted+1)..' files sorting by '..
+                'Load '..(#sorted+1)..' files sorting by '..
                 sort_modes[sortid2index(sort_id)].title.."."
                 )
         end
