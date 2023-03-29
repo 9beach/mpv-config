@@ -474,6 +474,7 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     -- If shuffle and no startover, current track goes to the first.
+    -- It's essential for not manually_called case.
     if (current and current > 1 and (command ~= 'shuffle' or startover)) then
         local pos_to = current <= max_count and current or max_count
         mp.commandv("playlist-move", 0, pos_to)
