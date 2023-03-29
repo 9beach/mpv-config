@@ -34,10 +34,6 @@ This script provides the script messages below:
 - script-message autoload-ex sort size-asc startover
 - script-message autoload-ex sort size-desc startover
 - script-message autoload-ex remove-others
-- script-message autoload-ex alert _arg1_ _arg2_
-
-`alert` is for the other sorting scripts like `simple-playlist`. It helps for 
-`autoload-ex` to save the previous states.
 
 You can edit key bindings in `input.conf`.
 
@@ -361,6 +357,8 @@ end
 
 -- commands: sort, shuffle, and remove-others.
 function autoload_ex(manually_called, command, sort_id, startover)
+    msg.info('called:', manually_called, command, sort_id, startover)
+
     local path = mp.get_property("path", "")
     if not is_local_file(path) then
         if manually_called and command == 'remove-others' then
@@ -487,18 +485,6 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 end
 
-function alert(p1, p2)
-    local path = mp.get_property("path", "")
-    if not is_local_file(path) then return end
-
-    local dir, filename = utils.split_path(path)
-    local count = mp.get_property_number('playlist-count', 0)
-
-    if count > 2 and #dir ~= 0 and (p1 == 'sort' or p1 == 'shuffle') then
-        write_sorting_states(dir, p1, p2)
-    end
-end
-
 local in_process = false
 local p = split_string(o.sort_command_on_autoload)
 
@@ -514,12 +500,6 @@ mp.register_event("start-file", function ()
 end)
 
 mp.register_script_message("autoload-ex", function (p1, p2, p3)
-    msg.info('script-message:', p1, p2, p3)
-    if p1 == 'alert' then
-        alert(p2, p3)
-        return
-    end
-
     if not in_process then
         in_process = true
         if p1 == 'shuffle' then

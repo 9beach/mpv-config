@@ -230,10 +230,6 @@ This script provides the script messages below:
 - script-message autoload-ex sort size-asc startover
 - script-message autoload-ex sort size-desc startover
 - script-message autoload-ex remove-others (`Alt+R, Ctrl+R, META+R`)
-- script-message autoload-ex alert _arg1_ _arg2_
-
-`alert` is for the other sorting scripts like `simple-playlist`. It helps for
-`autoload-ex` to save the previous states.
 
 You can edit key bindings in `input.conf`.
 
