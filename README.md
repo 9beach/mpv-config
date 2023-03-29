@@ -208,10 +208,10 @@ This script provides the functions below:
   open a file in the directory next time, `autoload-ex` restores previous
   sorting states of the directory.
 - Even though you set `disabled=yes` in `script-opts/autoload-ex.conf` and
-  manually call `autoload-ex` by keybinds, `autoload-ex` scans entries of the
+  call `autoload-ex` manually by keybinds, `autoload-ex` scans entries of the
   directory automatically next time.
-- If you set `disabled=no` and call `autoload-ex remove-others` for the
-  directory, `autoload-ex` does not scan entries of the directory next time.
+- If you set `disabled=no` and call `autoload-ex remove-others` manually by 
+  keybinds, `autoload-ex` does not scan entries of the directory next time.
 
 This script provides the script messages below:
 

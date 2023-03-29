@@ -12,10 +12,9 @@ This script provides the functions below:
   open a file in the directory next time, `autoload-ex` restores previous
   sorting states of the directory.
 - Even though you set `disabled=yes` in `script-opts/autoload-ex.conf` and
-  manually call `autoload-ex` by keybinds, `autoload-ex` scans entries of the
+  call `autoload-ex` manually by keybinds, `autoload-ex` scans entries of the
   directory automatically next time.
-- If you set `disabled=no` and call `autoload-ex remove-others` for the
-  directory, `autoload-ex` does not scan entries of the directory next time.
+- If you set `disabled=no` and call `autoload-ex remove-others` manually by       keybinds, `autoload-ex` does not scan entries of the directory next time.
 
 This script provides the script messages below:
 
@@ -51,8 +50,6 @@ Many parts in my code are from
 
 -- Minified code below defines `function sha256(message)`, and is a combination of <http://lua-users.org/wiki/SecureHashAlgorithm> and <https://www.snpedia.com/extensions/Scribunto/engines/LuaCommon/lualib/bit32.lua>.
 local sha256; do local b,c,d,e,f;if bit32 then b,c,d,e,f=bit32.band,bit32.rrotate,bit32.bxor,bit32.rshift,bit32.bnot else f=function(g)g=math.floor(tonumber(g))%0x100000000;return(-g-1)%0x100000000 end;local h={[0]={[0]=0,0,0,0},[1]={[0]=0,1,0,1},[2]={[0]=0,0,2,2},[3]={[0]=0,1,2,3}}local i={[0]={[0]=0,1,2,3},[1]={[0]=1,0,3,2},[2]={[0]=2,3,0,1},[3]={[0]=3,2,1,0}}local function j(k,l,m,n,o)for p=1,m do l[p]=math.floor(tonumber(l[p]))%0x100000000 end;local q=1;local r=0;for s=0,31,2 do local t=n;for p=1,m do t=o[t][l[p]%4]l[p]=math.floor(l[p]/4)end;r=r+t*q;q=q*4 end;return r end;b=function(...)return j('band',{...},select('#',...),3,h)end;d=function(...)return j('bxor',{...},select('#',...),0,i)end;e=function(g,u)g=math.floor(tonumber(g))%0x100000000;u=math.floor(tonumber(u))u=math.min(math.max(-32,u),32)return math.floor(g/2^u)%0x100000000 end;c=function(g,u)g=math.floor(tonumber(g))%0x100000000;u=-math.floor(tonumber(u))%32;local g=g*2^u;return g%0x100000000+math.floor(g/0x100000000)end end;local v={0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2}local function w(n)return string.gsub(n,".",function(t)return string.format("%02X",string.byte(t))end)end;local function x(y,z)local n=""for p=1,z do local A=y%256;n=string.char(A)..n;y=(y-A)/256 end;return n end;local function B(n,p)local z=0;for p=p,p+3 do z=z*256+string.byte(n,p)end;return z end;local function C(D,E)local F=-(E+1+8)%64;E=x(8*E,8)D=D.."\128"..string.rep("\0",F)..E;return D end;local function G(H)H[1]=0x6a09e667;H[2]=0xbb67ae85;H[3]=0x3c6ef372;H[4]=0xa54ff53a;H[5]=0x510e527f;H[6]=0x9b05688c;H[7]=0x1f83d9ab;H[8]=0x5be0cd19;return H end;local function I(D,p,H)local J={}for K=1,16 do J[K]=B(D,p+(K-1)*4)end;for K=17,64 do local L=J[K-15]local M=d(c(L,7),c(L,18),e(L,3))L=J[K-2]local N=d(c(L,17),c(L,19),e(L,10))J[K]=J[K-16]+M+J[K-7]+N end;local O,s,t,P,Q,R,S,T=H[1],H[2],H[3],H[4],H[5],H[6],H[7],H[8]for p=1,64 do local M=d(c(O,2),c(O,13),c(O,22))local U=d(b(O,s),b(O,t),b(s,t))local V=M+U;local N=d(c(Q,6),c(Q,11),c(Q,25))local W=d(b(Q,R),b(f(Q),S))local X=T+N+W+v[p]+J[p]T=S;S=R;R=Q;Q=P+X;P=t;t=s;s=O;O=X+V end;H[1]=b(H[1]+O)H[2]=b(H[2]+s)H[3]=b(H[3]+t)H[4]=b(H[4]+P)H[5]=b(H[5]+Q)H[6]=b(H[6]+R)H[7]=b(H[7]+S)H[8]=b(H[8]+T)end;local function Y(H)return w(x(H[1],4)..x(H[2],4)..x(H[3],4)..x(H[4],4)..x(H[5],4)..x(H[6],4)..x(H[7],4)..x(H[8],4))end;local Z={}sha256=function(D)D=C(D,#D)local H=G(Z)for p=1,#D,64 do I(D,p,H)end;return Y(H)end end
-
-MAXENTRIES = 5000
 
 local msg = require 'mp.msg'
 local options = require 'mp.options'
@@ -201,6 +198,16 @@ function get_file_info(path)
     return file_info
 end
 
+function sortid2index(sort_id)
+    local index = 1
+    for mode, sort_data in pairs(sort_modes) do
+        if sort_data.id == sort_id then
+            index = mode
+        end
+    end
+    return index
+end
+
 function readdir_by(dir, command, sort_id)
     -- Reads files in the dir.
     local files = utils.readdir(dir, "files")
@@ -230,14 +237,8 @@ function readdir_by(dir, command, sort_id)
         return files
     end
 
-    -- Shuffled gone, now sorts by sort_id.
-    local index = 1
-    for mode, sort_data in pairs(sort_modes) do
-        if sort_data.id == sort_id then
-            index = mode
-        end
-    end
-
+    -- 'shuffle' returned, now sorts by sort_id.
+    local index = sortid2index(sort_id)
     local need_file_info = index ~= 1 and index ~= 2
 
     local infos = {}
@@ -419,61 +420,56 @@ function autoload_ex(manually_called, command, sort_id, startover)
         msg.info('processing `start-file` command:', command, sort_id)
     end
 
-    local sorted
-    local current
-    if command ~= 'remove-others' then
-        sorted = readdir_by(dir, command, sort_id)
-
-        -- Finds the current track in `sorted` and remove it.
-        for i = 1, #sorted do
-            if sorted[i] == filename then
-                current = i
-                break
-            end
-        end
-        if #sorted == 0 then
-            msg.error("it's impossible!:", filename)
-            return
-        end
-        if current == nil then
-            msg.error("can't find current file in loaded files: "..filename)
-        else
-            table.remove(sorted, current)
-        end
-    end
-
+    -- First, remove others to prevent the modifications of other scripts.
     remove_others_silently(count)
-
-    if manually_called and (command == 'remove-others' or #sorted > 0) then
-        write_sorting_states(dir, command, sort_id)
-    end
 
     if command == 'remove-others' then
         if manually_called then
             mp.osd_message('All the other tracks removed.')
+            write_sorting_states(dir, command, sort_id)
         end
         return
     end
 
-    -- Add the sorted to playlist.
-    local my_dir = dir
-    if dir == "." then
-        my_dir = ""
+    -- Actually shuffled_or_sorted.
+    local sorted 
+    local current
+
+    sorted = readdir_by(dir, command, sort_id)
+
+    if #sorted == 0 then
+        msg.error("impossible, no other files in the dir!:", filename)
+        return
     end
 
-    local max_count = #sorted > MAXENTRIES and MAXENTRIES or #sorted
+    -- Finds the current track in `sorted` and removes it.
+    for i = 1, #sorted do
+        if sorted[i] == filename then
+            current = i
+            table.remove(sorted, current)
+            break
+        end
+    end
+
+    if current == nil then
+        msg.error("can't find current file in reloaded files:", filename)
+    end
+
+    if manually_called and #sorted > 0 then
+        write_sorting_states(dir, command, sort_id)
+    end
+
+    -- Add the sorted to playlist.
+    local my_dir = dir == "." and "" or dir
+    local max_count = #sorted > 5000 and 5000 or #sorted
+
     for i=1, max_count do
         mp.commandv("loadfile", my_dir..sorted[i], "append")
     end
 
     if (current and current > 1 and (command ~= 'shuffle' or startover)) then
-        local to
-        if current <= max_count then
-            to = current
-        else
-            to = max_count
-        end
-        mp.commandv("playlist-move", 0, to)
+        local pos_to = current <= max_count and current or max_count
+        mp.commandv("playlist-move", 0, pos_to)
     end
 
     if startover == true and #sorted > 0 then
@@ -481,7 +477,14 @@ function autoload_ex(manually_called, command, sort_id, startover)
     end
 
     if manually_called == true and #sorted > 0 then
-        mp.osd_message(tostring(#sorted+1)..' files loaded.')
+        if command == 'shuffle' then
+            mp.osd_message('Reload and shuffle '..(#sorted+1)..' files.')
+        else
+            mp.osd_message(
+                'Reload '..(#sorted+1)..' files sorting by '..
+                sort_modes[sortid2index(sort_id)].title.."."
+                )
+        end
     end
 end
 
