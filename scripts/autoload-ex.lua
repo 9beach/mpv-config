@@ -473,33 +473,32 @@ function autoload_ex(on_start_file, command, sort_id, startover)
 
     -- Adds `sorted` to playlist.
     local my_dir = dir == "." and "" or dir
-    local max_count = #sorted > 5000 and 5000 or #sorted
+    local tails_count = #sorted > 5000 and 5000 or #sorted
 
-    for i=1, max_count do
+    for i=1, tails_count do
         mp.commandv("loadfile", my_dir..sorted[i], "append")
     end
 
     -- If shuffle and no startover, current track goes to the first.
     -- It's essential for on_start_file case.
-    if (current > 1 and (command ~= 'shuffle' or startover)) then
-        local pos_to = current <= max_count and current or max_count
-        mp.commandv("playlist-move", 0, pos_to)
-        current = pos_to
-    else
+    if (command == 'shuffle' and not startover) then
         current = 1
+    else
+        current = current <= tails_count and current or tails_count+1
+        mp.commandv("playlist-move", 0, current)
     end
 
-    -- The only and same track does not need to restart.
+    -- The same track does not need to restart.
     if startover == true and current > 1 then
         mp.set_property('playlist-pos', 0)                         
     end
 
     if not on_start_file then
         if command == 'shuffle' then
-            mp.osd_message('Shuffled '..(#sorted+1)..' files.')
+            mp.osd_message('Shuffled '..(tails_count+1)..' files.')
         else
             mp.osd_message(
-                'Loaded '..(#sorted+1)..' files sorted by '..
+                'Loaded '..(tails_count+1)..' files sorted by '..
                 sort_modes[sortid2index(sort_id)].title.."."
                 )
         end
