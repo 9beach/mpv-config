@@ -14,7 +14,8 @@ This script provides the functions below:
 - Even though you set `disabled=yes` in `script-opts/autoload-ex.conf` and
   call `autoload-ex` manually by keybinds, `autoload-ex` scans entries of the
   directory automatically next time.
-- If you set `disabled=no` and call `autoload-ex remove-others` manually by       keybinds, `autoload-ex` does not scan entries of the directory next time.
+- If you set `disabled=no` and call `autoload-ex remove-others` manually by
+  keybinds, `autoload-ex` does not scan entries of the directory next time.
 
 Notice that when manually called, `autoload-ex` does reload and sort not
 the current playlist entries, but the files in the directory of the current
@@ -120,9 +121,15 @@ images_extensions = make_set {
 
 media_extensions = make_set {}
 
-if o.videos then media_extensions = set_union(media_extensions, video_extensions) end
-if o.audio then media_extensions = set_union(media_extensions, audio_extensions) end
-if o.images then media_extensions = set_union(media_extensions, images_extensions) end
+if o.videos then
+    media_extensions = set_union(media_extensions, video_extensions)
+end
+if o.audio then
+    media_extensions = set_union(media_extensions, audio_extensions)
+end
+if o.images then
+    media_extensions = set_union(media_extensions, images_extensions)
+end
 
 function get_extension(path)
     match = string.match(path, "%.([^%.]+)$" )
@@ -465,6 +472,9 @@ function autoload_ex(on_start_file, command, sort_id, startover)
     local altname
 
     if o.platform == 'darwin' then
+        -- `readdir` returns real filenames, but `Finder.app` passes
+        -- UTF-8-MAC encoded filename. We don't know that's real. So we need 
+        -- another UTF-8 encoded name for that to compare.
         altname = pipe_read(
             "printf '%s' '"..filename.."' | iconv -f UTF-8-MAC -t UTF-8"
             )
@@ -484,7 +494,7 @@ function autoload_ex(on_start_file, command, sort_id, startover)
         current = 1
     end
 
-    -- A directory with only one track needs to be remembered? I say No.
+    -- A directory with only one track needs to be remembered?
     if not on_start_file and #sorted > 0 then
         write_sorting_states(dir, command, sort_id)
     end
