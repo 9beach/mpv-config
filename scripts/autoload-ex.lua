@@ -50,7 +50,9 @@ META+SHIFT+r script-message autoload-ex remove-others
 ```
 
 Many parts in my code are from
-<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>,
+<http://lua-users.org/wiki/SecureHashAlgorithm>, and
+<https://www.snpedia.com/extensions/Scribunto/engines/LuaCommon/lualib/bit32.lua>.
 --]]
 
 -- Minified code below defines `function sha256(message)`, and is a combination of <http://lua-users.org/wiki/SecureHashAlgorithm> and <https://www.snpedia.com/extensions/Scribunto/engines/LuaCommon/lualib/bit32.lua>.
@@ -81,38 +83,39 @@ end
 
 options.read_options(o, "autoload-ex")
 
-function Set (t)
+function make_set(t)
     local set = {}
     for _, v in pairs(t) do set[v] = true end
     return set
 end
 
-function SetUnion (a,b)
+function set_union(a,b)
     local res = {}
     for k in pairs(a) do res[k] = true end
     for k in pairs(b) do res[k] = true end
     return res
 end
 
-EXTENSIONS_VIDEO = Set {
+video_extensions = make_set {
     '3g2', '3gp', 'avi', 'flv', 'm2ts', 'm4v', 'mj2', 'mkv', 'mov',
     'mp4', 'mpeg', 'mpg', 'ogv', 'rmvb', 'webm', 'wmv', 'y4m'
 }
 
-EXTENSIONS_AUDIO = Set {
+audio_extensions = make_set {
     'aiff', 'ape', 'au', 'flac', 'm4a', 'mka', 'mp3', 'oga', 'ogg',
     'ogm', 'opus', 'wav', 'wma'
 }
 
-EXTENSIONS_IMAGES = Set {
+images_extensions = make_set {
     'avif', 'bmp', 'gif', 'j2k', 'jp2', 'jpeg', 'jpg', 'jxl', 'png',
     'svg', 'tga', 'tif', 'tiff', 'webp'
 }
 
-EXTENSIONS = Set {}
-if o.videos then EXTENSIONS = SetUnion(EXTENSIONS, EXTENSIONS_VIDEO) end
-if o.audio then EXTENSIONS = SetUnion(EXTENSIONS, EXTENSIONS_AUDIO) end
-if o.images then EXTENSIONS = SetUnion(EXTENSIONS, EXTENSIONS_IMAGES) end
+media_extensions = make_set {}
+
+if o.videos then media_extensions = set_union(media_extensions, video_extensions) end
+if o.audio then media_extensions = set_union(media_extensions, audio_extensions) end
+if o.images then media_extensions = set_union(media_extensions, images_extensions) end
 
 function get_extension(path)
     match = string.match(path, "%.([^%.]+)$" )
@@ -231,7 +234,7 @@ function readdir_by(dir, command, sort_id)
         if ext == nil then
             return false
         end
-        return EXTENSIONS[string.lower(ext)]
+        return media_extensions[string.lower(ext)]
     end)
 
     if command == 'shuffle' then
@@ -380,7 +383,7 @@ function autoload_ex(on_start_file, command, sort_id, startover)
     local dir, filename = utils.split_path(path)
 
     local ext = get_extension(filename)
-    if ext == nil or not EXTENSIONS[string.lower(ext)] then
+    if ext == nil or not media_extensions[string.lower(ext)] then
         msg.info('stopping: no interesting file,', path)
         return
     end

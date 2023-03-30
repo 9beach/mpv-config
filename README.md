@@ -247,7 +247,9 @@ META+SHIFT+r script-message autoload-ex remove-others
 ```
 
 Many parts in my code are from
-<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>.
+<https://github.com/mpv-player/mpv/blob/master/TOOLS/lua/autoload.lua>,
+<http://lua-users.org/wiki/SecureHashAlgorithm>, and
+<https://www.snpedia.com/extensions/Scribunto/engines/LuaCommon/lualib/bit32.lua>.
 
 ### [on-startup-shutdown.lua](https://github.com/9beach/mpv-config/blob/master/scripts/on-startup-shutdown.lua)
 
