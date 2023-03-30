@@ -32,20 +32,20 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
-    -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
+    -- Temporary download scripts directory.
     -- Supports `$HOME` also for Microsoft Windows.
-    download_dir = '$HOME/Downloads',
+    scripts_dir = '$HOME/Downloads',
     -- `yt-dlp` options for downloading video.
-    download_command = 'yt-dlp --no-mtime --write-sub -o "%(title)s.%(ext)s"',
+    download_command = 'yt-dlp --no-mtime --write-sub -o "$HOME/Downloads/%(title)s.%(ext)s"',
     -- If `ffmpeg` is installed, adds the options below to download commands.
     -- `--embed-chapters` for chapter markers.
     ffmpeg_options = '--embed-chapters',
     -- `yt-dlp` options for downloading audio.
     -- `ba` for 'best audio'.
-    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime -o "%(title)s.%(ext)s"',
+    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime -o "$HOME/Downloads/%(title)s.%(ext)s"',
     ffmpeg_audio_options = '--embed-chapters',
     -- `yt-dlp` options for alternative downloading.
-    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub -o "%(title)s.%(ext)s"',
+    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub -o "$HOME/Downloads/%(title)s.%(ext)s"',
     ffmpeg_alternative_options = '--embed-chapters',
     linux_download = 'gnome-terminal -e "bash \'$SCRIPT\'"',
     windows_download = 'start cmd /c "$SCRIPT"',
@@ -100,7 +100,7 @@ PAUSE >NUL & DEL %0 & EXIT 1
 
 :DOWNLOAD_DIR
 
-ECHO Press ENTER to download __COUNT file(s) to "__DIRNAME".
+ECHO Press ENTER to download __COUNT file(s).
 PAUSE >NUL
 
 %DLCMD% %FFMPEG_OPTS% -a %URLS_PATH%
@@ -132,7 +132,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-read -p 'Press ENTER to download __COUNT file(s) to "__DIRNAME".'
+read -p 'Press ENTER to download __COUNT file(s).'
 
 if [ $FFMPEG_INST -eq 0 ]; then
     __DLCMD __FFMPEG_OPTS -a "__URLS_PATH"
@@ -160,15 +160,16 @@ rm -- "$0" "__URLS_PATH"
 ]]
 end
 
-if o.download_dir == nil or o.download_dir == "" then
-    o.download_dir = mp.command_native({"expand-path", "~~/"})..
+local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
+
+if o.scripts_dir == nil or o.scripts_dir == "" then
+    o.scripts_dir = mp.command_native({"expand-path", "~~/"})..
                      (o.platform == 'windows' and "\\downloads" or "/downloads")
 else
-    local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
-    o.download_dir = o.download_dir:gsub('%$HOME', home_dir)
-    o.download_dir = mp.command_native({"expand-path", o.download_dir})
+    o.scripts_dir = o.scripts_dir:gsub('%$HOME', home_dir)
+    o.scripts_dir = mp.command_native({"expand-path", o.scripts_dir})
     if o.platform == 'windows' then
-        o.download_dir = o.download_dir:gsub('/', '\\')
+        o.scripts_dir = o.scripts_dir:gsub('/', '\\')
     end
 end
 
@@ -200,9 +201,9 @@ end
 
 function tmppath()
     if o.platform ~= 'windows' then
-        return o.download_dir..(os.tmpname():gsub('.*/', '/.wdl-'))
+        return o.scripts_dir..(os.tmpname():gsub('.*/', '/.wdl-'))
     else
-        return o.download_dir..(os.tmpname():gsub('.*\\', '\\.wdl-'))
+        return o.scripts_dir..(os.tmpname():gsub('.*\\', '\\.wdl-'))
     end
 end
 
@@ -272,9 +273,10 @@ function get_download_script(current, dlmode, tmpname)
     return 0, script
         :gsub('__DLCMD', (dlcmd:gsub("%%", "%%%%")))
         :gsub('__FFMPEG_OPTS', (ffmpeg_options:gsub("%%", "%%%%")))
-        :gsub('__DIRNAME', (o.download_dir:gsub("%%", "%%%%")))
+        :gsub('__DIRNAME', (o.scripts_dir:gsub("%%", "%%%%")))
         :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
         :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
+        :gsub('%$HOME', (home_dir:gsub("%%", "%%%%")))
 end
 
 -- Quotes string for powershell path including "'"
@@ -349,9 +351,9 @@ local is_first = true
 function download(current, dlmode)
     if is_first then
         is_first = false
-        if create_dir(o.download_dir) == false then
+        if create_dir(o.scripts_dir) == false then
             osd_error(
-                'Failed to create download directory "'..o.download_dir..'"'
+                'Failed to create download directory "'..o.scripts_dir..'"'
                 )
             return
         end
@@ -376,7 +378,7 @@ function download(current, dlmode)
     local path = make_download_script(content, tmpname)
     if not path then
         mp.osd_message(
-            'Failed to create download script in "'..o.download_dir..'".'
+            'Failed to create download script in "'..o.scripts_dir..'".'
             )
         return
     end
