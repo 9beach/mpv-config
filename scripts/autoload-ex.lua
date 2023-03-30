@@ -457,7 +457,6 @@ function autoload_ex(on_start_file, command, sort_id, startover)
 
     -- Finds the current track in `sorted` and removes it.
     for i = 1, #sorted do
-        msg.info(sorted[i])
         if sorted[i] == filename then
             current = i
             table.remove(sorted, current)
