@@ -83,6 +83,13 @@ end
 
 options.read_options(o, "autoload-ex")
 
+function pipe_read(cmd)
+    local f = io.popen(cmd, 'r')
+    local s = f:read('*a')
+    f:close()
+    return s
+end
+
 function make_set(t)
     local set = {}
     for _, v in pairs(t) do set[v] = true end
@@ -455,9 +462,17 @@ function autoload_ex(on_start_file, command, sort_id, startover)
         return
     end
 
+    local altname
+
+    if o.platform == 'darwin' then
+        altname = pipe_read(
+            "printf '%s' '"..filename.."' | iconv -f UTF-8-MAC -t UTF-8"
+            )
+    end
+
     -- Finds the current track in `sorted` and removes it.
     for i = 1, #sorted do
-        if sorted[i] == filename then
+        if sorted[i] == filename or (altname and altname == sorted[i]) then
             current = i
             table.remove(sorted, current)
             break
