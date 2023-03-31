@@ -87,6 +87,7 @@ options.read_options(o, "autoload-ex")
 function pipe_read(cmd)
     local f = io.popen(cmd, 'r')
     local s = f:read('*a')
+    if s == '' or s == nil then msg.error(cmd) else msg.info(s) end
     f:close()
     return s
 end
@@ -472,11 +473,13 @@ function autoload_ex(on_start_file, command, sort_id, startover)
     local altname
 
     if o.platform == 'darwin' then
+        -- Converts UTF-8 NFD filenames to UTF-8 NFC.
         -- `readdir` returns real filenames, but `Finder.app` passes
-        -- UTF-8-MAC encoded filename. We don't know that's real. So we need 
-        -- another UTF-8 encoded name for that to compare.
+        -- normalized filenames. We don't know those're originally normalized.
         altname = pipe_read(
-            "printf '%s' '"..filename.."' | iconv -f UTF-8-MAC -t UTF-8"
+            "perl -E 'use Encode qw/encode decode/; use Unicode::Normalize "..
+            "qw/compose/; print encode(\"utf8\", compose(decode(\"utf8\",\""..
+            filename.."\")));'"
             )
     end
 
