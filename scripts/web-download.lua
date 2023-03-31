@@ -31,6 +31,9 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
+    -- Converts `yt_dlp` option, `%(title)s` to `%(title)#U` in macOS.
+    -- **Finder.app** can't open NFC files with Korean letters very often.
+    nfd_for_mac_yt_dlp = true,
     -- `yt-dlp` options for downloading video. `~/` for home directory.
     download_command = 'yt-dlp --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
     -- If `ffmpeg` is installed, adds the options below to download commands.
@@ -226,6 +229,8 @@ end
 
 -- Replaces `__*` from `script`.
 function get_download_script(dlmode, count, urlspath)
+    local dlcmd
+
     if (dlmode == 'video') then
         dlcmd = o.download_command
     elseif (dlmode == 'audio') then
@@ -255,13 +260,18 @@ function get_download_script(dlmode, count, urlspath)
     end
 
     -- No plain string replacement functioin, poor Lua!
-    return script
+    local this_script = script
         :gsub('__DLCMD', (dlcmd:gsub("%%", "%%%%")))
         :gsub('__FFMPEG_OPTS', (ffmpeg_options:gsub("%%", "%%%%")))
         :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
         :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
         :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%"))) -- Risky!
         :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%"))) -- Risky!
+    if o.platform == 'darwin' and o.nfd_for_mac_yt_dlp then
+        return this_script:gsub('%%%(title%)s', '%%(title)#U')
+    else
+        return this_script
+    end
 end
 
 -- Quotes string for powershell path including "'"
@@ -287,6 +297,7 @@ function make_download_script(dlmode, count, urlspath)
 
     local file, err = io.open(path, "w")
     if not file then
+        msg.error('fail to open:', path)
         return nil
     end
 

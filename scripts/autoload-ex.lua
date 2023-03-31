@@ -475,20 +475,9 @@ function autoload_ex(on_start_file, command, sort_id, startover)
 
     local altname
 
-    if o.platform == 'darwin' then
-        -- Converts UTF-8 NFD filenames to UTF-8 NFC.
-        -- `readdir` returns real filenames, but `Finder.app` passes
-        -- normalized filenames. We don't know those're originally normalized.
-        altname = pipe_read(
-            "perl -E 'use Encode qw/encode decode/; use Unicode::Normalize "..
-            "qw/compose/; print encode(\"utf8\", compose(decode(\"utf8\",\""..
-            filename.."\")));'"
-            )
-    end
-
     -- Finds the current track in `sorted` and removes it.
     for i = 1, #sorted do
-        if sorted[i] == filename or (altname and altname == sorted[i]) then
+        if sorted[i] == filename then
             current = i
             table.remove(sorted, current)
             break
