@@ -31,8 +31,6 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
-    -- Temporary download scripts directory. `~/` for home directory.
-    scripts_dir = '~/Downloads',
     -- `yt-dlp` options for downloading video.
     download_command = 'yt-dlp --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
     -- If `ffmpeg` is installed, adds the options below to download commands.
@@ -72,7 +70,7 @@ end
 
 options.read_options(o, "web-download")
 
--- To be replaced __DLCMD, __URLS_PATH, __FFMPEG_OPTS, __DIRNAME, and __COUNT.
+-- To be replaced __DLCMD, __URLS_PATH, __FFMPEG_OPTS, and __COUNT.
 local script
 
 if o.platform == 'windows' then
@@ -87,16 +85,6 @@ WHERE ffmpeg >NUL 2>NUL
 IF %ERRORLEVEL% == 0 SET FFMPEG_OPTS=__FFMPEG_OPTS
 
 ECHO Download command: %DLCMD% %FFMPEG_OPTS%
-
-CD "__DIRNAME"
-IF %ERRORLEVEL% == 0 GOTO DOWNLOAD_DIR
-
-ECHO Failed to go to "__DIRNAME". Press ENTER to quit.
-DEL %URLS_PATH%
-
-PAUSE >NUL & DEL %0 & EXIT 1
-
-:DOWNLOAD_DIR
 
 ECHO Press ENTER to download __COUNT file(s).
 PAUSE >NUL
@@ -120,14 +108,6 @@ else
 cat <<EOF
 Download command: __DLCMD
 EOF
-fi
-
-cd "__DIRNAME"
-
-if [ $? -ne 0 ]; then
-    read -p 'Failed to go to "__DIRNAME". Press ENTER to quit.'
-    rm -- "$0" "__URLS_PATH"
-    exit 1
 fi
 
 read -p 'Press ENTER to download __COUNT file(s).'
@@ -158,12 +138,6 @@ rm -- "$0" "__URLS_PATH"
 ]]
 end
 
-if o.scripts_dir == nil or o.scripts_dir == "" then
-    o.scripts_dir = mp.command_native({"expand-path", "~/Downloads"})
-else
-    o.scripts_dir = mp.command_native({"expand-path", o.scripts_dir})
-end
-
 function osd_error(text)
     msg.error(text)
     mp.osd_message(text)
@@ -191,25 +165,27 @@ function is_url(path)
 end
 
 function tmppath()
-    if o.platform ~= 'windows' then
-        return o.scripts_dir..(os.tmpname():gsub('.*/', '/.wdl-'))
+    if o.platform == 'windows' then
+        return os.getenv('temp')..(os.tmpname():gsub('.*\\', '\\.wdl-'))
     else
-        return o.scripts_dir..(os.tmpname():gsub('.*\\', '\\.wdl-'))
+        return os.tmpname()
     end
 end
 
 local home_dir = mp.command_native({"expand-path", "~/"})..'/'
 local mpv_dir = mp.command_native({"expand-path", "~~/"})..'/'
 
--- Returns `return_code` and `script`.
---
+-- Returns `return_code`, `count`, and `urlspath`.
 -- 0: Success.
 -- 1: No URLs.
 -- 2: Failed to create URLs file.
 -- 3: Nothing loaded.
-function get_download_script(current, dlmode, tmpname)
+function make_urlsfile(current)
     local playlist = mp.get_property_native('playlist')
-    if #playlist == 0 then return 3 end
+    if #playlist == 0 then
+        mp.osd_message('Nothing loaded in the playlist.')
+        return 3
+    end
 
     local urls = ''
 
@@ -225,15 +201,29 @@ function get_download_script(current, dlmode, tmpname)
         end
     end
 
-    if count == 0 then return 1 end
+    if count == 0 then
+        if current then
+            mp.osd_message("Current track is not from internet.")
+        else
+            mp.osd_message("No URLs in the playlist.")
+        end
+        return 1
+    end
 
-    local urlspath = tmpname..'.urls'
+    local urlspath = tmppath()
     local file, err = io.open(urlspath, "w")
-    if not file then return 2 end
+    if not file then
+        mp.osd_message('Failed to create temporary file: '..urlspath)
+        return 2
+    end
     file:write(urls)
     file:close()
 
-    -- Replaces `__*`.
+    return 0, count, urlspath
+end
+
+-- Replaces `__*` from `script`.
+function get_download_script(dlmode, count, urlspath)
     local dlcmd
     if (dlmode == 'video') then
         dlcmd = o.download_command
@@ -264,14 +254,13 @@ function get_download_script(current, dlmode, tmpname)
     end
 
     -- No plain string replacement functioin, poor Lua!
-    return 0, script
+    return script
         :gsub('__DLCMD', (dlcmd:gsub("%%", "%%%%")))
         :gsub('__FFMPEG_OPTS', (ffmpeg_options:gsub("%%", "%%%%")))
-        :gsub('__DIRNAME', (o.scripts_dir:gsub("%%", "%%%%")))
         :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
         :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
-        :gsub('([, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%"))) -- Risky!
-        :gsub('([, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%"))) -- Risky!
+        :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%"))) -- Risky!
+        :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%"))) -- Risky!
 end
 
 -- Quotes string for powershell path including "'"
@@ -291,8 +280,9 @@ function ps_iconv_to_oem(in_utf8_filepath, out_oem_filepath)
     return utils.subprocess({args=args, cancellable=false})
 end
 
-function make_download_script(content, tmpname)
-    local path = o.platform ~= 'windows' and tmpname..'.sh' or tmpname
+function make_download_script(count, urlspath)
+    local content = get_download_script(dlmode, count, urlspath)
+    local path = o.platform ~= 'windows' and urlspath..'.sh' or urlspath..'.'
 
     local file, err = io.open(path, "w")
     if not file then
@@ -303,7 +293,7 @@ function make_download_script(content, tmpname)
     file:close()
 
     if o.platform == 'windows' then
-        local new_path = path..'.bat'
+        local new_path = path..'bat'
         ps_iconv_to_oem(path, new_path)
         os.remove(path)
         return new_path
@@ -312,7 +302,7 @@ function make_download_script(content, tmpname)
     end
 end
 
-function get_my_script_command(path)
+function get_start_download_script(path)
     if o.platform == 'windows' then
         return o.windows_download:gsub('$SCRIPT', path)
     elseif o.platform == 'darwin' then
@@ -322,73 +312,32 @@ function get_my_script_command(path)
     end
 end
 
-function create_dir(dir)
-    if utils.readdir(dir) == nil then
-        local args
-        if o.platform == 'windows' then
-            args = {
-                'powershell', '-NoProfile', '-Command', 'mkdir',
-                ps_quote_string(dir)
-            }
-        else
-            args = {'mkdir', dir}
-        end
-
-        local res = utils.subprocess({args=args, cancellable=false})
-        return res.status == 0
-    else
-        return true
-    end
-end
-
-local is_first = true
-
 function download(current, dlmode)
-    if is_first then
-        is_first = false
-        if create_dir(o.scripts_dir) == false then
-            osd_error(
-                'Failed to create download directory "'..o.scripts_dir..'"'
-                )
-            return
-        end
-    end
-
-    local tmpname = tmppath()
-    local ret, content = get_download_script(current, dlmode, tmpname)
-
-    if ret ~= 0 then
-        if ret == 2 then
-            mp.osd_message('Failed to create file: "'..tmpname..'".')
-        elseif ret == 3 then
-            mp.osd_message('Nothing loaded in the playlist.')
-        elseif current then
-            mp.osd_message("Current track is not from internet.")
-        else
-            mp.osd_message("No URLs in the playlist.")
-        end
+    local ret, count, urlspath = make_urlsfile(current)
+    if ret ~= 0 then return end
+    local path = make_download_script(count, urlspath)
+    if nil == path then
+        mp.osd_message('Failed to create download script.')
         return
     end
 
-    local path = make_download_script(content, tmpname)
-    if not path then
-        mp.osd_message(
-            'Failed to create download script in "'..o.scripts_dir..'".'
-            )
-        return
-    end
+    local start = get_start_download_script(path)
 
-    local command = get_my_script_command(path)
-
-    if command == nil or command == '' then
+    if start == '' then
         os.remove(path)
+        os.remove(urlspath)
         osd_error(
-            'Failed to read options: '
-            ..mpv_dir..'/script-opts/web-download.conf'
+            "Something's wrong: "..mpv_dir.."/script-opts/web-download.conf"
             )
     else
-        local ret = os.execute(command)
-        if not ret then msg.error('failed: '..command) end
+        local ret = os.execute(start)
+        if not ret then
+            os.remove(path)
+            os.remove(urlspath)
+            osd_error(
+                "Something's wrong: "..mpv_dir.."/script-opts/web-download.conf"
+                )
+        end
     end
 end
 
