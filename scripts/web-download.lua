@@ -282,7 +282,7 @@ function ps_iconv_to_oem(in_utf8_filepath, out_oem_filepath)
     return utils.subprocess({args=args, cancellable=false})
 end
 
-function make_download_script(count, urlspath)
+function make_download_script(dlmode, count, urlspath)
     local content = get_download_script(dlmode, count, urlspath)
     local path = o.platform ~= 'windows' and urlspath..'.sh' or urlspath..'-utf8file'
 
@@ -317,7 +317,7 @@ end
 function download(current, dlmode)
     local ret, count, urlspath = make_urlsfile(current)
     if ret ~= 0 then return end
-    local path = make_download_script(count, urlspath)
+    local path = make_download_script(dlmode, count, urlspath)
     if nil == path then
         mp.osd_message('Failed to create download script.')
         return
