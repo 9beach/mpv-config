@@ -297,7 +297,7 @@ function make_download_script(dlmode, count, urlspath)
 
     local file, err = io.open(path, "w")
     if not file then
-        msg.error('fail to open:', path)
+        msg.error('Failed to open:', path)
         return nil
     end
 

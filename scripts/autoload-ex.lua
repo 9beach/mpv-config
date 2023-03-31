@@ -484,6 +484,25 @@ function autoload_ex(on_start_file, command, sort_id, startover)
         end
     end
 
+    if current == nil and o.platform == 'darwin' then
+        -- Converts UTF-8 NFD filenames to UTF-8 NFC.
+        -- `readdir` returns real filenames, but `Finder.app` passes
+        -- NFD filenames to MPV. We don't know those're of NFD originally.
+        altname = pipe_read(
+            "perl -E 'use Encode qw/encode decode/; use Unicode::Normalize "..
+            "qw/compose/; print encode(\"utf8\", compose(decode(\"utf8\",\""..
+            filename.."\")));'"
+            )
+        if altname ~= nil and altname ~= '' then
+            for i = 1, #sorted do
+                if sorted[i] == altname then
+                    current = i
+                    table.remove(sorted, current)
+                    break
+                end
+            end
+        end
+    end
     if current == nil then
         msg.error("can't find current file in reloaded files:", filename)
         current = 1
