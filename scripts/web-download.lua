@@ -226,7 +226,6 @@ end
 
 -- Replaces `__*` from `script`.
 function get_download_script(dlmode, count, urlspath)
-    local dlcmd
     if (dlmode == 'video') then
         dlcmd = o.download_command
     elseif (dlmode == 'audio') then
