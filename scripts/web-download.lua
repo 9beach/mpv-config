@@ -284,7 +284,7 @@ end
 
 function make_download_script(count, urlspath)
     local content = get_download_script(dlmode, count, urlspath)
-    local path = o.platform ~= 'windows' and urlspath..'.sh' or urlspath..'.x'
+    local path = o.platform ~= 'windows' and urlspath..'.sh' or urlspath..'x'
 
     local file, err = io.open(path, "w")
     if not file then
