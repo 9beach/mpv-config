@@ -87,7 +87,10 @@ options.read_options(o, "autoload-ex")
 function pipe_read(cmd)
     local f = io.popen(cmd, 'r')
     local s = f:read('*a')
-    if s == '' or s == nil then msg.error(cmd) else msg.info(s) end
+    if s == '' or s == nil then
+        msg.error(cmd)
+        return nil
+    end
     f:close()
     return s
 end
