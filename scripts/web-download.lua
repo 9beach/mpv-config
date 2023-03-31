@@ -295,7 +295,7 @@ function make_download_script(count, urlspath)
     file:close()
 
     if o.platform == 'windows' then
-        local new_path = path..'.bat'
+        local new_path = urlspath..'.bat'
         ps_iconv_to_oem(path, new_path)
         os.remove(path)
         return new_path
