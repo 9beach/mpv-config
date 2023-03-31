@@ -168,7 +168,7 @@ end
 
 function tmppath()
     if o.platform == 'windows' then
-        return os.getenv('temp')..(os.tmpname():gsub('.*\\', '\\wdl-'))
+        return os.getenv('temp')..(os.tmpname():gsub('.*\\(.*)', '\\webdl-%1o'))
     else
         return os.tmpname()
     end
