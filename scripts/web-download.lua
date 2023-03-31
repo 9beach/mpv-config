@@ -1,10 +1,8 @@
 --[[
 https://github.com/9beach/mpv-config/blob/main/scripts/web-download.lua
 
-With this script, you can download media files of **mpv** playlist from web
-sites including YouTube, Twitter, Twitch.tv, Naver, Kakao...
-
-You can edit key bindings below in `script-opts/web-download.conf`:
+You can download media URLs of **mpv** playlist from web sites including 
+YouTube, Twitter, Twitch.tv, Naver, Kakao, ... with this script:
 
 - Downloads currently playing media. (`Ctrl+d, Alt+d, Meta+d`)
 - Downloads all media of **mpv** playlist. (`Ctrl+D, Alt+D, Meta+D`)
@@ -16,7 +14,8 @@ You can edit key bindings below in `script-opts/web-download.conf`:
 - Downloads all media of **mpv** playlist with alternative option.
   (`Ctrl+Y, Alt+Y, Meta+Y`)
 
-Please notice that:
+You can edit key bindings above in `script-opts/web-download.conf`. Please 
+notice that:
 
 1. To play and download media from URLs with **mpv**, you need to install
    [yt-dlp](https://github.com/yt-dlp/yt-dlp/releases). For _Microsoft 
@@ -32,20 +31,19 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
-    -- Temporary download scripts directory.
-    -- Supports `$HOME` also for Microsoft Windows.
-    scripts_dir = '$HOME/Downloads',
+    -- Temporary download scripts directory. `~/` for home directory.
+    scripts_dir = '~/Downloads',
     -- `yt-dlp` options for downloading video.
-    download_command = 'yt-dlp --no-mtime --write-sub -o "$HOME/Downloads/%(title)s.%(ext)s"',
+    download_command = 'yt-dlp --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
     -- If `ffmpeg` is installed, adds the options below to download commands.
     -- `--embed-chapters` for chapter markers.
     ffmpeg_options = '--embed-chapters',
     -- `yt-dlp` options for downloading audio.
     -- `ba` for 'best audio'.
-    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime -o "$HOME/Downloads/%(title)s.%(ext)s"',
+    download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime -o "~/Downloads/%(title)s.%(ext)s"',
     ffmpeg_audio_options = '--embed-chapters',
     -- `yt-dlp` options for alternative downloading.
-    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub -o "$HOME/Downloads/%(title)s.%(ext)s"',
+    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
     ffmpeg_alternative_options = '--embed-chapters',
     linux_download = 'gnome-terminal -e "bash \'$SCRIPT\'"',
     windows_download = 'start cmd /c "$SCRIPT"',
@@ -160,17 +158,10 @@ rm -- "$0" "__URLS_PATH"
 ]]
 end
 
-local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
-
 if o.scripts_dir == nil or o.scripts_dir == "" then
-    o.scripts_dir = mp.command_native({"expand-path", "~~/"})..
-                     (o.platform == 'windows' and "\\downloads" or "/downloads")
+    o.scripts_dir = mp.command_native({"expand-path", "~/Downloads"})
 else
-    o.scripts_dir = o.scripts_dir:gsub('%$HOME', home_dir)
     o.scripts_dir = mp.command_native({"expand-path", o.scripts_dir})
-    if o.platform == 'windows' then
-        o.scripts_dir = o.scripts_dir:gsub('/', '\\')
-    end
 end
 
 function osd_error(text)
@@ -206,6 +197,9 @@ function tmppath()
         return o.scripts_dir..(os.tmpname():gsub('.*\\', '\\.wdl-'))
     end
 end
+
+local home_dir = mp.command_native({"expand-path", "~/"})..'/'
+local mpv_dir = mp.command_native({"expand-path", "~~/"})..'/'
 
 -- Returns `return_code` and `script`.
 --
@@ -276,7 +270,8 @@ function get_download_script(current, dlmode, tmpname)
         :gsub('__DIRNAME', (o.scripts_dir:gsub("%%", "%%%%")))
         :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
         :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
-        :gsub('%$HOME', (home_dir:gsub("%%", "%%%%")))
+        :gsub('~~/', (mpv_dir:gsub("%%", "%%%%")))
+        :gsub('~/', (home_dir:gsub("%%", "%%%%")))
 end
 
 -- Quotes string for powershell path including "'"
@@ -388,9 +383,8 @@ function download(current, dlmode)
     if command == nil or command == '' then
         os.remove(path)
         osd_error(
-            'Failed to read download command from "'
-            ..mp.command_native({"expand-path", "~~/"})
-            ..'/script-opts/web-download.conf".'
+            'Failed to read options: '
+            ..mpv_dir..'/script-opts/web-download.conf'
             )
     else
         local ret = os.execute(command)

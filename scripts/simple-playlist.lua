@@ -37,8 +37,8 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
-    -- `~~desktop/` is `$HOME/Desktop`, `~~/' is mpv configuration directory.
-    -- Supports `$HOME` also for Microsoft Windows.
+    -- `~~desktop/`, the path to the desktop (win32, macOS).
+    -- `~/`, home directory.
     playlist_dir = '~~desktop/',
 }
 
@@ -53,14 +53,9 @@ end
 options.read_options(o, "simple-playlist")
 
 if o.playlist_dir == nil or o.playlist_dir == "" then
-    o.playlist_dir = mp.command_native({"expand-path", "~~/"}).."/playlists"
+    o.playlist_dir = mp.command_native({"expand-path", "~~/playlists"})
 else
-    local home_dir = os.getenv("HOME") or os.getenv("USERPROFILE")
-    o.playlist_dir = o.playlist_dir:gsub('%$HOME', home_dir)
     o.playlist_dir = mp.command_native({"expand-path", o.playlist_dir})
-    if o.platform == 'windows' then
-        o.playlist_dir =  o.playlist_dir:gsub('/', '\\')
-    end
 end
 
 math.randomseed(os.time())
