@@ -97,7 +97,7 @@ IF %ERRORLEVEL% == 0 (ECHO Successfully completed! Press ENTER to quit.) ELSE (E
 PAUSE >NUL & DEL %0 & EXIT
 ]]
     local exe_dir = mp.command_native({"expand-path", "~~exe_dir/"})
-    script:gsub('__EXE_DIR', (exe_dir:gsub("%%", "%%%%")))
+    script = script:gsub('__EXE_DIR', (exe_dir:gsub("%%", "%%%%")))
 else
     script = [[
 type ffmpeg > /dev/null 2>&1
