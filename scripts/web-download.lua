@@ -270,8 +270,8 @@ function get_download_script(current, dlmode, tmpname)
         :gsub('__DIRNAME', (o.scripts_dir:gsub("%%", "%%%%")))
         :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
         :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
-        :gsub('~~/', (mpv_dir:gsub("%%", "%%%%")))
-        :gsub('~/', (home_dir:gsub("%%", "%%%%")))
+        :gsub('([, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%"))) -- Risky!
+        :gsub('([, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%"))) -- Risky!
 end
 
 -- Quotes string for powershell path including "'"
