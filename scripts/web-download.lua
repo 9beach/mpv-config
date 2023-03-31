@@ -168,7 +168,7 @@ end
 
 function tmppath()
     if o.platform == 'windows' then
-        return os.getenv('temp')..(os.tmpname():gsub('.*\\', '\\.wdl-'))
+        return os.getenv('temp')..(os.tmpname():gsub('.*\\', '\\wdl-'))
     else
         return os.tmpname()
     end
@@ -295,7 +295,7 @@ function make_download_script(count, urlspath)
     file:close()
 
     if o.platform == 'windows' then
-        local new_path = urlspath..'.bat'
+        local new_path = urlspath..'-oem-encoded.bat'
         ps_iconv_to_oem(path, new_path)
         os.remove(path)
         return new_path
