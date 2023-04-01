@@ -185,7 +185,7 @@ local mpv_dir = mp.command_native({"expand-path", "~~/"})..'/'
 -- 1: No URLs.
 -- 2: Failed to create URLs file.
 -- 3: Nothing loaded.
-function make_urlsfile(current)
+function create_urlsfile(current)
     local playlist = mp.get_property_native('playlist')
     if #playlist == 0 then
         mp.osd_message('Nothing loaded in the playlist.')
@@ -299,7 +299,7 @@ function ps_iconv_to_oem(in_utf8_filepath, out_oem_filepath)
     return utils.subprocess({args=args, cancellable=false})
 end
 
-function make_download_script(dlmode, count, urlspath)
+function create_download_script(dlmode, count, urlspath)
     local content = get_download_script(dlmode, count, urlspath)
     local path = o.platform ~= 'windows' and urlspath..'.sh' or urlspath..'-utf8file'
 
@@ -322,7 +322,7 @@ function make_download_script(dlmode, count, urlspath)
     end
 end
 
-function get_start_download_script(path)
+function get_terminal_open_command(path)
     if o.platform == 'windows' then
         return o.windows_download:gsub('$SCRIPT', path)
     elseif o.platform == 'darwin' then
@@ -333,26 +333,26 @@ function get_start_download_script(path)
 end
 
 function download(current, dlmode)
-    local ret, count, urlspath = make_urlsfile(current)
+    local ret, count, urlspath = create_urlsfile(current)
     if ret ~= 0 then return end
-    local path = make_download_script(dlmode, count, urlspath)
-    if nil == path then
+    local script_path = create_download_script(dlmode, count, urlspath)
+    if nil == script_path then
         mp.osd_message('Failed to create download script.')
         return
     end
 
-    local start = get_start_download_script(path)
+    local open_term = get_terminal_open_command(script_path)
 
-    if start == '' then
-        os.remove(path)
+    if open_term == '' then
+        os.remove(script_path)
         os.remove(urlspath)
         osd_error(
             "Something's wrong: "..mpv_dir.."/script-opts/web-download.conf"
             )
     else
-        local ret = os.execute(start)
+        local ret = os.execute(open_term)
         if not ret then
-            os.remove(path)
+            os.remove(script_path)
             os.remove(urlspath)
             osd_error(
                 "Something's wrong: "..mpv_dir.."/script-opts/web-download.conf"
