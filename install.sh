@@ -70,9 +70,10 @@ cp -R fonts script-opts scripts input.conf "$MPV_CONF_PATH"
 # By setting `ytdl=no` and copying `osx-scripts/ytdl_hook.lua` to
 # `scripts`, applies patched `ytdl_hook.lua` over **mpv** internal version
 # before patched OSX **mpv** releases.
-if [ `uname` = "Darwin" ]; then
+if [ "$PLATFORM" = "darwin" ]; then
 	cp -R osx-scripts/ytdl_hook.lua "$MPV_CONF_PATH/scripts"
 fi
+
 cat mpv.conf | my_filter > "$MPV_CONF_PATH"/mpv.conf
 mv "$BACKUP_DIR/watch_later" "$MPV_CONF_PATH" 2> /dev/null
 echo "new mpv config to \"$MPV_CONF_PATH\""
