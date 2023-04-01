@@ -238,13 +238,17 @@ function get_download_script(dlmode, count, urlspath)
     else
         dlcmd = o.download_alternative_command
     end
+
     if o.platform == 'windows' then
         -- `%` is special character in `.bat`
         dlcmd = dlcmd:gsub('%%', '%%%%')
+    elseif o.platform == 'darwin' and o.nfd_for_mac_yt_dlp then
+        dlcmd = dlcmd:gsub('%%%(title%)s', '%%(title)#U')
     end
 
-    local count_and_type =
-        'audio' == dlmode and tostring(count)..' audio' or tostring(count)
+    dlcmd = dlcmd
+        :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%")))
+        :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%")))
 
     local ffmpeg_options
     if (dlmode == 'video') then
@@ -254,24 +258,23 @@ function get_download_script(dlmode, count, urlspath)
     else
         ffmpeg_options = o.ffmpeg_alternative_options
     end
+
+    local count_and_type =
+        'audio' == dlmode and tostring(count)..' audio' or tostring(count)
+
     if o.platform == 'windows' then
         -- `%` is special character in `.bat`
         ffmpeg_options = ffmpeg_options:gsub('%%', '%%%%')
+            :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%")))
+            :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%")))
     end
 
     -- No plain string replacement functioin, poor Lua!
-    local this_script = script
+    return script
         :gsub('__DLCMD', (dlcmd:gsub("%%", "%%%%")))
         :gsub('__FFMPEG_OPTS', (ffmpeg_options:gsub("%%", "%%%%")))
         :gsub('__COUNT', (count_and_type:gsub("%%", "%%%%")))
         :gsub('__URLS_PATH', (urlspath:gsub("%%", "%%%%")))
-        :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%"))) -- Risky!
-        :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%"))) -- Risky!
-    if o.platform == 'darwin' and o.nfd_for_mac_yt_dlp then
-        return this_script:gsub('%%%(title%)s', '%%(title)#U')
-    else
-        return this_script
-    end
 end
 
 -- Quotes string for powershell path including "'"
