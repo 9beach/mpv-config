@@ -35,7 +35,7 @@ local o = {
     -- **Finder.app** fails to open NFC Korean files very often.
     nfd_for_mac_yt_dlp = true,
     -- `yt-dlp` options for downloading video. `~/` for home directory.
-    download_command = 'yt-dlp --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
+    download_command = 'yt-dlp --no-mtime -o "~/Downloads/%(title)s.%(ext)s"',
     -- If `ffmpeg` is installed, adds the options below to download commands.
     -- `--embed-chapters` for chapter markers.
     ffmpeg_options = '--embed-chapters',
@@ -44,7 +44,7 @@ local o = {
     download_audio_command = 'yt-dlp -f ba -S ext:m4a --no-mtime -o "~/Downloads/%(title)s.%(ext)s"',
     ffmpeg_audio_options = '--embed-chapters',
     -- `yt-dlp` options for alternative downloading.
-    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
+    download_alternative_command = 'yt-dlp -S ext:mp4 --no-mtime -o "~/Downloads/%(title)s.%(ext)s"',
     ffmpeg_alternative_options = '--embed-chapters',
     linux_download = 'gnome-terminal -e "bash \'$SCRIPT\'"',
     windows_download = 'start cmd /c "$SCRIPT"',
