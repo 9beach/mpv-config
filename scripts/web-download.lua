@@ -31,8 +31,8 @@ local utils = require 'mp.utils'
 local msg = require 'mp.msg'
 
 local o = {
-    -- Converts `yt_dlp` option, `%(title)s` to `%(title)#U` in macOS.
-    -- **Finder.app** can't open NFC files with Korean letters very often.
+    -- Converts the `yt_dlp` option, `%(title)s` to `%(title)#U` in macOS.
+    -- **Finder.app** fails to open NFC Korean files very often.
     nfd_for_mac_yt_dlp = true,
     -- `yt-dlp` options for downloading video. `~/` for home directory.
     download_command = 'yt-dlp --no-mtime --write-sub -o "~/Downloads/%(title)s.%(ext)s"',
