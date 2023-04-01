@@ -2,11 +2,36 @@
 
 cd "$(dirname "$0")"
 
+case "$(uname -sr)" in
+
+  Darwin*)
+    PLATFORM='darwin'
+    ;;
+
+  Linux*Microsoft*)
+    PLATFORM='wsl'
+    ;;
+
+  Linux*)
+    PLATFORM='linux'
+    ;;
+
+  CYGWIN*|MINGW*|MINGW32*|MSYS*)
+    PLATFORM='windows'
+    ;;
+
+esac
+
 # If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
-if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
-	WINHOME=`wslpath -a "$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"`
+if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
+
+	if [ "$PLATFORM" = "wsl" ]; then
+		MY_HOME=`wslpath -a "$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"`
+	else
+		MY_HOME=$HOME
+	fi
 	if [ "$MPV_CONF_PATH" = "" ]; then
-		MPV_CONF_PATH="$WINHOME"/AppData/Roaming/mpv
+		MPV_CONF_PATH="$MY_HOME/AppData/Roaming/mpv"
 	fi
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {

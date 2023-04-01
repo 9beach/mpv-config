@@ -239,6 +239,10 @@ function get_download_script(dlmode, count, urlspath)
         dlcmd = o.download_alternative_command
     end
 
+    dlcmd = dlcmd
+        :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%")))
+        :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%")))
+
     if o.platform == 'windows' then
         -- `%` is special character in `.bat`
         dlcmd = dlcmd:gsub('%%', '%%%%')
@@ -246,11 +250,8 @@ function get_download_script(dlmode, count, urlspath)
         dlcmd = dlcmd:gsub('%%%(title%)s', '%%(title)#U')
     end
 
-    dlcmd = dlcmd
-        :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%")))
-        :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%")))
-
     local ffmpeg_options
+
     if (dlmode == 'video') then
         ffmpeg_options = o.ffmpeg_options
     elseif (dlmode == 'audio') then
@@ -259,15 +260,19 @@ function get_download_script(dlmode, count, urlspath)
         ffmpeg_options = o.ffmpeg_alternative_options
     end
 
-    local count_and_type =
-        'audio' == dlmode and tostring(count)..' audio' or tostring(count)
+    ffmpeg_options = ffmpeg_options
+            :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%")))
+            :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%")))
 
     if o.platform == 'windows' then
         -- `%` is special character in `.bat`
         ffmpeg_options = ffmpeg_options:gsub('%%', '%%%%')
-            :gsub('([:;, ="\'])(~~/)', '%1'..(mpv_dir:gsub("%%", "%%%%")))
-            :gsub('([:;, ="\'])(~/)', '%1'..(home_dir:gsub("%%", "%%%%")))
+    elseif o.platform == 'darwin' and o.nfd_for_mac_yt_dlp then
+        ffmpeg_options = ffmpeg_options:gsub('%%%(title%)s', '%%(title)#U')
     end
+
+    local count_and_type =
+        'audio' == dlmode and tostring(count)..' audio' or tostring(count)
 
     -- No plain string replacement functioin, poor Lua!
     return script
