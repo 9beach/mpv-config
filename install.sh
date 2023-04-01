@@ -4,27 +4,26 @@ cd "$(dirname "$0")"
 
 case "$(uname -sr)" in
 
-  Darwin*)
-    PLATFORM='darwin'
-    ;;
+	Darwin*)
+		PLATFORM='darwin'
+		;;
 
-  Linux*Microsoft*)
-    PLATFORM='wsl'
-    ;;
+	Linux*icrosoft*)
+		PLATFORM='wsl'
+		;;
 
-  Linux*)
-    PLATFORM='linux'
-    ;;
+	Linux*)
+		PLATFORM='linux'
+		;;
 
-  CYGWIN*|MINGW*|MINGW32*|MSYS*)
-    PLATFORM='windows'
-    ;;
+	CYGWIN*|MINGW*|MINGW32*|MSYS*)
+		PLATFORM='windows'
+		;;
 
-esac
+	esac
 
 # If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
 if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
-
 	if [ "$PLATFORM" = "wsl" ]; then
 		MY_HOME=`wslpath -a "$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"`
 	else
@@ -33,6 +32,7 @@ if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
 	if [ "$MPV_CONF_PATH" = "" ]; then
 		MPV_CONF_PATH="$MY_HOME/AppData/Roaming/mpv"
 	fi
+	echo $MPV_CONF_PATH
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {
 			grep -v "^# *osx *:" | sed -e "s/^# *nvidia *://"
@@ -42,7 +42,7 @@ if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
 			grep -v '^# *osx *:' | grep -v '^# *nvidia *:'
 		}
 	fi
-elif [ `uname` = "Darwin" ]; then
+elif [ "$PLATFORM" = "darwin" ]; then
 	if [ "$MPV_CONF_PATH" = "" ]; then
 		MPV_CONF_PATH="$HOME/.config/mpv"
 	fi
