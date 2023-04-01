@@ -3,24 +3,19 @@
 cd "$(dirname "$0")"
 
 case "$(uname -sr)" in
-
 	Darwin*)
 		PLATFORM='darwin'
 		;;
-
 	Linux*icrosoft*)
 		PLATFORM='wsl'
 		;;
-
 	Linux*)
 		PLATFORM='linux'
 		;;
-
 	CYGWIN*|MINGW*|MINGW32*|MSYS*)
 		PLATFORM='windows'
 		;;
-
-	esac
+esac
 
 # If your machine has NVIDIA GPU installed, run `./install.sh nvidia`.
 if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
