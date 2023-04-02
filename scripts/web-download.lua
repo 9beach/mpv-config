@@ -341,23 +341,15 @@ function download(current, dlmode)
         return
     end
 
-    local open_term = get_terminal_open_command(script_path)
+    local open_terminal = get_terminal_open_command(script_path)
 
-    if open_term == '' then
+    if open_terminal == '' or not os.execute(open_terminal) then
         os.remove(script_path)
         os.remove(urlspath)
         osd_error(
             "Something's wrong: "..mpv_dir.."/script-opts/web-download.conf"
             )
-    else
-        local ret = os.execute(open_term)
-        if not ret then
-            os.remove(script_path)
-            os.remove(urlspath)
-            osd_error(
-                "Something's wrong: "..mpv_dir.."/script-opts/web-download.conf"
-                )
-        end
+        return
     end
 end
 
