@@ -27,7 +27,6 @@ if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
 	if [ "$MPV_CONF_PATH" = "" ]; then
 		MPV_CONF_PATH="$MY_HOME/AppData/Roaming/mpv"
 	fi
-	echo $MPV_CONF_PATH
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {
 			grep -v "^# *osx *:" | sed -e "s/^# *nvidia *://"
@@ -50,7 +49,7 @@ else
 	fi
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {
-			grep -v '^# *osx *:' | sed -e 's/^# *nvidia *://'
+			grep -v "^#osx:" | grep -v vulkan | sed -e "s/^#nvidia://" -e "s/vo=gpu-next/vo=gpu/"
 		}
 	else
 		my_filter() {
