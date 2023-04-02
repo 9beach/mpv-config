@@ -386,7 +386,7 @@ end
 
 -- commands: sort, shuffle, and remove-others.
 function autoload_ex(on_start_file, command, sort_id, startover)
-    msg.info('called:', on_start_file, command, sort_id, startover)
+    msg.verbose('called:', on_start_file, command, sort_id, startover)
 
     local path = mp.get_property("path", "")
     if not is_local_file(path) then
@@ -402,12 +402,12 @@ function autoload_ex(on_start_file, command, sort_id, startover)
 
     local ext = get_extension(filename)
     if ext == nil or not media_extensions[string.lower(ext)] then
-        msg.info('stopping: no interesting file,', path)
+        msg.verbose('stopping: no interesting file,', path)
         return
     end
 
     if #dir == 0 then
-        msg.info("stopping: not a local path,", path)
+        msg.verbose("stopping: not a local path,", path)
         return
     end
 
@@ -420,7 +420,7 @@ function autoload_ex(on_start_file, command, sort_id, startover)
     end
 
     if on_start_file and count > 1 then
-        msg.info("stopping: already scanned, or manually made playlist")
+        msg.verbose("stopping: already scanned, or manually made playlist")
         return
     end
 
@@ -432,12 +432,12 @@ function autoload_ex(on_start_file, command, sort_id, startover)
 
     if o.disabled and on_start_file then
         if p_command ~= 'sort' and p_command ~= 'shuffle' then return end
-        msg.info('`disabled=yes`, but previously loaded, so scan dir')
+        msg.verbose('`disabled=yes`, but previously loaded, so scan dir')
     end
 
     if not o.disabled and on_start_file then
         if p_command == 'remove-others' then
-            msg.info('`remove-others` called previously, so does not scan dir')
+            msg.info('`remove-others` called previously, so does not scan')
             return
         end
     end
