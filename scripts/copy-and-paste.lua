@@ -38,9 +38,9 @@ local o = {
     -- Enables displaying osd messages when actions occur.
     osd_messages = true,
     -- Keybind for copy file path or URL of current track.
-    copy_current_track_keybind = 'Ctrl+c Alt+c Meta+c',
+    copy_current_track_keybind = 'Ctrl+c Alt+c Meta+c Ctrl+INS',
     -- Keybind for paste file paths or URLs in clipboard to playlist.
-    paste_to_playlist_keybind = 'Ctrl+Shift+v Alt+Shift+v Meta+Shift+v',
+    paste_to_playlist_keybind = 'Ctrl+Shift+v Alt+Shift+v Meta+Shift+v Shift+INS',
     -- Keybind for append file paths or URLs in clipboard to playlist.
     append_to_playlist_keybind = 'Ctrl+b Alt+b Meta+b',
     -- Keybind for append file paths or URLs in clipboard to current track.
