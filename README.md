@@ -161,6 +161,8 @@ Many parts in my code are from <https://github.com/jonniek/mpv-playlistmanager>.
 
 This script provides the functions below:
 
+- Always starts from the begining when `do_not_resume` is set even if mpv option
+  `save-position-on-quit` is set. (`Ctrl+*`)
 - Shows OSC always when an audio file (that is of known audio extensions or
   has no video) is loaded.
 - Plays even in paused state when a new file is loaded.

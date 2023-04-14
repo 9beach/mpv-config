@@ -3,6 +3,8 @@ https://github.com/9beach/mpv-config/blob/master/scripts/on-file-loaded.lua
 
 This script provides the functions below:
 
+- Always starts from the begining when `do_not_resume` is set even if mpv option 
+  `save-position-on-quit` is set. (`Ctrl+*`)
 - Shows OSC always when an audio file (that is of known audio extensions or 
   has no video) is loaded.
 - Plays even in paused state when a new file is loaded.
@@ -30,6 +32,12 @@ local msg = require 'mp.msg'
 local utils = require 'mp.utils'
 
 local o = {
+    -- Enables displaying osd messages when actions occur.
+    osd_messages = true,
+    -- Always starts from the begining when `do_not_resume` is set even if mpv 
+    -- option `save-position-on-quit` is set.
+    do_not_resume = false,
+    do_not_resume_toggle_keybind = 'Ctrl+*',
     -- Escapes from small rectable when a webm media has video even if 
     -- `mpv.conf` has settings below.
     --
@@ -54,6 +62,28 @@ if o.hide_sub_if_path_matches ~= nil and o.hide_sub_if_path_matches ~= '' then
     o.hide_sub_if_path_matches = utils.parse_json(o.hide_sub_if_path_matches)
 else
     o.hide_sub_if_path_matches = nil
+end
+
+function osd_info(text)
+    msg.info(text)
+    if o.osd_messages == true then mp.osd_message(text) end
+end
+
+function bind_keys(keys, name, func, opts)
+    if not keys or keys == '' then
+        mp.add_forced_key_binding(nil, name, func, opts)
+        return
+    end
+
+    local i = 0
+    for key in string.gmatch(keys, "[^%s]+") do
+        i = i + 1
+        if i == 1 then
+            mp.add_forced_key_binding(key, name, func, opts)
+        else
+            mp.add_forced_key_binding(key, name .. i, func, opts)
+        end
+    end
 end
 
 AUDIO_EXTENSIONS = {
@@ -121,6 +151,9 @@ function on_file_loaded()
     -- `watch_later` settings override `sub-visibility` obove. 
     if 0 ~= mp.get_property_number('time-pos') then
         msg.info('resumed file, sub-visibility check skipped.')
+        if o.do_not_resume == true then
+            mp.set_property_number('time-pos', 0)
+        end
         return
     end
 
@@ -153,5 +186,13 @@ function on_file_loaded()
 
     mp.set_property_bool("sub-visibility", sub_visible)
 end
+
+bind_keys(
+    o.do_not_resume_toggle_keybind,
+    'do-not-resume-toggle',
+    function()
+        o.do_not_resume = not o.do_not_resume
+        osd_info('Resume '..(o.do_not_resume and 'Off' or 'On'))
+    end)
 
 mp.register_event("file-loaded", on_file_loaded)
