@@ -29,11 +29,11 @@ if [ "$PLATFORM" = "windows" ] || [ "$PLATFORM" = "wsl" ]; then
 	fi
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {
-			grep -v "^# *osx *:" | sed -e "s/^# *nvidia *://"
+			grep -v "^#osx:" | grep -v '^#linux:' | sed -e "s/^#nvidia://"
 		}
 	else
 		my_filter() {
-			grep -v '^# *osx *:' | grep -v '^# *nvidia *:'
+			grep -v '^#osx:' | grep -v '^#nvidia:' | grep -v '^#linux:'
 		}
 	fi
 elif [ "$PLATFORM" = "darwin" ]; then
@@ -41,7 +41,7 @@ elif [ "$PLATFORM" = "darwin" ]; then
 		MPV_CONF_PATH="$HOME/.config/mpv"
 	fi
 	my_filter() {
-		grep -v '^# *nvidia *:' | sed -e 's/^# *osx *://'
+		grep -v '^#nvidia:' | grep -v '^#linux:' | sed -e 's/^#osx://'
 	}
 else
 	if [ "$MPV_CONF_PATH" = "" ]; then
@@ -49,11 +49,11 @@ else
 	fi
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {
-			grep -v "^#osx:" | grep -v vulkan | sed -e "s/^#nvidia://" -e "s/vo=gpu-next/vo=gpu/"
+			grep -v "^#osx:" | grep -v vulkan | sed -e "s/^#linux://" -e "s/^#nvidia://" -e "s/vo=gpu-next/vo=gpu/"
 		}
 	else
 		my_filter() {
-			grep -v '^# *osx *:' | grep -v '^# *nvidia *:'
+			grep -v '^#osx:' | grep -v '^#nvidia:'
 		}
 	fi
 fi
