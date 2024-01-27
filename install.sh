@@ -45,7 +45,11 @@ elif [ "$PLATFORM" = "darwin" ]; then
 	}
 else
 	if [ "$MPV_CONF_PATH" = "" ]; then
-		MPV_CONF_PATH="$HOME/.config/mpv"
+		if [ "$HOSTNAME" = "steamdeck" ]; then
+			MPV_CONF_PATH="$HOME/.var/app/io.mpv.Mpv/config/mpv"
+		else
+			MPV_CONF_PATH="$HOME/.config/mpv"
+		fi
 	fi
 	if [ "$1" = "nvidia" ]; then
 		my_filter() {
