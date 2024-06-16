@@ -351,6 +351,7 @@ function read_sorting_states(dir)
 end
 
 function write_sorting_states(dir, command, sort_id)
+    msg.info('write sorting states: ', dir, command, sort_id)
     local path = watch_later..sha256(dir)
     local f = io.open(path, "w+")
     if f then
@@ -409,6 +410,10 @@ function autoload_ex(on_start_file, command, sort_id, startover)
     if #dir == 0 then
         msg.verbose("stopping: not a local path,", path)
         return
+    end
+
+    if dir == '.' then
+        dir = os.getenv("PWD")..'/'
     end
 
     local playlist = mp.get_property_native('playlist')
